@@ -288,9 +288,22 @@ public class SriAprilTagDriver extends LinearOpMode {
                 x = range * sin(bearing)
                 y = (sin(90-x) * range) - targetDistance
             the robot follows the line to target distance
-             */
 
-            /*
+            loop with 3 sections: if yaw!=0, rotate; if bearing!=0, slide; if range!=target, drive
+            */
+            while (true) {
+                if (Math.abs(target.ftcPose.yaw) > 1) {
+                    // turn yaw
+                } else if (Math.abs(target.ftcPose.bearing) > 1) {
+                    // slide right if bearing>1, etc.
+                } else if (Math.abs(target.ftcPose.range) > 1) {
+                    // drive forward or backward
+                } else {
+                    break;
+                }
+            }
+
+/*
             if (rangeSensorError < 0) {
                 forwardDriveSpeed = Range.clip(rangeSensorError * speedGain, -maxSpeed, -0.1);
             } else if (rangeSensorError > 0) {
@@ -310,7 +323,9 @@ public class SriAprilTagDriver extends LinearOpMode {
                 moveRobot(backwards ? -forwardDriveSpeed : forwardDriveSpeed,
                         left ? lateralDriveSpeed : -lateralDriveSpeed, turnSpeed);
             }
-            */
+
+              */
+
 
             telemetry.update();
         }
