@@ -212,6 +212,13 @@ public class ConceptAprilTag extends LinearOpMode {
                 telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
                 telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));*/
                 telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.yaw));
+                double TX = 0;
+                double TY = 5;
+                double yawRad = Math.toRadians(detection.ftcPose.yaw);
+                double RX = detection.ftcPose.x + (Math.sin(yawRad) * TY + Math.cos(yawRad) * TX);
+                double RY = detection.ftcPose.y + (-Math.sin(yawRad) * TX - Math.cos(yawRad) * TY);
+                telemetry.addLine(String.format("(RX, RY) %6.1f %6.1f", RX, RY));
+                telemetry.addLine(String.format("(PX, PY)%6.1f %6.1f", detection.ftcPose.x, detection.ftcPose.y));
             } else {
                 telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
                 telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));

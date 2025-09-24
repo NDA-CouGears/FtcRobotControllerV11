@@ -106,9 +106,10 @@ public class SriAprilTagDriver extends LinearOpMode {
     protected DistanceSensor sensorBackDistance = null;
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
 
         initAprilTag();
+        initHardware();
 
         // Wait for the DS start button to be touched.
         telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
@@ -129,6 +130,9 @@ public class SriAprilTagDriver extends LinearOpMode {
                     visionPortal.stopStreaming();
                 } else if (gamepad1.dpad_up) {
                     visionPortal.resumeStreaming();
+                }
+                if (gamepad1.x) {
+                    driveToAprilTag(.2, 23, 10, 0, 0, 0.04);
                 }
 
                 // Share the CPU.
@@ -256,7 +260,7 @@ public class SriAprilTagDriver extends LinearOpMode {
 
             for (AprilTagDetection detection : currentDetections) {
                 if (detection.metadata != null) {
-                    if (detection.id == 20) {
+                    if (detection.id == tagID) {
                         target = detection;
                         break;
                     }
@@ -268,68 +272,37 @@ public class SriAprilTagDriver extends LinearOpMode {
             }   // end for() loop
 
             if (target == null) {
+                moveRobot(0, 0, 0);
                 return;
             }
 
-            double rangeTagError = target.ftcPose.range - targetForwardDistance;
+            double yawRad = Math.toRadians(target.ftcPose.yaw);
+            double errorX = target.ftcPose.x + (Math.sin(yawRad) * targetForwardDistance + Math.cos(yawRad) * targetLateralDistance);
+            double errorY = target.ftcPose.y + (-Math.sin(yawRad) * targetLateralDistance - Math.cos(yawRad) * targetForwardDistance);
+            //double rangeTagError = target.ftcPose.range - targetForwardDistance;
+
             // If we are close on all axes stop, we need to experiment to find good values
-            if (Math.abs(rangeTagError) < 1) {
+            if ((Math.abs(errorX) < 1) && (Math.abs(errorY) < 1) && (Math.abs(target.ftcPose.yaw) < 1)) {
                 break;
             }
 
             // Use the speed and turn "gains" to calculate how we want the robot to move. These are
             // more values with best guesses that need experimentation to find good values
-            double forwardDriveSpeed = 0;
-            double lateralDriveSpeed = 0;
-            double turnSpeed = target.ftcPose.yaw - heading; //getSteeringCorrection(heading, TURN_GAIN);
+            double forwardDriveSpeed = Math.min(errorY * speedGain, maxSpeed);
+            double lateralDriveSpeed = Math.min(errorX * speedGain, maxSpeed);
+            double turnSpeed = Math.min(target.ftcPose.yaw * TURN_GAIN, maxSpeed); //getSteeringCorrection(heading, TURN_GAIN);
+            telemetry.addLine(String.format("turn speed = %5.2f", turnSpeed));
+            telemetry.addLine(String.format("error x = %5.2f; drive speed = %5.2f", errorX, lateralDriveSpeed));
 
-            /*
-            optimal path to target distance from tag:
-                x = range * sin(bearing)
-                y = (sin(90-x) * range) - targetDistance
-            the robot follows the line to target distance
-
-            loop with 3 sections: if yaw!=0, rotate; if bearing!=0, slide; if range!=target, drive
-            */
-            while (true) {
-                if (Math.abs(target.ftcPose.yaw) > 1) {
-                    // turn yaw
-                } else if (Math.abs(target.ftcPose.bearing) > 1) {
-                    // slide right if bearing>1, etc.
-                } else if (Math.abs(target.ftcPose.range) > 1) {
-                    // drive forward or backward
-                } else {
-                    break;
-                }
-            }
-
-/*
-            if (rangeSensorError < 0) {
-                forwardDriveSpeed = Range.clip(rangeSensorError * speedGain, -maxSpeed, -0.1);
-            } else if (rangeSensorError > 0) {
-                forwardDriveSpeed = Range.clip(rangeSensorError * speedGain, 0.1, maxSpeed);
-            }
-            if (rangeErrorLateral < 0) {
-                lateralDriveSpeed = Range.clip(rangeErrorLateral * speedGain, -maxSpeed, -0.1);
-            } else if (rangeErrorLateral > 0) {
-                lateralDriveSpeed = Range.clip(rangeErrorLateral * speedGain, 0.1, maxSpeed);
-            }
-            telemetry.addData("Auto DTD", "Drive %5.2f Lateral %5.2f Turn %5.2f ", forwardDriveSpeed, lateralDriveSpeed, turnSpeed);
-
-            // For debugging let us pause motion to see telemetry
-            if (gamepad1.y) {
+            if (gamepad1.b) {
                 moveRobot(0, 0, 0);
             } else {
-                moveRobot(backwards ? -forwardDriveSpeed : forwardDriveSpeed,
-                        left ? lateralDriveSpeed : -lateralDriveSpeed, turnSpeed);
+                moveRobot(-forwardDriveSpeed, -lateralDriveSpeed, 0);
             }
 
-              */
-
-
+            telemetryAprilTag();
             telemetry.update();
         }
-//        } while (opModeIsActive() && localForwardSensor.getDistance(DistanceUnit.INCH) > targetForwardDistance && !gamepad1.y); // if we over shot loop again to back up a bit
 
         moveRobot(0, 0, 0);
     }
