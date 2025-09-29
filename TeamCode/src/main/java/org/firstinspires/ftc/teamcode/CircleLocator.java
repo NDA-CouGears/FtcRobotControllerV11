@@ -75,6 +75,7 @@ public class CircleLocator extends LinearOpMode{/*
     private VisionPortal portal = null;
 
     //for joystick experimenting w/ controller
+    /*
     private int     myExposure  ;
     private int     minExposure ;
     private int     maxExposure ;
@@ -89,6 +90,8 @@ public class CircleLocator extends LinearOpMode{/*
     boolean lastExpDn = false;
     boolean lastGainUp = false;
     boolean lastGainDn = false;
+
+     */
 
         @Override
         public void runOpMode() {
@@ -151,7 +154,7 @@ public class CircleLocator extends LinearOpMode{/*
             ColorBlobLocatorProcessor colorLocator = new ColorBlobLocatorProcessor.Builder()
                     .setTargetColorRange(ColorRange.ARTIFACT_GREEN)   // Use a predefined color match
                     .setContourMode(ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY)
-                    .setRoi(ImageRegion.asUnityCenterCoordinates(-0.75, 0.75, 0.75, -0.75))
+                    .setRoi(ImageRegion.asUnityCenterCoordinates(-1, 1, 1, -1))
                     .setDrawContours(true)   // Show contours on the Stream Preview
                     .setBoxFitColor(0)       // Disable the drawing of rectangles
                     .setCircleFitColor(Color.rgb(255, 255, 0)) // Draw a circle
@@ -191,7 +194,7 @@ public class CircleLocator extends LinearOpMode{/*
             telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
 
 
-
+            setManualExposure(50, 0);
             // WARNING:  To view the stream preview on the Driver Station, this code runs in INIT mode.
             while (opModeIsActive() || opModeInInit()) {
                 telemetry.addData("preview on/off", "... Camera Stream\n");
@@ -254,6 +257,8 @@ public class CircleLocator extends LinearOpMode{/*
                  *      ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA, SortOrder.DESCENDING, blobs);
                  */
 
+                //for changing exposure/gain
+                /*
                 if (portal.getCameraState() == VisionPortal.CameraState.STREAMING) {
                     ExposureControl exposureControl = portal.getCameraControl(ExposureControl.class);
                     minExposure = (int) exposureControl.getMinExposure(TimeUnit.MILLISECONDS) + 1;
@@ -263,6 +268,8 @@ public class CircleLocator extends LinearOpMode{/*
                     minGain = gainControl.getMinGain();
                     maxGain = gainControl.getMaxGain();
                 }
+
+                 */
                 telemetry.addLine("Circularity Radius Center");
 
                 // Display the Blob's circularity, and the size (radius) and center location of its circleFit.
@@ -273,11 +280,16 @@ public class CircleLocator extends LinearOpMode{/*
                             b.getCircularity(), (int) circleFit.getRadius(), (int) circleFit.getX(), (int) circleFit.getY()));
                 }
 
+                //telemetry for exposure/gain experimentation
+                /*
                 telemetry.addData("Exposure","%d  (%d - %d)", myExposure, minExposure, maxExposure);
                 telemetry.addData("Gain","%d  (%d - %d)", myGain, minGain, maxGain);
 
+                 */
 
+                //for joystick input for changing exposure/gain
                 // check to see if we need to change exposure or gain.
+                /*
                 thisExpUp = gamepad1.left_bumper;
                 thisExpDn = gamepad1.left_trigger > 0.25;
                 thisGainUp = gamepad1.right_bumper;
@@ -308,6 +320,9 @@ public class CircleLocator extends LinearOpMode{/*
 
                 telemetry.update();
                 sleep(100); // Match the telemetry update interval.
+
+                 */
+                telemetry.update();
             }
         }
 
