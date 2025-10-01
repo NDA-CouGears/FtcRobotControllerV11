@@ -132,7 +132,7 @@ public class SriAprilTagDriver extends LinearOpMode {
                     visionPortal.resumeStreaming();
                 }
                 if (gamepad1.x) {
-                    driveToAprilTag(.2, 23, 10, 0, 0, 0.04);
+                    driveToAprilTag(.2, 23, 40, 0, 0, 0.03);
                 }
 
                 // Share the CPU.
@@ -151,11 +151,12 @@ public class SriAprilTagDriver extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rf_drive"); // control hub 3
         rightBackDrive = hardwareMap.get(DcMotor.class, "rb_drive"); // control hub 1
 
-
+        /*
         sensorFrontDistance = hardwareMap.get(DistanceSensor.class, "distance"); // expansion i2c 0
         sensorLeftDistance = hardwareMap.get(DistanceSensor.class, "left_sensor"); // expansion i2c 1
         sensorRightDistance = hardwareMap.get(DistanceSensor.class, "right_sensor"); // control hub bus 2
         sensorBackDistance = hardwareMap.get(DistanceSensor.class, "back_sensor"); // expansion i2c 2
+         */
 
 
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -242,7 +243,7 @@ public class SriAprilTagDriver extends LinearOpMode {
 
     public void driveToAprilTag(double maxSpeed, int tagID, double targetForwardDistance, double targetLateralDistance, double heading, double speedGain) throws InterruptedException {
         //final double SPEED_GAIN = 0.03;   //  Forward Speed Control "Gain". e.g. Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
-        final double TURN_GAIN = 0.01;   //  Turn Control "Gain".  e.g. Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
+        final double TURN_GAIN = 0.005;   //  Turn Control "Gain".  e.g. Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
 
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -289,10 +290,21 @@ public class SriAprilTagDriver extends LinearOpMode {
             // Use the speed and turn "gains" to calculate how we want the robot to move. These are
             // more values with best guesses that need experimentation to find good values
             double forwardDriveSpeed = Math.min(errorY * speedGain, maxSpeed);
-            double lateralDriveSpeed = Math.min(errorX * speedGain, maxSpeed);
+            double lateralDriveSpeed = Math.min(-errorX * speedGain, maxSpeed);
             double turnSpeed = Math.min(target.ftcPose.yaw * TURN_GAIN, maxSpeed); //getSteeringCorrection(heading, TURN_GAIN);
             telemetry.addLine(String.format("turn speed = %5.2f", turnSpeed));
             telemetry.addLine(String.format("error x = %5.2f; drive speed = %5.2f", errorX, lateralDriveSpeed));
+
+            if (forwardDriveSpeed < 0) {
+                forwardDriveSpeed = Range.clip(forwardDriveSpeed, -maxSpeed, -0.1);
+            } else if (forwardDriveSpeed > 0) {
+                forwardDriveSpeed = Range.clip(forwardDriveSpeed, 0.1, maxSpeed);
+            }
+            if (lateralDriveSpeed < 0) {
+                lateralDriveSpeed = Range.clip(lateralDriveSpeed, -maxSpeed, -0.1);
+            } else if (lateralDriveSpeed > 0) {
+                lateralDriveSpeed = Range.clip(lateralDriveSpeed, 0.1, maxSpeed);
+            }
 
             if (gamepad1.b) {
                 moveRobot(0, 0, 0);

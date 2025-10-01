@@ -71,16 +71,16 @@ public abstract class RobotParent extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rf_drive"); // control hub 3
         rightBackDrive = hardwareMap.get(DcMotor.class, "rb_drive"); // control hub 1
 
-        leftShoot = hardwareMap.get(DcMotor.class, "left shoot");
-        rightShoot = hardwareMap.get(DcMotor.class, "right shoot");
+        //leftShoot = hardwareMap.get(DcMotor.class, "left shoot");
+        //rightShoot = hardwareMap.get(DcMotor.class, "right shoot");
 
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
 
-        leftShoot.setDirection(DcMotor.Direction.FORWARD);
-        rightShoot.setDirection(DcMotorSimple.Direction.REVERSE);
+        //leftShoot.setDirection(DcMotor.Direction.FORWARD);
+        //rightShoot.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -92,16 +92,16 @@ public abstract class RobotParent extends LinearOpMode {
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        leftShoot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightShoot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //leftShoot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //rightShoot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        leftShoot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightShoot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //leftShoot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        //rightShoot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
@@ -180,4 +180,51 @@ public abstract class RobotParent extends LinearOpMode {
         // visionPortal.setProcessorEnabled(aprilTag, true);
 
     }   // end method initAprilTag()
+
+    private double signPreserveSquare(double value) {
+
+        if (value > 0) {
+            return value * value;
+        } else {
+            return -(value * value);
+        }
+    }
+
+    protected void mecanumDrive() {
+        //mecanum drive
+        double max;
+        // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
+        double axial = -signPreserveSquare(gamepad1.left_stick_y * -0.9); // Remember, this is reversed!
+        double lateral = signPreserveSquare(gamepad1.left_stick_x * 0.7); // Counteract imperfect strafing
+        double yaw = (signPreserveSquare(gamepad1.right_stick_x * 1)) * 0.5;
+
+        moveRobot(axial, lateral, yaw);
+    }
+
+    public void moveRobot(double x, double y, double yaw) {
+        // Calculate wheel powers.
+        double leftFrontPower = x - y - yaw;
+        double rightFrontPower = x + y + yaw;
+        double leftBackPower = x + y - yaw;
+        double rightBackPower = x - y + yaw;
+
+        // Normalize wheel powers to be less than 1.0
+        double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+        max = Math.max(max, Math.abs(leftBackPower));
+        max = Math.max(max, Math.abs(rightBackPower));
+
+        if (max > 1.0) {
+            leftFrontPower /= max;
+            rightFrontPower /= max;
+            leftBackPower /= max;
+            rightBackPower /= max;
+        }
+
+        // Send powers to the wheels.
+        leftFrontDrive.setPower(leftFrontPower);
+        rightFrontDrive.setPower(rightFrontPower);
+        leftBackDrive.setPower(leftBackPower);
+        rightBackDrive.setPower(rightBackPower);
+    }
+
 }
