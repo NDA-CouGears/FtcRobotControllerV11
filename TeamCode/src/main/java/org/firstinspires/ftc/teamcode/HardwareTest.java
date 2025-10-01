@@ -29,7 +29,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -71,26 +70,49 @@ public class HardwareTest extends LinearOpMode {
         motor1.setDirection(DcMotorSimple.Direction.FORWARD);
         motor2.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        motor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         // Wait for the game to start (driver presses START)
         waitForStart();
 
         double positionA = 0, positionB = 0, curPos = 0;
         boolean configMode = true;
-        boolean buttonPressed = false;
+        boolean useEncoders = true;
+        boolean yButtonPressed = false;
+        boolean xButtonPressed = false;
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+            if (useEncoders) {
+                motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+            else {
+                motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            }
+
             if (gamepad1.y) {
-                if (!buttonPressed) {
+                if (!yButtonPressed) {
                     configMode = !configMode;
-                    buttonPressed = true;
+                    yButtonPressed = true;
                 }
             }
             else {
-                buttonPressed = false;
+                yButtonPressed = false;
+            }
+            if (gamepad1.x) {
+                if (!xButtonPressed) {
+                    useEncoders = !useEncoders;
+                    xButtonPressed = true;
+                }
+            }
+            else {
+                xButtonPressed = false;
             }
 
             if (configMode) {
@@ -111,6 +133,7 @@ public class HardwareTest extends LinearOpMode {
             }
             else {
                 telemetry.addLine("RUN MODE");
+                telemetry.addLine(String.format("Using encoders %b", useEncoders));
                 telemetry.addLine(String.format("A: %1.2f; B: %1.2f", positionA, positionB));
                 if (gamepad1.a) {
                     testServo.setPosition(positionA);
@@ -118,6 +141,9 @@ public class HardwareTest extends LinearOpMode {
                 if (gamepad1.b) {
                     testServo.setPosition(positionB);
                 }
+
+                telemetry.addLine(String.format("Positions 1: %d; 2: %d", motor1.getCurrentPosition(), motor2.getCurrentPosition()));
+                telemetry.addLine(String.format("Power 1: %1.2f; 2: %1.2f", motor1.getPower(), motor2.getPower()));
 
                 motor1.setPower(gamepad1.left_stick_y);
                 motor2.setPower(gamepad1.left_stick_y);
