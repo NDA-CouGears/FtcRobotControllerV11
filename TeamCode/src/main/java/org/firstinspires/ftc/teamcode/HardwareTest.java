@@ -32,8 +32,10 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.Range;
 
 
@@ -50,11 +52,11 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Hardware Test", group="Hardware")
+@TeleOp(name = "Hardware Test", group = "Hardware")
 public class HardwareTest extends LinearOpMode {
 
-    DcMotor motor1;
-    DcMotor motor2;
+    DcMotorEx motor1;
+    DcMotorEx motor2;
 
     Servo testServo;
 
@@ -63,9 +65,9 @@ public class HardwareTest extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        testServo  = hardwareMap.get(Servo.class, "servo one");
-        motor1 = hardwareMap.get(DcMotor.class, "motor one");
-        motor2 = hardwareMap.get(DcMotor.class, "motor two");
+        testServo = hardwareMap.get(Servo.class, "servo one");
+        motor1 = hardwareMap.get(DcMotorEx.class, "motor one");
+        motor2 = hardwareMap.get(DcMotorEx.class, "motor two");
 
         motor1.setDirection(DcMotorSimple.Direction.FORWARD);
         motor2.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -90,8 +92,7 @@ public class HardwareTest extends LinearOpMode {
             if (useEncoders) {
                 motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            }
-            else {
+            } else {
                 motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             }
@@ -101,8 +102,7 @@ public class HardwareTest extends LinearOpMode {
                     configMode = !configMode;
                     yButtonPressed = true;
                 }
-            }
-            else {
+            } else {
                 yButtonPressed = false;
             }
             if (gamepad1.x) {
@@ -110,8 +110,7 @@ public class HardwareTest extends LinearOpMode {
                     useEncoders = !useEncoders;
                     xButtonPressed = true;
                 }
-            }
-            else {
+            } else {
                 xButtonPressed = false;
             }
 
@@ -120,7 +119,7 @@ public class HardwareTest extends LinearOpMode {
                 telemetry.addLine(String.format("Cur Position: %1.2f", curPos));
                 telemetry.addLine(String.format("A: %1.2f; B: %1.2f", positionA, positionB));
 
-                curPos += gamepad1.left_stick_y/50.0;
+                curPos += gamepad1.left_stick_y / 50.0;
                 curPos = Range.clip(curPos, 0, 1);
 
                 testServo.setPosition(curPos);
@@ -130,8 +129,7 @@ public class HardwareTest extends LinearOpMode {
                 if (gamepad1.b) {
                     positionB = curPos;
                 }
-            }
-            else {
+            } else {
                 telemetry.addLine("RUN MODE");
                 telemetry.addLine(String.format("Using encoders %b", useEncoders));
                 telemetry.addLine(String.format("A: %1.2f; B: %1.2f", positionA, positionB));
