@@ -8,6 +8,8 @@ public class TeleOp extends RobotParent {
 
         while (opModeIsActive()) {
             mecanumDrive();
+            shootArtifact();
+            controlCarousel();
         }
     }
 }
