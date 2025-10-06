@@ -44,6 +44,8 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
@@ -52,6 +54,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /*
  * This OpMode illustrates the basics of AprilTag recognition and pose estimation,
@@ -124,6 +127,7 @@ public class SriAprilTagDriver extends LinearOpMode {
 
                 // Push telemetry to the Driver Station.
                 telemetry.update();
+                setManualExposure(0, 50);
 
                 // Save CPU resources; can resume streaming when needed.
                 if (gamepad1.dpad_down) {
@@ -132,7 +136,7 @@ public class SriAprilTagDriver extends LinearOpMode {
                     visionPortal.resumeStreaming();
                 }
                 if (gamepad1.x) {
-                    driveToAprilTag(.2, 23, 40, 0, 0, 0.03);
+                    driveToAprilTag(.2, 23, 25, -5, 0, 0.03);
                 }
 
                 // Share the CPU.
@@ -244,6 +248,8 @@ public class SriAprilTagDriver extends LinearOpMode {
     public void driveToAprilTag(double maxSpeed, int tagID, double targetForwardDistance, double targetLateralDistance, double heading, double speedGain) throws InterruptedException {
         //final double SPEED_GAIN = 0.03;   //  Forward Speed Control "Gain". e.g. Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
         final double TURN_GAIN = 0.005;   //  Turn Control "Gain".  e.g. Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
+        double retryStartTime = 0;
+        int retryCount = 0;
 
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -272,9 +278,26 @@ public class SriAprilTagDriver extends LinearOpMode {
                 }
             }   // end for() loop
 
-            if (target == null) {
+            if (target == null && retryStartTime == 0) {
+                retryStartTime = getRuntime();
+                retryCount = 0;
                 moveRobot(0, 0, 0);
-                return;
+            }
+            if (target != null) {
+                retryStartTime = 0;
+                retryCount = 0;
+            }
+            if (retryStartTime != 0) {
+                while ((getRuntime() - retryStartTime) <= .1 && opModeIsActive()) {
+                    Thread.sleep(10);
+                    telemetry.addLine("Retrying: " + retryCount);
+                    telemetry.update();
+                }
+                if (!opModeIsActive() || retryCount >= 2) {
+                    return;
+                }
+                retryCount += 1;
+                continue;
             }
 
             double yawRad = Math.toRadians(target.ftcPose.yaw);
@@ -309,7 +332,7 @@ public class SriAprilTagDriver extends LinearOpMode {
             if (gamepad1.b) {
                 moveRobot(0, 0, 0);
             } else {
-                moveRobot(-forwardDriveSpeed, -lateralDriveSpeed, 0);
+                moveRobot(-forwardDriveSpeed, -lateralDriveSpeed, turnSpeed);
             }
 
             telemetryAprilTag();
@@ -416,5 +439,43 @@ public class SriAprilTagDriver extends LinearOpMode {
         telemetry.addLine("RBE = Range, Bearing & Elevation");
 
     }   // end method telemetryAprilTag()
+
+    private boolean setManualExposure(int exposureMS, int gain) {
+        // Ensure Vision Portal has been setup.
+        if (visionPortal == null) {
+            return false;
+        }
+
+        // Wait for the camera to be open
+        if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
+            telemetry.addData("Camera", "Waiting");
+            telemetry.update();
+            while (!isStopRequested() && (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
+                sleep(20);
+            }
+            telemetry.addData("Camera", "Ready");
+            telemetry.update();
+        }
+
+        // Set camera controls unless we are stopping.
+        if (!isStopRequested()) {
+            // Set exposure.  Make sure we are in Manual Mode for these values to take effect.
+            ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
+            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
+                exposureControl.setMode(ExposureControl.Mode.Manual);
+                sleep(50);
+            }
+            exposureControl.setExposure((long) exposureMS, TimeUnit.MILLISECONDS);
+            sleep(20);
+
+            // Set Gain.
+            GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
+            gainControl.setGain(gain);
+            sleep(20);
+            return (true);
+        } else {
+            return (false);
+        }
+    }
 
 }   // end class

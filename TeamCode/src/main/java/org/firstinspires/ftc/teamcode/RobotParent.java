@@ -36,6 +36,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -60,10 +61,21 @@ public abstract class RobotParent extends LinearOpMode {
     protected DcMotor leftBackDrive = null;
     protected DcMotor rightFrontDrive = null;
     protected DcMotor rightBackDrive = null;
-    protected DcMotor leftShoot = null;
-    protected DcMotor rightShoot = null;
+    protected DcMotorEx leftShoot = null;
+    protected DcMotorEx rightShoot = null;
+    protected DcMotorEx carousel = null;
+    protected Servo carouselArm = null;
     private AprilTagProcessor aprilTagProcessor;
     private VisionPortal aprilTagVisionPortal;
+    private ElapsedTime shootRunTime = new ElapsedTime();
+    private boolean shootButtonPressed = false;
+    private static final int MAX_SHOOT_TIME = 2;
+    private static final float SHOOT_GEAR_RATIO = 3.7f;
+    private static final float SHOOT_MAX_RPM = 1620f;
+    private static final float SHOOT_TICKS_PER_ROTATION = 28*SHOOT_GEAR_RATIO;
+    private static final double CAROUSEL_ARM_OPEN = .25;
+    private static final double CAROUSEL_ARM_CLOSED = .75;
+
 
     public void initHardware() {
         leftFrontDrive = hardwareMap.get(DcMotor.class, "lf_drive"); // control hub 2
@@ -71,16 +83,19 @@ public abstract class RobotParent extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rf_drive"); // control hub 3
         rightBackDrive = hardwareMap.get(DcMotor.class, "rb_drive"); // control hub 1
 
-        //leftShoot = hardwareMap.get(DcMotor.class, "left shoot");
-        //rightShoot = hardwareMap.get(DcMotor.class, "right shoot");
+        leftShoot = hardwareMap.get(DcMotorEx.class, "left shoot");
+        rightShoot = hardwareMap.get(DcMotorEx.class, "right shoot");
+        carousel = hardwareMap.get(DcMotorEx.class, "carousel");
+        carouselArm = hardwareMap.get(Servo.class, "carousel arm");
 
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
 
-        //leftShoot.setDirection(DcMotor.Direction.FORWARD);
-        //rightShoot.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftShoot.setDirection(DcMotor.Direction.REVERSE);
+        rightShoot.setDirection(DcMotor.Direction.FORWARD);
+        carousel.setDirection(DcMotorSimple.Direction.FORWARD);
 
         leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -92,16 +107,18 @@ public abstract class RobotParent extends LinearOpMode {
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        //leftShoot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //rightShoot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftShoot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightShoot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        carousel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        //leftShoot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        //rightShoot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftShoot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightShoot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        carousel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
@@ -199,6 +216,35 @@ public abstract class RobotParent extends LinearOpMode {
         double yaw = (signPreserveSquare(gamepad1.right_stick_x * 1)) * 0.5;
 
         moveRobot(axial, lateral, yaw);
+    }
+
+    public void shootArtifact(){
+        if (gamepad1.left_bumper && !shootButtonPressed){
+            shootButtonPressed = true;
+            shootRunTime.reset();
+            float motorVel = (SHOOT_MAX_RPM/60)*SHOOT_TICKS_PER_ROTATION;
+            leftShoot.setVelocity(motorVel);
+            rightShoot.setVelocity(motorVel);
+        }
+        if (shootRunTime.seconds()>=MAX_SHOOT_TIME && shootButtonPressed){
+            shootButtonPressed = false;
+            leftShoot.setVelocity(0);
+            rightShoot.setVelocity(0);
+        }
+    }
+
+    public void controlCarousel(){
+        float RPM=223;
+        float carouselSpeed = (gamepad1.right_trigger - gamepad1.left_trigger);
+        float carouselVelocity = carouselSpeed * (RPM/60 * 28 * 29.9f);
+        // carouselSpeed * (rotations per second * ticks per rotation * gear ratio)
+        carousel.setVelocity(carouselVelocity/7.4);
+        if (gamepad1.dpad_up){
+            carouselArm.setPosition(CAROUSEL_ARM_OPEN);
+        }
+        else if (gamepad1.dpad_down){
+            carouselArm.setPosition(CAROUSEL_ARM_CLOSED);
+        }
     }
 
     public void moveRobot(double x, double y, double yaw) {
