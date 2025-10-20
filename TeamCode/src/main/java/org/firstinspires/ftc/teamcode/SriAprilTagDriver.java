@@ -136,7 +136,7 @@ public class SriAprilTagDriver extends LinearOpMode {
                     visionPortal.resumeStreaming();
                 }
                 if (gamepad1.x) {
-                    driveToAprilTag(.2, 23, 25, -5, 0, 0.03);
+                    driveToAprilTag(.2, 20, 25, -5, 0, 0.03);
                 }
 
                 // Share the CPU.

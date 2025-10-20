@@ -31,26 +31,26 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 /*
@@ -65,6 +65,11 @@ public abstract class RobotParent extends LinearOpMode {
     protected DcMotorEx rightShoot = null;
     protected DcMotorEx carousel = null;
     protected Servo carouselArm = null;
+    public double targetHeading = 0;
+    public double headingError = 0;
+    public double turnSpeed = 0;
+    public List<LynxModule> allHubs = null;
+    public IMU imu = null;// Control/Expansion Hub IMU
     private AprilTagProcessor aprilTagProcessor;
     private VisionPortal aprilTagVisionPortal;
     private ElapsedTime shootRunTime = new ElapsedTime();
@@ -75,6 +80,13 @@ public abstract class RobotParent extends LinearOpMode {
     private static final float SHOOT_TICKS_PER_ROTATION = 28*SHOOT_GEAR_RATIO;
     private static final double CAROUSEL_ARM_OPEN = .25;
     private static final double CAROUSEL_ARM_CLOSED = .75;
+    static final double P_DRIVE_GAIN = 0.03;// Larger is more responsive, but also less stable.
+    static final double P_TURN_GAIN = 0.02;// Larger is more responsive, but also less stable.
+    static final double HEADING_THRESHOLD = 1.0;// How close must the heading get to the target before moving to next step.
+    static final double DRIVE_GEAR_REDUCTION = 1.0;
+    static final double WHEEL_DIAMETER_INCHES = 102 / 25.4;
+    static final double COUNTS_PER_MOTOR_REV = 483.3836858;  //NEED TO FIX DIS >:3
+    static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * 3.14159);
 
 
     public void initHardware() {
@@ -82,6 +94,12 @@ public abstract class RobotParent extends LinearOpMode {
         leftBackDrive = hardwareMap.get(DcMotor.class, "lb_drive"); // control hub 0
         rightFrontDrive = hardwareMap.get(DcMotor.class, "rf_drive"); // control hub 3
         rightBackDrive = hardwareMap.get(DcMotor.class, "rb_drive"); // control hub 1
+
+        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
+        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
+        imu = hardwareMap.get(IMU.class, "imu");
+        imu.initialize(new IMU.Parameters(orientationOnRobot));
 
         leftShoot = hardwareMap.get(DcMotorEx.class, "left shoot");
         rightShoot = hardwareMap.get(DcMotorEx.class, "right shoot");
@@ -120,16 +138,11 @@ public abstract class RobotParent extends LinearOpMode {
         rightShoot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         carousel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
+        allHubs = hardwareMap.getAll(LynxModule.class);
 
         for (LynxModule module : allHubs) {
             module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
-
-        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
-        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
-        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
-
 
         // Wait for the game to start (driver presses START)
         telemetry.addData("Status", "Initialized");
@@ -198,6 +211,102 @@ public abstract class RobotParent extends LinearOpMode {
 
     }   // end method initAprilTag()
 
+    public void driveToAprilTag(double maxSpeed, int tagID, double targetForwardDistance, double targetLateralDistance, double heading, double speedGain) throws InterruptedException {
+        //final double SPEED_GAIN = 0.03;   //  Forward Speed Control "Gain". e.g. Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
+        final double TURN_GAIN = 0.005;   //  Turn Control "Gain".  e.g. Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
+        double retryStartTime = 0;
+        int retryCount = 0;
+        setManualExposureAprilTag(0,50);
+
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        while (opModeIsActive() && !gamepad1.y) {
+
+            List<AprilTagDetection> currentDetections = aprilTagProcessor.getDetections();
+            telemetry.addData("# AprilTags Detected", currentDetections.size());
+
+            // Step through the list of detections and display info for each one.
+
+            AprilTagDetection target = null;// store target AprilTag
+
+            for (AprilTagDetection detection : currentDetections) {
+                if (detection.metadata != null) {
+                    if (detection.id == tagID) {
+                        target = detection;
+                        break;
+                    }
+                    telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
+                    telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
+                    telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
+                    telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
+                }
+            }   // end for() loop
+
+            if (target == null && retryStartTime == 0) {
+                retryStartTime = getRuntime();
+                retryCount = 0;
+                moveRobot(0, 0, 0);
+            }
+            if (target != null) {
+                retryStartTime = 0;
+                retryCount = 0;
+            }
+            if (retryStartTime != 0) {
+                while ((getRuntime() - retryStartTime) <= .1 && opModeIsActive()) {
+                    Thread.sleep(10);
+                    telemetry.addLine("Retrying: " + retryCount);
+                    telemetry.update();
+                }
+                if (!opModeIsActive() || retryCount >= 2) {
+                    return;
+                }
+                retryCount += 1;
+                continue;
+            }
+
+            double yawRad = Math.toRadians(target.ftcPose.yaw);
+            double errorX = target.ftcPose.x + (Math.sin(yawRad) * targetForwardDistance + Math.cos(yawRad) * targetLateralDistance);
+            double errorY = target.ftcPose.y + (-Math.sin(yawRad) * targetLateralDistance - Math.cos(yawRad) * targetForwardDistance);
+            //double rangeTagError = target.ftcPose.range - targetForwardDistance;
+
+            // If we are close on all axes stop, we need to experiment to find good values
+            if ((Math.abs(errorX) < 1) && (Math.abs(errorY) < 1) && (Math.abs(target.ftcPose.yaw) < 1)) {
+                break;
+            }
+
+            // Use the speed and turn "gains" to calculate how we want the robot to move. These are
+            // more values with best guesses that need experimentation to find good values
+            double forwardDriveSpeed = Math.min(errorY * speedGain, maxSpeed);
+            double lateralDriveSpeed = Math.min(-errorX * speedGain, maxSpeed);
+            double turnSpeed = Math.min(target.ftcPose.yaw * TURN_GAIN, maxSpeed); //getSteeringCorrection(heading, TURN_GAIN);
+            telemetry.addLine(String.format("turn speed = %5.2f", turnSpeed));
+            telemetry.addLine(String.format("error x = %5.2f; drive speed = %5.2f", errorX, lateralDriveSpeed));
+
+            if (forwardDriveSpeed < 0) {
+                forwardDriveSpeed = Range.clip(forwardDriveSpeed, -maxSpeed, -0.1);
+            } else if (forwardDriveSpeed > 0) {
+                forwardDriveSpeed = Range.clip(forwardDriveSpeed, 0.1, maxSpeed);
+            }
+            if (lateralDriveSpeed < 0) {
+                lateralDriveSpeed = Range.clip(lateralDriveSpeed, -maxSpeed, -0.1);
+            } else if (lateralDriveSpeed > 0) {
+                lateralDriveSpeed = Range.clip(lateralDriveSpeed, 0.1, maxSpeed);
+            }
+
+            if (gamepad1.b) {
+                moveRobot(0, 0, 0);
+            } else {
+                moveRobot(-forwardDriveSpeed, -lateralDriveSpeed, turnSpeed);
+            }
+
+
+        }
+
+        moveRobot(0, 0, 0);
+    }
     private double signPreserveSquare(double value) {
 
         if (value > 0) {
@@ -272,5 +381,162 @@ public abstract class RobotParent extends LinearOpMode {
         leftBackDrive.setPower(leftBackPower);
         rightBackDrive.setPower(rightBackPower);
     }
+    public double getHeading() {
+        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
+        return orientation.getYaw(AngleUnit.DEGREES);
+    }
 
+    public double getSteeringCorrection(double desiredHeading, double proportionalGain) {
+        targetHeading = desiredHeading;  // Save for telemetry
+
+        // Determine the heading current error
+        headingError = targetHeading - getHeading();
+
+        // Normalize the error to be within +/- 180 degrees to avoid wasting time with overly long turns
+        while (headingError > 180) headingError -= 360;
+        while (headingError <= -180) headingError += 360;
+
+        // Multiply the error by the gain to determine the required steering correction/  Limit the result to +/- 1.0
+        return Range.clip(headingError * proportionalGain, -1, 1);
+    }
+
+    public void turnToHeading(double maxTurnSpeed, double heading) throws InterruptedException {
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Run getSteeringCorrection() once to pre-calculate the current error
+        getSteeringCorrection(heading, P_TURN_GAIN);
+
+        // keep looping while we are still active, and not on heading.
+        while (opModeIsActive() && (Math.abs(headingError) > HEADING_THRESHOLD)) {
+            // Determine required steering to keep on heading
+            turnSpeed = getSteeringCorrection(heading, P_TURN_GAIN);
+
+            // Clip the speed to the maximum permitted value.
+            if( turnSpeed < 0 ) {
+                turnSpeed = Range.clip(turnSpeed, -maxTurnSpeed, -0.1);
+            }
+            else{
+                turnSpeed = Range.clip(turnSpeed,0.1, maxTurnSpeed);
+            }
+            // Pivot in place by applying the turning correction
+            moveRobot(0, 0, turnSpeed);
+        }
+
+        // Stop all motion;
+        moveRobot(0, 0, 0);
+    }
+    public void driveStraight(double maxDriveSpeed,
+                              double distance,
+                              double heading) throws InterruptedException {
+        //clear cache to get most recent encoder value(s)
+        clearBulkCache();
+
+        // Ensure that the OpMode is still active
+        if (opModeIsActive()) {
+            // Determine new target position, and pass to motor controller
+            ElapsedTime runtime = new ElapsedTime();
+            int moveCounts = (int)(distance * COUNTS_PER_INCH);
+            int newLeftFrontTarget = leftFrontDrive.getCurrentPosition() + moveCounts;
+            int newLeftBackTarget = leftBackDrive.getCurrentPosition() + moveCounts;
+            int newRightFrontTarget = rightFrontDrive.getCurrentPosition() + moveCounts;
+            int newRightBackTarget = rightBackDrive.getCurrentPosition() + moveCounts;
+            leftFrontDrive.setTargetPosition(newLeftFrontTarget);
+            leftBackDrive.setTargetPosition(newLeftBackTarget);
+            rightFrontDrive.setTargetPosition(newRightFrontTarget);
+            rightBackDrive.setTargetPosition(newRightBackTarget);
+
+            leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            leftBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightBackDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+
+            // Set the required driving speed  (must be positive for RUN_TO_POSITION)
+            // Start driving straight, and then enter the control loop
+            maxDriveSpeed = Math.abs(maxDriveSpeed);
+            moveRobot(maxDriveSpeed, 0, 0);
+
+            // We are using bulk cache so the isBusy flag will be cached along with all other sensor
+            // values when we accessed the encoder values above. Flush the cache no to ensure we get an
+            // up to date reading.
+            clearBulkCache();
+
+            // keep looping while we are still active, and BOTH motors are running.
+            while (opModeIsActive() &&
+                    (leftFrontDrive.isBusy() && leftBackDrive.isBusy() && rightFrontDrive.isBusy() && rightBackDrive.isBusy())) {
+
+                // Determine required steering to keep on heading
+                turnSpeed = getSteeringCorrection(heading, P_DRIVE_GAIN);
+                telemetry.addLine("turn speed: " + turnSpeed);
+                telemetry.addLine("heading: " + this.getHeading());
+
+                // if driving in reverse, the motor correction also needs to be reversed
+                if (distance < 0) {
+                    turnSpeed *= -1.0;
+                    telemetry.addLine("turn speed 2: " + turnSpeed);
+                }
+
+                // Ramp up to max driving speed over one second
+                if (runtime.seconds() < 1){
+                    moveRobot(maxDriveSpeed * runtime.seconds(), 0, turnSpeed);
+                }
+                else {
+                    // Apply the turning correction to the current driving speed.
+                    double remainingDistance = (newLeftFrontTarget - leftFrontDrive.getCurrentPosition())/COUNTS_PER_INCH;
+                    double driveSpeed = remainingDistance/10 * maxDriveSpeed;
+                    driveSpeed = Range.clip(driveSpeed, -maxDriveSpeed, maxDriveSpeed);
+                    moveRobot(driveSpeed, 0, turnSpeed);
+                }
+            }
+
+            // Stop all motion & Turn off RUN_TO_POSITION
+            moveRobot(0, 0, 0);
+
+        }
+    }
+    public void clearBulkCache() {
+        for (LynxModule module : allHubs) {
+            module.clearBulkCache();
+        }
+    }
+    protected boolean setManualExposureAprilTag(int exposureMS, int gain) {
+        // Ensure Vision Portal has been setup.
+        if (aprilTagVisionPortal == null) {
+            return false;
+        }
+
+        // Wait for the camera to be open
+        if (aprilTagVisionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
+            telemetry.addData("Camera", "Waiting");
+            telemetry.update();
+            while (!isStopRequested() && (aprilTagVisionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
+                sleep(20);
+            }
+            telemetry.addData("Camera", "Ready");
+            telemetry.update();
+        }
+
+        // Set camera controls unless we are stopping.
+        if (!isStopRequested()) {
+            // Set exposure.  Make sure we are in Manual Mode for these values to take effect.
+            ExposureControl exposureControl = aprilTagVisionPortal.getCameraControl(ExposureControl.class);
+            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
+                exposureControl.setMode(ExposureControl.Mode.Manual);
+                sleep(50);
+            }
+            exposureControl.setExposure((long) exposureMS, TimeUnit.MILLISECONDS);
+            sleep(20);
+
+            // Set Gain.
+            GainControl gainControl = aprilTagVisionPortal.getCameraControl(GainControl.class);
+            gainControl.setGain(gain);
+            sleep(20);
+            return (true);
+        } else {
+            return (false);
+        }
+    }
 }
