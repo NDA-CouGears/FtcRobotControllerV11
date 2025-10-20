@@ -150,7 +150,7 @@ public abstract class RobotParent extends LinearOpMode {
 
 
 
-        
+
         initOtos();
 
 
@@ -637,4 +637,65 @@ public abstract class RobotParent extends LinearOpMode {
             return (false);
         }
     }
+    public void driveToLocation(double maxDriveSpeed,
+                              double x_target_position, double y_target_position,
+                              double target_heading) throws InterruptedException {
+
+        // Ensure that the OpMode is still active
+        if (opModeIsActive()) {
+            // Determine new target position, and pass to motor controller
+            ElapsedTime runtime = new ElapsedTime();
+
+            // Set the required driving speed  (must be positive for RUN_TO_POSITION)
+            // Start driving straight, and then enter the control loop
+            maxDriveSpeed = Math.abs(maxDriveSpeed);
+
+
+            // We are using bulk cache so the isBusy flag will be cached along with all other sensor
+            // values when we accessed the encoder values above. Flush the cache no to ensure we get an
+            // up to date reading.
+            clearBulkCache();
+
+            // keep looping while we are still active, and BOTH motors are running.
+            while (opModeIsActive()){
+                SparkFunOTOS.Pose2D cur_position = otosSensor.getPosition();
+
+                // Determine the heading current error
+                headingError = target_heading - cur_position.h;
+
+                // Normalize the error to be within +/- 180 degrees to avoid wasting time with overly long turns
+                while (headingError > 180) headingError -= 360;
+                while (headingError <= -180) headingError += 360;
+
+                // Multiply the error by the gain to determine the required steering correction/  Limit the result to +/- 1.0
+                turnSpeed = Range.clip(headingError * P_TURN_GAIN, -1, 1);
+
+
+                telemetry.addLine("turn speed: " + turnSpeed);
+                telemetry.addLine("heading: " + cur_position.h);
+
+                double xError = x_target_position - cur_position.x;
+                double yError = y_target_position - cur_position.y;
+
+                double xSpeed = Range.clip(xError * P_DRIVE_GAIN, -1, 1);
+                double ySpeed = Range.clip(yError * P_DRIVE_GAIN, -1, 1);
+
+                // Ramp up to max driving speed over one second
+                if (runtime.seconds() < 1){
+                    moveRobot(xSpeed * runtime.seconds(), ySpeed * runtime.seconds(), turnSpeed * runtime.seconds());
+                }
+                else{
+                    moveRobot(xSpeed, ySpeed, turnSpeed);
+                }
+                if (Math.abs(xError) < 1 && Math.abs(yError) < 1 && Math.abs(headingError) < 1){
+                    break;
+                }
+            }
+
+            // Stop all motion & Turn off RUN_TO_POSITION
+            moveRobot(0, 0, 0);
+
+        }
+    }
+
 }
