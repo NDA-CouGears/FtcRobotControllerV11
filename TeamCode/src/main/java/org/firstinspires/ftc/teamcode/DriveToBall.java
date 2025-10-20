@@ -17,6 +17,7 @@ import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor;
 import org.firstinspires.ftc.vision.opencv.ColorRange;
 import org.firstinspires.ftc.vision.opencv.ImageRegion;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -147,8 +148,8 @@ public class DriveToBall extends LinearOpMode{
                 telemetry.addData("preview on/off", "... Camera Stream\n");
 
                 // Read the current list
-                List<ColorBlobLocatorProcessor.Blob> blobs = greenColorLocator.getBlobs();
-                blobs.addAll(purpleColorLocator.getBlobs());
+                List<ColorBlobLocatorProcessor.Blob> greenBlobs = greenColorLocator.getBlobs();
+                List<ColorBlobLocatorProcessor.Blob> purpleBlobs = purpleColorLocator.getBlobs();
 
                 /*
                  * The list of Blobs can be filtered to remove unwanted Blobs.
@@ -185,7 +186,14 @@ public class DriveToBall extends LinearOpMode{
                  */
                 ColorBlobLocatorProcessor.Util.filterByCriteria(
                         ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA,
-                        200, 20000, blobs);  // filter out very small blobs.
+                        768, 20000, greenBlobs);  // filter out very small blobs.
+
+                ColorBlobLocatorProcessor.Util.filterByCriteria(
+                        ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA,
+                        768, 20000, purpleBlobs);  // filter out very small blobs.
+
+                List<ColorBlobLocatorProcessor.Blob> blobs = new ArrayList<ColorBlobLocatorProcessor.Blob>(purpleBlobs);
+                blobs.addAll(greenBlobs);
 
                 /*
                 ColorBlobLocatorProcessor.Util.filterByCriteria(
@@ -203,15 +211,25 @@ public class DriveToBall extends LinearOpMode{
 
                 // Display the Blob's circularity, and the size (radius) and center location of its circleFit.
                 /*
+                int count = 0;
                 for (ColorBlobLocatorProcessor.Blob b : blobs) {
 
                     Circle circleFit = b.getCircle();
-                    telemetry.addLine(String.format("%5.3f      %3d     (%3d,%3d)",
-                            b.getCircularity(), (int) circleFit.getRadius(), (int) circleFit.getX(), (int) circleFit.getY()));
+                    count += circleFit.getRadius();
+                    //telemetry.addLine(String.format("%5.3f      %3d     (%3d,%3d)",
+                            //b.getCircularity(), (int) circleFit.getRadius(), (int) circleFit.getX(), (int) circleFit.getY()));
+                }
+                if (blobs.size() > 0){
+                    telemetry.addLine(String.format("%3d,", count/blobs.size()));
                 }
 
                  */
-                telemetry.addLine(String.format("%3d", blobs.size()));
+                telemetry.addLine(String.format("b %3d", blobs.size()));
+                telemetry.addLine(String.format("g %3d", greenBlobs.size()));
+                telemetry.addLine(String.format("p %3d", purpleBlobs.size()));
+
+                
+
                 telemetry.update();
             }
 
