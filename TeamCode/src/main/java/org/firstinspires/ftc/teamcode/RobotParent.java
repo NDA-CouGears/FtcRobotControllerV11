@@ -247,7 +247,7 @@ public abstract class RobotParent extends LinearOpMode {
         telemetry.update();
     }
 
-    private void initAprilTag() {
+    protected void initAprilTag() {
 
         // Create the AprilTag processor.
         aprilTagProcessor = new AprilTagProcessor.Builder()
@@ -397,7 +397,7 @@ public abstract class RobotParent extends LinearOpMode {
             if (gamepad1.b) {
                 moveRobot(0, 0, 0);
             } else {
-                moveRobot(-forwardDriveSpeed, -lateralDriveSpeed, turnSpeed);
+                moveRobot(forwardDriveSpeed, lateralDriveSpeed, -turnSpeed);
             }
 
 
@@ -418,11 +418,11 @@ public abstract class RobotParent extends LinearOpMode {
         //mecanum drive
         double max;
         // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-        double axial = -signPreserveSquare(gamepad1.left_stick_y * -0.9); // Remember, this is reversed!
+        double axial = signPreserveSquare(gamepad1.left_stick_y * -0.9); // Remember, this is reversed!
         double lateral = signPreserveSquare(gamepad1.left_stick_x * 0.7); // Counteract imperfect strafing
         double yaw = (signPreserveSquare(gamepad1.right_stick_x * 1)) * 0.5;
 
-        moveRobot(axial, lateral, yaw);
+        moveRobot(lateral, axial, yaw);
     }
 
     public void shootArtifact(){
@@ -454,12 +454,23 @@ public abstract class RobotParent extends LinearOpMode {
         }
     }
 
+    /**
+     *
+     * @param x positive is right, negative is left
+     * @param y
+     * @param yaw positive is clockwise, negative is counterclockwise
+     */
     public void moveRobot(double x, double y, double yaw) {
+        // make forward = positive y, right = positive x, and clockwise = positive yaw
+        x=-x;
+        // y=y;
+        yaw=-yaw;
+
         // Calculate wheel powers.
-        double leftFrontPower = x - y - yaw;
-        double rightFrontPower = x + y + yaw;
-        double leftBackPower = x + y - yaw;
-        double rightBackPower = x - y + yaw;
+        double leftFrontPower = y - x - yaw;
+        double rightFrontPower = y + x + yaw;
+        double leftBackPower = y + x - yaw;
+        double rightBackPower = y - x + yaw;
 
         // Normalize wheel powers to be less than 1.0
         double max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
@@ -651,11 +662,6 @@ public abstract class RobotParent extends LinearOpMode {
             maxDriveSpeed = Math.abs(maxDriveSpeed);
 
 
-            // We are using bulk cache so the isBusy flag will be cached along with all other sensor
-            // values when we accessed the encoder values above. Flush the cache no to ensure we get an
-            // up to date reading.
-            clearBulkCache();
-
             // keep looping while we are still active, and BOTH motors are running.
             while (opModeIsActive()){
                 SparkFunOTOS.Pose2D cur_position = otosSensor.getPosition();
@@ -680,14 +686,28 @@ public abstract class RobotParent extends LinearOpMode {
                 double xSpeed = Range.clip(xError * P_DRIVE_GAIN, -1, 1);
                 double ySpeed = Range.clip(yError * P_DRIVE_GAIN, -1, 1);
 
+                telemetry.addLine("x error: " + xError);
+                telemetry.addLine("y error: " + yError);
+                telemetry.addLine("heading error: " + headingError);
+                telemetry.addLine("current position x: " + cur_position.x);
+                telemetry.addLine("current position y: " + cur_position.y);
+                telemetry.addLine("x speed: " + xSpeed);
+                telemetry.addLine("y speed: " + ySpeed);
+                telemetry.update();
+
+                if (gamepad1.y){
+                    moveRobot(0,0,0);
+                    continue;
+                }
+
                 // Ramp up to max driving speed over one second
                 if (runtime.seconds() < 1){
-                    moveRobot(xSpeed * runtime.seconds(), ySpeed * runtime.seconds(), turnSpeed * runtime.seconds());
+                    moveRobot(xSpeed * runtime.seconds(), -ySpeed * runtime.seconds(), 0 * runtime.seconds());
                 }
                 else{
-                    moveRobot(xSpeed, ySpeed, turnSpeed);
+                    moveRobot(xSpeed, -ySpeed, 0);
                 }
-                if (Math.abs(xError) < 1 && Math.abs(yError) < 1 && Math.abs(headingError) < 1){
+                if (Math.abs(xError) < 1 && Math.abs(yError) < 1 /*&& Math.abs(headingError) < 1*/){
                     break;
                 }
             }

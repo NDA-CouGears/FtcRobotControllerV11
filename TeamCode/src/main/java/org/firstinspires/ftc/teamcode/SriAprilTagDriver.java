@@ -332,7 +332,7 @@ public class SriAprilTagDriver extends LinearOpMode {
             if (gamepad1.b) {
                 moveRobot(0, 0, 0);
             } else {
-                moveRobot(-forwardDriveSpeed, -lateralDriveSpeed, turnSpeed);
+                moveRobot(forwardDriveSpeed, lateralDriveSpeed, turnSpeed);
             }
 
             telemetryAprilTag();
