@@ -487,15 +487,14 @@ public abstract class RobotParent extends LinearOpMode {
         }
 
         // Send powers to the wheels.
-        /*
         leftFrontDrive.setPower(leftFrontPower);
         rightFrontDrive.setPower(rightFrontPower);
         leftBackDrive.setPower(leftBackPower);
         rightBackDrive.setPower(rightBackPower);
 
-         */
+
         telemetry.addLine(String.format("X, Y, Yaw: %1.2f, %1.2f, %1.2f", x, y, yaw));
-        telemetry.update();
+
     }
     public double getHeading() {
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
@@ -709,10 +708,10 @@ public abstract class RobotParent extends LinearOpMode {
 
                 // Ramp up to max driving speed over one second
                 if (runtime.seconds() < 1){
-                    moveRobot(xSpeed * runtime.seconds(), -ySpeed * runtime.seconds(), 0 * runtime.seconds());
+                    moveRobot(xSpeed * runtime.seconds(), ySpeed * runtime.seconds(), 0 * runtime.seconds());
                 }
                 else{
-                    moveRobot(xSpeed, -ySpeed, 0);
+                    moveRobot(xSpeed, ySpeed, 0);
                 }
                 if (Math.abs(xError) < 1 && Math.abs(yError) < 1 /*&& Math.abs(headingError) < 1*/){
                     break;

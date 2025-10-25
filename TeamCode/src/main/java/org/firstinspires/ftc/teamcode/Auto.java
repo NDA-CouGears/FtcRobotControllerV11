@@ -19,8 +19,8 @@ public class Auto extends RobotParent{
         while (opModeIsActive()){
             //driveStraight(.2,-72.0,0);
             //turnToHeading(.2,-45);
-            driveToAprilTag(.2,20,25,0,0,.03);
-            //driveToLocation(0.3,-24, 24, 0);
+            //driveToAprilTag(.2,20,25,0,0,.03);
+            driveToLocation(0.3,-24, 24, 0);
             /*
             moveRobot(.2,0,0);
             Thread.sleep((2000));
