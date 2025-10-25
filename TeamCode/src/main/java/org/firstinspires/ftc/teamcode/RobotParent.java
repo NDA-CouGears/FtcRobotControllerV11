@@ -443,11 +443,11 @@ public abstract class RobotParent extends LinearOpMode {
     }
 
     public void controlCarousel(){
-        float RPM=223;
+        float RPM=30;
         float carouselSpeed = (gamepad1.right_trigger - gamepad1.left_trigger);
-        float carouselVelocity = carouselSpeed * (RPM/60 * 28 * 29.9f);
         // carouselSpeed * (rotations per second * ticks per rotation * gear ratio)
-        carousel.setVelocity(carouselVelocity/7.4);
+        float carouselVelocity = carouselSpeed * (RPM/60 * 28 * 26.9f);
+        carousel.setVelocity(carouselVelocity);
         if (gamepad1.dpad_up){
             carouselArm.setPosition(CAROUSEL_ARM_OPEN);
         }
@@ -487,10 +487,13 @@ public abstract class RobotParent extends LinearOpMode {
         }
 
         // Send powers to the wheels.
+        /*
         leftFrontDrive.setPower(leftFrontPower);
         rightFrontDrive.setPower(rightFrontPower);
         leftBackDrive.setPower(leftBackPower);
         rightBackDrive.setPower(rightBackPower);
+
+         */
         telemetry.addLine(String.format("X, Y, Yaw: %1.2f, %1.2f, %1.2f", x, y, yaw));
         telemetry.update();
     }
