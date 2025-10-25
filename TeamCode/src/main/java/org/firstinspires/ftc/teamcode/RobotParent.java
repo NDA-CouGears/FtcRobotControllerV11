@@ -314,7 +314,7 @@ public abstract class RobotParent extends LinearOpMode {
         final double TURN_GAIN = 0.005;   //  Turn Control "Gain".  e.g. Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
         double retryStartTime = 0;
         int retryCount = 0;
-        setManualExposureAprilTag(0,50);
+        setManualExposureAprilTag(0,75);
 
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -378,10 +378,11 @@ public abstract class RobotParent extends LinearOpMode {
             // Use the speed and turn "gains" to calculate how we want the robot to move. These are
             // more values with best guesses that need experimentation to find good values
             double forwardDriveSpeed = Math.min(errorY * speedGain, maxSpeed);
-            double lateralDriveSpeed = Math.min(-errorX * speedGain, maxSpeed);
+            double lateralDriveSpeed = Math.min(errorX * speedGain, maxSpeed);
             double turnSpeed = Math.min(target.ftcPose.yaw * TURN_GAIN, maxSpeed); //getSteeringCorrection(heading, TURN_GAIN);
             telemetry.addLine(String.format("turn speed = %5.2f", turnSpeed));
             telemetry.addLine(String.format("error x = %5.2f; drive speed = %5.2f", errorX, lateralDriveSpeed));
+            telemetry.addLine(String.format("error y = %5.2f;", errorY));
 
             if (forwardDriveSpeed < 0) {
                 forwardDriveSpeed = Range.clip(forwardDriveSpeed, -maxSpeed, -0.1);
@@ -397,7 +398,8 @@ public abstract class RobotParent extends LinearOpMode {
             if (gamepad1.b) {
                 moveRobot(0, 0, 0);
             } else {
-                moveRobot(forwardDriveSpeed, lateralDriveSpeed, -turnSpeed);
+                // negate drive speeds because camera is currently at the back of the robot
+                moveRobot(-lateralDriveSpeed, -forwardDriveSpeed, -turnSpeed);
             }
 
 
@@ -489,6 +491,8 @@ public abstract class RobotParent extends LinearOpMode {
         rightFrontDrive.setPower(rightFrontPower);
         leftBackDrive.setPower(leftBackPower);
         rightBackDrive.setPower(rightBackPower);
+        telemetry.addLine(String.format("X, Y, Yaw: %1.2f, %1.2f, %1.2f", x, y, yaw));
+        telemetry.update();
     }
     public double getHeading() {
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();

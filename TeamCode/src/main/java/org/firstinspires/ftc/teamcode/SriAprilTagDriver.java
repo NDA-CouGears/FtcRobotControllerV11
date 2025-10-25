@@ -317,6 +317,7 @@ public class SriAprilTagDriver extends LinearOpMode {
             double turnSpeed = Math.min(target.ftcPose.yaw * TURN_GAIN, maxSpeed); //getSteeringCorrection(heading, TURN_GAIN);
             telemetry.addLine(String.format("turn speed = %5.2f", turnSpeed));
             telemetry.addLine(String.format("error x = %5.2f; drive speed = %5.2f", errorX, lateralDriveSpeed));
+            telemetry.addLine(String.format("error y = %5.2f;", errorY));
 
             if (forwardDriveSpeed < 0) {
                 forwardDriveSpeed = Range.clip(forwardDriveSpeed, -maxSpeed, -0.1);

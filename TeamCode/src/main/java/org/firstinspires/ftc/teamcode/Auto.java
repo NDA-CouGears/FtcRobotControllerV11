@@ -16,7 +16,7 @@ public class Auto extends RobotParent{
         waitForStart();
         imu.resetYaw();
 
-        if (opModeIsActive()){
+        while (opModeIsActive()){
             //driveStraight(.2,-72.0,0);
             //turnToHeading(.2,-45);
             driveToAprilTag(.2,20,25,0,0,.03);
