@@ -671,7 +671,7 @@ public abstract class RobotParent extends LinearOpMode {
             // keep looping while we are still active, and BOTH motors are running.
             while (opModeIsActive()){
                 SparkFunOTOS.Pose2D cur_position = otosSensor.getPosition();
-
+                //fix heading errors...three coordinate systems!!
                 // Determine the heading current error
                 headingError = target_heading - cur_position.h;
 
@@ -688,6 +688,13 @@ public abstract class RobotParent extends LinearOpMode {
 
                 double xError = x_target_position - cur_position.x;
                 double yError = y_target_position - cur_position.y;
+
+                telemetry.addLine("x error b: " + xError);
+                telemetry.addLine("y error b: " + yError);
+                double trigHeading = headingError + 90;
+
+                xError = yError * Math.cos(trigHeading) + xError * Math.sin(trigHeading);
+                yError = xError * Math.cos(trigHeading) + yError * Math.sin(trigHeading);
 
                 double xSpeed = Range.clip(xError * P_DRIVE_GAIN, -1, 1);
                 double ySpeed = Range.clip(yError * P_DRIVE_GAIN, -1, 1);
@@ -708,12 +715,12 @@ public abstract class RobotParent extends LinearOpMode {
 
                 // Ramp up to max driving speed over one second
                 if (runtime.seconds() < 1){
-                    moveRobot(xSpeed * runtime.seconds(), ySpeed * runtime.seconds(), 0 * runtime.seconds());
+                    moveRobot(xSpeed * runtime.seconds(), ySpeed * runtime.seconds(), -turnSpeed * runtime.seconds());
                 }
                 else{
-                    moveRobot(xSpeed, ySpeed, 0);
+                    moveRobot(xSpeed, ySpeed, -turnSpeed);//negated turnSpeed b/c otos has counterclockwise as positive
                 }
-                if (Math.abs(xError) < 1 && Math.abs(yError) < 1 /*&& Math.abs(headingError) < 1*/){
+                if (Math.abs(xError) < 1 && Math.abs(yError) < 1 && Math.abs(headingError) < 1){
                     break;
                 }
             }
