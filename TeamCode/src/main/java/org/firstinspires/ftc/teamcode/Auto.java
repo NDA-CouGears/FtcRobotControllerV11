@@ -15,21 +15,12 @@ public class Auto extends RobotParent{
         initAprilTag();
         waitForStart();
         imu.resetYaw();
+        setCurrentPosition(55,-15,-90);
 
         while (opModeIsActive()){
+            //driveToLocation(.2, 35, -15, 0);
             showNavigationTelemetry();
-            //driveStraight(.2,-72.0,0);
-            //turnToHeading(.2,-45);
-            //driveToAprilTag(.2,20,25,0,0,.03);
-            //driveToLocation(0.3,0, 0, 45);
-            /*
-            moveRobot(.2,0,0);
-            Thread.sleep((2000));
-            moveRobot(0,.2,0);
-            Thread.sleep((2000));
-            moveRobot(0,0,.2);
-            Thread.sleep((2000));
-            */
+            driveToAprilTag(.2,20,25,0,0,.03);
         }
 
     }

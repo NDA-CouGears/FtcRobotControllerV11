@@ -45,6 +45,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -157,6 +158,22 @@ public abstract class RobotParent extends LinearOpMode {
         // Wait for the game to start (driver presses START)
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+    }
+
+    protected void setCurrentPosition(double x, double y, double heading) {
+        otosSensor.setPosition(new SparkFunOTOS.Pose2D(-y, x, heading + 90));
+    }
+
+    /**
+     * Don't access the OTOS sensor except through this
+     * @return field pose as computed from the OTOS sensor
+     */
+    protected Pose2D getFieldPosition(){
+        SparkFunOTOS.Pose2D otosPos = otosSensor.getPosition();
+        double heading = otosPos.h + 90;
+        double x = otosPos.y;
+        double y = -otosPos.x;
+        return new Pose2D(DistanceUnit.INCH, x, y, AngleUnit.DEGREES, heading);
     }
 
     private void initOtos() {
@@ -670,7 +687,9 @@ public abstract class RobotParent extends LinearOpMode {
 
             // keep looping while we are still active, and BOTH motors are running.
             while (opModeIsActive()){
+                // need to update this to use getFieldPosition()
                 SparkFunOTOS.Pose2D cur_position = otosSensor.getPosition();
+
                 //fix heading errors...three coordinate systems!!
                 // Determine the heading current error
                 headingError = target_heading - cur_position.h;
@@ -748,8 +767,11 @@ public abstract class RobotParent extends LinearOpMode {
             }
         }   // end for() loop
 
-        SparkFunOTOS.Pose2D cur_position = otosSensor.getPosition();
-        telemetry.addLine(String.format("OTOS XYZ %6.1f %6.1f %6.1f  (inch)", cur_position.x, cur_position.y, cur_position.h));
+        Pose2D cur_position = getFieldPosition();
+        telemetry.addLine(String.format("OTOS Field XYZ %6.1f %6.1f %6.1f  (inch)", cur_position.getX(DistanceUnit.INCH), cur_position.getY(DistanceUnit.INCH), cur_position.getHeading(AngleUnit.DEGREES)));
+
+        SparkFunOTOS.Pose2D otos_position = otosSensor.getPosition();
+        telemetry.addLine(String.format("OTOS XYZ %6.1f %6.1f %6.1f  (inch)", otos_position.x, otos_position.y, otos_position.h));
 
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         telemetry.addLine(String.format("IMU PRY %6.1f %6.1f %6.1f  (deg)", orientation.getPitch(), orientation.getRoll(), orientation.getYaw()));
