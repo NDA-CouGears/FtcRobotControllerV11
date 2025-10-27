@@ -731,4 +731,29 @@ public abstract class RobotParent extends LinearOpMode {
         }
     }
 
+    protected void showNavigationTelemetry() {
+        List<AprilTagDetection> tags = aprilTagProcessor.getDetections();
+        telemetry.addData("# AprilTags Detected", tags.size());
+
+        // Step through the list of detections and display info for each one.
+        AprilTagDetection target = null;// store target AprilTag
+        for (AprilTagDetection detection : tags) {
+            if (detection.metadata != null) {
+                telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
+                telemetry.addLine(String.format("Tag XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
+                telemetry.addLine(String.format("Tag PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
+                telemetry.addLine(String.format("Tag RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
+                telemetry.addLine(String.format("Field XYZ %6.1f %6.1f %6.1f  (inch)", detection.robotPose.getPosition().x, detection.robotPose.getPosition().y, detection.robotPose.getPosition().z));
+                telemetry.addLine(String.format("Field PRY %6.1f %6.1f %6.1f  (deg)", detection.robotPose.getOrientation().getPitch(), detection.robotPose.getOrientation().getRoll(), detection.robotPose.getOrientation().getYaw()));
+            }
+        }   // end for() loop
+
+        SparkFunOTOS.Pose2D cur_position = otosSensor.getPosition();
+        telemetry.addLine(String.format("OTOS XYZ %6.1f %6.1f %6.1f  (inch)", cur_position.x, cur_position.y, cur_position.h));
+
+        YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
+        telemetry.addLine(String.format("IMU PRY %6.1f %6.1f %6.1f  (deg)", orientation.getPitch(), orientation.getRoll(), orientation.getYaw()));
+
+        telemetry.update();
+    }
 }
