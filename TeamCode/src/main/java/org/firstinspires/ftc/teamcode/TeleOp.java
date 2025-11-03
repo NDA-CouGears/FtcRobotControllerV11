@@ -10,6 +10,7 @@ public class TeleOp extends RobotParent {
             mecanumDrive();
             shootArtifact();
             controlCarousel();
+            intakeBall();
         }
     }
 }

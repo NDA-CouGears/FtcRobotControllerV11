@@ -69,6 +69,7 @@ public abstract class RobotParent extends LinearOpMode {
     protected DcMotorEx rightShoot = null;
     protected DcMotorEx carousel = null;
     protected Servo carouselArm = null;
+    protected DcMotorEx intakeSpinny = null;
     public double targetHeading = 0;
     public double headingError = 0;
     public double turnSpeed = 0;
@@ -110,6 +111,7 @@ public abstract class RobotParent extends LinearOpMode {
         rightShoot = hardwareMap.get(DcMotorEx.class, "right shoot");
         carousel = hardwareMap.get(DcMotorEx.class, "carousel");
         carouselArm = hardwareMap.get(Servo.class, "carousel arm");
+        intakeSpinny = hardwareMap.get(DcMotorEx.class, "intake spinny");
 
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         leftBackDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -459,6 +461,15 @@ public abstract class RobotParent extends LinearOpMode {
         }
     }
 
+    public void intakeBall(){
+        if (gamepad1.a){
+            intakeSpinny.setPower(50);
+        }
+        else{
+            intakeSpinny.setPower(0);
+        }
+    }
+
     public void controlCarousel(){
         float RPM=30;
         float carouselSpeed = (gamepad1.right_trigger - gamepad1.left_trigger);
@@ -472,6 +483,7 @@ public abstract class RobotParent extends LinearOpMode {
             carouselArm.setPosition(CAROUSEL_ARM_CLOSED);
         }
     }
+
 
     /**
      *

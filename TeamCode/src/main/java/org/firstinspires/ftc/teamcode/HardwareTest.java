@@ -35,7 +35,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.Range;
 
 
@@ -65,19 +64,20 @@ public class HardwareTest extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        testServo = hardwareMap.get(Servo.class, "servo one");
-        motor1 = hardwareMap.get(DcMotorEx.class, "motor one");
-        motor2 = hardwareMap.get(DcMotorEx.class, "motor two");
+        testServo = hardwareMap.get(Servo.class, "carousel arm");
+        motor1 = hardwareMap.tryGet(DcMotorEx.class, "motor one");
+        motor2 = hardwareMap.tryGet(DcMotorEx.class, "motor two");
 
-        motor1.setDirection(DcMotorSimple.Direction.FORWARD);
-        motor2.setDirection(DcMotorSimple.Direction.REVERSE);
+        if (motor1 != null && motor2 != null) {
+            motor1.setDirection(DcMotorSimple.Direction.FORWARD);
+            motor2.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        motor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
+            motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            motor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        }
         // Wait for the game to start (driver presses START)
         waitForStart();
 
@@ -89,12 +89,14 @@ public class HardwareTest extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            if (useEncoders) {
-                motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            } else {
-                motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            if (motor1!=null && motor2!=null){
+                if (useEncoders) {
+                    motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                } else {
+                    motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                }
             }
 
             if (gamepad1.y) {
@@ -143,8 +145,10 @@ public class HardwareTest extends LinearOpMode {
                 telemetry.addLine(String.format("Positions 1: %d; 2: %d", motor1.getCurrentPosition(), motor2.getCurrentPosition()));
                 telemetry.addLine(String.format("Power 1: %1.2f; 2: %1.2f", motor1.getPower(), motor2.getPower()));
 
-                motor1.setPower(gamepad1.left_stick_y);
-                motor2.setPower(gamepad1.left_stick_y);
+                if (motor1 != null && motor2 != null) {
+                    motor1.setPower(gamepad1.left_stick_y);
+                    motor2.setPower(gamepad1.left_stick_y);
+                }
             }
 
             telemetry.update();
