@@ -18,9 +18,7 @@ public class Auto extends RobotParent{
         waitForStart();
 
         if (opModeIsActive()){
-            //driveToLocation(.2, -20, -30, -90);
-            driveToLocation(.2,55,-15,-45);
-            driveToLocation(.2,0,-15,-45);
+            driveToLocation(.2,0,-30,135);
             //showNavigationTelemetry();
             //driveToAprilTag(.2,20,25,0,0,.03);
         }

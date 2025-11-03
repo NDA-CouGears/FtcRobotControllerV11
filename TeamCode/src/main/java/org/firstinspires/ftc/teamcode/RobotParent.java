@@ -729,8 +729,22 @@ public abstract class RobotParent extends LinearOpMode {
                 double robotXError = fieldXError * Math.cos(trigHeading) + fieldYError * Math.sin(trigHeading);
                 double robotYError = fieldYError * Math.cos(trigHeading) + fieldXError * Math.sin(trigHeading);
 
-                double xSpeed = Range.clip(robotXError * P_DRIVE_GAIN, -1, 1);
-                double ySpeed = Range.clip(robotYError * P_DRIVE_GAIN, -1, 1);
+                double xSpeed = 0;
+                double ySpeed = 0;
+
+                if (robotXError>1){
+                    xSpeed = Range.clip(robotXError * P_DRIVE_GAIN, 0.1, 1);
+                }
+                else if (robotXError<-1){
+                    xSpeed = Range.clip(robotXError * P_DRIVE_GAIN, -1, -0.1);
+                }
+
+                if (robotYError>1){
+                    ySpeed = Range.clip(robotYError * P_DRIVE_GAIN, 0.1, 1);
+                }
+                else if (robotYError<-1){
+                    ySpeed = Range.clip(robotYError * P_DRIVE_GAIN, -1, -0.1);
+                }
 
                 telemetry.addLine("x error: " + robotXError);
                 telemetry.addLine("y error: " + robotYError);
