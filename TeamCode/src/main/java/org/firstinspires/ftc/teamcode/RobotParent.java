@@ -161,7 +161,7 @@ public abstract class RobotParent extends LinearOpMode {
     }
 
     protected void setCurrentPosition(double x, double y, double heading) {
-        otosSensor.setPosition(new SparkFunOTOS.Pose2D(-y, x, heading + 90));
+        otosSensor.setPosition(new SparkFunOTOS.Pose2D(y, -x, heading - 90));
     }
 
     /**
@@ -171,8 +171,8 @@ public abstract class RobotParent extends LinearOpMode {
     protected Pose2D getFieldPosition(){
         SparkFunOTOS.Pose2D otosPos = otosSensor.getPosition();
         double heading = otosPos.h + 90;
-        double x = otosPos.y;
-        double y = -otosPos.x;
+        double x = -otosPos.y;
+        double y = otosPos.x;
         return new Pose2D(DistanceUnit.INCH, x, y, AngleUnit.DEGREES, heading);
     }
 
@@ -207,7 +207,7 @@ public abstract class RobotParent extends LinearOpMode {
         // clockwise (negative rotation) from the robot's orientation, the offset
         // would be {-5, 10, -90}. These can be any value, even the angle can be
         // tweaked slightly to compensate for imperfect mounting (eg. 1.3 degrees).
-        SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(-2, -4, 0);
+        SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(-2, -2.75, 0);
         otosSensor.setOffset(offset);
 
         // Here we can set the linear and angular scalars, which can compensate for
@@ -671,6 +671,16 @@ public abstract class RobotParent extends LinearOpMode {
             return (false);
         }
     }
+
+    /**
+     * Drive to location and heading in field coordinate system.
+     *
+     * @param maxDriveSpeed
+     * @param x_target_position
+     * @param y_target_position
+     * @param target_heading
+     * @throws InterruptedException
+     */
     public void driveToLocation(double maxDriveSpeed,
                               double x_target_position, double y_target_position,
                               double target_heading) throws InterruptedException {
@@ -688,11 +698,15 @@ public abstract class RobotParent extends LinearOpMode {
             // keep looping while we are still active, and BOTH motors are running.
             while (opModeIsActive()){
                 // need to update this to use getFieldPosition()
-                SparkFunOTOS.Pose2D cur_position = otosSensor.getPosition();
+                Pose2D cur_position = getFieldPosition();
+                //SparkFunOTOS.Pose2D cur_position = otosSensor.getPosition();
+                double x = cur_position.getX(DistanceUnit.INCH);
+                double y = cur_position.getY(DistanceUnit.INCH);
+                double h = cur_position.getHeading(AngleUnit.DEGREES);
 
                 //fix heading errors...three coordinate systems!!
                 // Determine the heading current error
-                headingError = target_heading - cur_position.h;
+                headingError = target_heading - h;
 
                 // Normalize the error to be within +/- 180 degrees to avoid wasting time with overly long turns
                 while (headingError > 180) headingError -= 360;
@@ -703,28 +717,29 @@ public abstract class RobotParent extends LinearOpMode {
 
 
                 telemetry.addLine("turn speed: " + turnSpeed);
-                telemetry.addLine("heading: " + cur_position.h);
+                telemetry.addLine("heading: " + h);
 
-                double xError = x_target_position - cur_position.x;
-                double yError = y_target_position - cur_position.y;
+                double fieldXError = x_target_position - x;
+                double fieldYError = y_target_position - y;
 
-                telemetry.addLine("x error b: " + xError);
-                telemetry.addLine("y error b: " + yError);
-                double trigHeading = headingError + 90;
+                telemetry.addLine("x error field: " + fieldXError);
+                telemetry.addLine("y error field: " + fieldYError);
+                double trigHeading = -Math.toRadians(h);
 
-                xError = yError * Math.cos(trigHeading) + xError * Math.sin(trigHeading);
-                yError = xError * Math.cos(trigHeading) + yError * Math.sin(trigHeading);
+                double robotXError = fieldXError * Math.cos(trigHeading) + fieldYError * Math.sin(trigHeading);
+                double robotYError = fieldYError * Math.cos(trigHeading) + fieldXError * Math.sin(trigHeading);
 
-                double xSpeed = Range.clip(xError * P_DRIVE_GAIN, -1, 1);
-                double ySpeed = Range.clip(yError * P_DRIVE_GAIN, -1, 1);
+                double xSpeed = Range.clip(robotXError * P_DRIVE_GAIN, -1, 1);
+                double ySpeed = Range.clip(robotYError * P_DRIVE_GAIN, -1, 1);
 
-                telemetry.addLine("x error: " + xError);
-                telemetry.addLine("y error: " + yError);
+                telemetry.addLine("x error: " + robotXError);
+                telemetry.addLine("y error: " + robotYError);
                 telemetry.addLine("heading error: " + headingError);
-                telemetry.addLine("current position x: " + cur_position.x);
-                telemetry.addLine("current position y: " + cur_position.y);
+                telemetry.addLine("current position x: " + x);
+                telemetry.addLine("current position y: " + y);
                 telemetry.addLine("x speed: " + xSpeed);
                 telemetry.addLine("y speed: " + ySpeed);
+                telemetry.addLine("h: " + h);
                 telemetry.update();
 
                 if (gamepad1.y){
@@ -737,9 +752,9 @@ public abstract class RobotParent extends LinearOpMode {
                     moveRobot(xSpeed * runtime.seconds(), ySpeed * runtime.seconds(), -turnSpeed * runtime.seconds());
                 }
                 else{
-                    moveRobot(xSpeed, ySpeed, -turnSpeed);//negated turnSpeed b/c otos has counterclockwise as positive
+                    moveRobot(xSpeed, ySpeed, -turnSpeed); // negated turnSpeed b/c field has counterclockwise as positive
                 }
-                if (Math.abs(xError) < 1 && Math.abs(yError) < 1 && Math.abs(headingError) < 1){
+                if (Math.abs(fieldXError) < 1 && Math.abs(fieldYError) < 1 && Math.abs(headingError) < 1){
                     break;
                 }
             }

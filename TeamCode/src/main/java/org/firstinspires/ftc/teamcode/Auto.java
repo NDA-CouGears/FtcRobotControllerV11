@@ -13,14 +13,16 @@ public class Auto extends RobotParent{
     public void runOpMode() throws InterruptedException {
         initHardware();
         initAprilTag();
-        waitForStart();
         imu.resetYaw();
         setCurrentPosition(55,-15,-90);
+        waitForStart();
 
-        while (opModeIsActive()){
-            //driveToLocation(.2, 35, -15, 0);
-            showNavigationTelemetry();
-            driveToAprilTag(.2,20,25,0,0,.03);
+        if (opModeIsActive()){
+            //driveToLocation(.2, -20, -30, -90);
+            driveToLocation(.2,55,-15,-45);
+            driveToLocation(.2,0,-15,-45);
+            //showNavigationTelemetry();
+            //driveToAprilTag(.2,20,25,0,0,.03);
         }
 
     }
