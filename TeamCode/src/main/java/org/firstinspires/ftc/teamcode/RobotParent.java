@@ -84,8 +84,8 @@ public abstract class RobotParent extends LinearOpMode {
     private static final float SHOOT_GEAR_RATIO = 3.7f;
     private static final float SHOOT_MAX_RPM = 1620f;
     private static final float SHOOT_TICKS_PER_ROTATION = 28*SHOOT_GEAR_RATIO;
-    private static final double CAROUSEL_ARM_OPEN = .25;
-    private static final double CAROUSEL_ARM_CLOSED = .75;
+    private static final double CAROUSEL_ARM_OPEN = .75;
+    private static final double CAROUSEL_ARM_CLOSED = .25;
     static final double P_DRIVE_GAIN = 0.03;// Larger is more responsive, but also less stable.
     static final double P_TURN_GAIN = 0.02;// Larger is more responsive, but also less stable.
     static final double HEADING_THRESHOLD = 1.0;// How close must the heading get to the target before moving to next step.
@@ -111,6 +111,7 @@ public abstract class RobotParent extends LinearOpMode {
         rightShoot = hardwareMap.get(DcMotorEx.class, "right shoot");
         carousel = hardwareMap.get(DcMotorEx.class, "carousel");
         carouselArm = hardwareMap.get(Servo.class, "carousel arm");
+        carouselArm.setPosition(CAROUSEL_ARM_CLOSED);
         intakeSpinny = hardwareMap.get(DcMotorEx.class, "intake spinny");
 
         leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -472,16 +473,21 @@ public abstract class RobotParent extends LinearOpMode {
 
     public void controlCarousel(){
         float RPM=30;
-        float carouselSpeed = (gamepad1.right_trigger - gamepad1.left_trigger);
+        float carouselSpeed = (gamepad2.right_trigger - gamepad2.left_trigger);
         // carouselSpeed * (rotations per second * ticks per rotation * gear ratio)
         float carouselVelocity = carouselSpeed * (RPM/60 * 28 * 26.9f);
         carousel.setVelocity(carouselVelocity);
+
         if (gamepad2.dpad_up){
+            telemetry.addLine("carousel arm open");
             carouselArm.setPosition(CAROUSEL_ARM_OPEN);
         }
-        else if (gamepad2.dpad_down){
+        else if (carouselArm.getPosition()==CAROUSEL_ARM_OPEN){
+            telemetry.addLine("carousel arm closed");
             carouselArm.setPosition(CAROUSEL_ARM_CLOSED);
         }
+
+        telemetry.update();
     }
 
 
