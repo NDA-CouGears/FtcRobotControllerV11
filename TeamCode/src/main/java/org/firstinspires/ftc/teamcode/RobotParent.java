@@ -447,7 +447,7 @@ public abstract class RobotParent extends LinearOpMode {
     }
 
     public void shootArtifact(){
-        if (gamepad1.left_bumper && !shootButtonPressed){
+        if (gamepad2.left_bumper && !shootButtonPressed){
             shootButtonPressed = true;
             shootRunTime.reset();
             float motorVel = (SHOOT_MAX_RPM/60)*SHOOT_TICKS_PER_ROTATION;
@@ -462,7 +462,7 @@ public abstract class RobotParent extends LinearOpMode {
     }
 
     public void intakeBall(){
-        if (gamepad1.a){
+        if (gamepad2.a){
             intakeSpinny.setPower(50);
         }
         else{
@@ -476,10 +476,10 @@ public abstract class RobotParent extends LinearOpMode {
         // carouselSpeed * (rotations per second * ticks per rotation * gear ratio)
         float carouselVelocity = carouselSpeed * (RPM/60 * 28 * 26.9f);
         carousel.setVelocity(carouselVelocity);
-        if (gamepad1.dpad_up){
+        if (gamepad2.dpad_up){
             carouselArm.setPosition(CAROUSEL_ARM_OPEN);
         }
-        else if (gamepad1.dpad_down){
+        else if (gamepad2.dpad_down){
             carouselArm.setPosition(CAROUSEL_ARM_CLOSED);
         }
     }
@@ -736,10 +736,14 @@ public abstract class RobotParent extends LinearOpMode {
 
                 telemetry.addLine("x error field: " + fieldXError);
                 telemetry.addLine("y error field: " + fieldYError);
-                double trigHeading = -Math.toRadians(h);
+                double trigHeading = -Math.toRadians(h); // TO DO: figure why we're negating this
 
-                double robotXError = fieldXError * Math.cos(trigHeading) + fieldYError * Math.sin(trigHeading);
-                double robotYError = fieldYError * Math.cos(trigHeading) + fieldXError * Math.sin(trigHeading);
+                //double robotXError = fieldXError * Math.cos(trigHeading) + fieldYError * Math.sin(trigHeading);
+                //double robotYError = fieldYError * Math.cos(trigHeading) + fieldXError * Math.sin(trigHeading);
+
+                double robotXError = fieldYError / Math.cos(trigHeading-(Math.toRadians(90))) + fieldXError * Math.sin(trigHeading);
+                double robotYError = fieldYError / Math.cos(trigHeading) + fieldXError * Math.sin(trigHeading);
+                // TO DO: figure out the field x error's impact on robot errors
 
                 double xSpeed = 0;
                 double ySpeed = 0;

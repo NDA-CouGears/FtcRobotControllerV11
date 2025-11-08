@@ -52,7 +52,7 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name = "Hardware Test", group = "Hardware")
-public class HardwareTest extends LinearOpMode {
+public class HardwareTest extends RobotParent {
 
     DcMotorEx motor1;
     DcMotorEx motor2;
