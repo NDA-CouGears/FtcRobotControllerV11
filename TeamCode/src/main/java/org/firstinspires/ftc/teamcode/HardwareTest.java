@@ -29,11 +29,9 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
@@ -64,11 +62,13 @@ public class HardwareTest extends RobotParent {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        testServo = hardwareMap.get(Servo.class, "carousel arm");
+        /* testServo = hardwareMap.get(Servo.class, "carousel arm");
         motor1 = hardwareMap.tryGet(DcMotorEx.class, "motor one");
-        motor2 = hardwareMap.tryGet(DcMotorEx.class, "motor two");
+        motor2 = hardwareMap.tryGet(DcMotorEx.class, "motor two"); */
 
-        if (motor1 != null && motor2 != null) {
+        initHardware();
+
+        /* if (motor1 != null && motor2 != null) {
             motor1.setDirection(DcMotorSimple.Direction.FORWARD);
             motor2.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -77,35 +77,35 @@ public class HardwareTest extends RobotParent {
 
             motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             motor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        }
+        } */
+
         // Wait for the game to start (driver presses START)
         waitForStart();
 
         double positionA = 0, positionB = 0, curPos = 0;
         boolean configMode = true;
         boolean useEncoders = true;
-        boolean yButtonPressed = false;
+        boolean aButtonPressed = false;
         boolean xButtonPressed = false;
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            if (motor1!=null && motor2!=null){
-                if (useEncoders) {
-                    motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                } else {
-                    motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                    motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                }
+            if (useEncoders) {
+                motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            } else {
+                motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             }
 
-            if (gamepad1.y) {
-                if (!yButtonPressed) {
+
+            if (gamepad1.a) {
+                if (!aButtonPressed) {
                     configMode = !configMode;
-                    yButtonPressed = true;
+                    aButtonPressed = true;
                 }
             } else {
-                yButtonPressed = false;
+                aButtonPressed = false;
             }
             if (gamepad1.x) {
                 if (!xButtonPressed) {
@@ -136,19 +136,18 @@ public class HardwareTest extends RobotParent {
                 telemetry.addLine(String.format("Using encoders %b", useEncoders));
                 telemetry.addLine(String.format("A: %1.2f; B: %1.2f", positionA, positionB));
                 if (gamepad1.a) {
-                    testServo.setPosition(positionA);
+                    carouselArm.setPosition(positionA);
                 }
                 if (gamepad1.b) {
-                    testServo.setPosition(positionB);
+                    carouselArm.setPosition(positionB);
                 }
 
-                telemetry.addLine(String.format("Positions 1: %d; 2: %d", motor1.getCurrentPosition(), motor2.getCurrentPosition()));
-                telemetry.addLine(String.format("Power 1: %1.2f; 2: %1.2f", motor1.getPower(), motor2.getPower()));
+                telemetry.addLine(String.format("Positions 1: %d; 2: %d", leftShoot.getCurrentPosition(), rightShoot.getCurrentPosition()));
+                telemetry.addLine(String.format("Power 1: %1.2f; 2: %1.2f", leftShoot.getPower(), rightShoot.getPower()));
 
-                if (motor1 != null && motor2 != null) {
-                    motor1.setPower(gamepad1.left_stick_y);
-                    motor2.setPower(gamepad1.left_stick_y);
-                }
+                leftShoot.setPower(gamepad1.left_stick_y);
+                rightShoot.setPower(gamepad1.left_stick_y);
+
             }
 
             telemetry.update();
