@@ -736,13 +736,11 @@ public abstract class RobotParent extends LinearOpMode {
 
                 telemetry.addLine("x error field: " + fieldXError);
                 telemetry.addLine("y error field: " + fieldYError);
-                double trigHeading = -Math.toRadians(h); // TO DO: figure why we're negating this
+                double trigHeading = Math.toRadians(h);
 
-                //double robotXError = fieldXError * Math.cos(trigHeading) + fieldYError * Math.sin(trigHeading);
-                //double robotYError = fieldYError * Math.cos(trigHeading) + fieldXError * Math.sin(trigHeading);
+                double robotXError = fieldXError * Math.cos(trigHeading) - fieldYError * Math.sin(trigHeading);
+                double robotYError = fieldYError * Math.cos(trigHeading) + fieldXError * Math.sin(trigHeading);
 
-                double robotXError = fieldYError / Math.cos(trigHeading-(Math.toRadians(90))) + fieldXError * Math.sin(trigHeading);
-                double robotYError = fieldYError / Math.cos(trigHeading) + fieldXError * Math.sin(trigHeading);
                 // TO DO: figure out the field x error's impact on robot errors
 
                 double xSpeed = 0;
