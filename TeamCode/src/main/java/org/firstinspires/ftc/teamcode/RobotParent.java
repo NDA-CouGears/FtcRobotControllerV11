@@ -700,8 +700,8 @@ public abstract class RobotParent extends LinearOpMode {
      * @throws InterruptedException
      */
     public void driveToLocation(double maxDriveSpeed,
-                              double x_target_position, double y_target_position,
-                              double target_heading) throws InterruptedException {
+                                double x_target_position, double y_target_position,
+                                double target_heading) throws InterruptedException {
 
         // Ensure that the OpMode is still active
         if (opModeIsActive()) {
@@ -742,8 +742,11 @@ public abstract class RobotParent extends LinearOpMode {
 
                 telemetry.addLine("x error field: " + fieldXError);
                 telemetry.addLine("y error field: " + fieldYError);
-                double trigHeading = Math.toRadians(h);
 
+                // This code rotates the error vector from field space to robot space. The heading
+                // represents how far out of alignment the field and robot space is, to undo this
+                // misalignment for the error vector we negate the heading.
+                double trigHeading = Math.toRadians(-h);
                 double robotXError = fieldXError * Math.cos(trigHeading) - fieldYError * Math.sin(trigHeading);
                 double robotYError = fieldYError * Math.cos(trigHeading) + fieldXError * Math.sin(trigHeading);
 

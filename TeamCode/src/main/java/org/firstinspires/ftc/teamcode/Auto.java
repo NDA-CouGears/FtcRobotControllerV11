@@ -4,13 +4,14 @@ package org.firstinspires.ftc.teamcode;
 
 public class Auto extends RobotParent{
     int curMenu = 0;
-    double config_x = 55, config_y = -15, config_h = -90;
+    double config_x = 0, config_y = 0, config_h = 0;
 
-    protected void configMenu() throws InterruptedException {
+    protected void configMenu(String heading) throws InterruptedException {
         boolean changed = false;
 
         // Display current menu state
-        telemetry.addLine("CONFIG MENU");
+        telemetry.addLine(heading);
+        telemetry.addLine("dpad.y to select, left stick.y to change value");
         telemetry.addLine(String.format("%s CHANGE X %2.2f", curMenu == 0?"*":"-", config_x));
         telemetry.addLine(String.format("%s CHANGE Y %2.2f", curMenu == 1?"*":"-", config_y));
         telemetry.addLine(String.format("%s CHANGE H %2.2f", curMenu == 2?"*":"-", config_h));
@@ -20,7 +21,7 @@ public class Auto extends RobotParent{
             curMenu++;
             changed = true;
         }
-        else if (gamepad1.dpad_up) {
+        else if (gamepad1.dpad_up && curMenu > 0) {
             curMenu--;
             changed = true;
         }
@@ -63,15 +64,26 @@ public class Auto extends RobotParent{
         initAprilTag();
         imu.resetYaw();
 
+        // Starting field pose for this run
+        config_x = 55;
+        config_y = -15;
+        config_h = -90;
+
         while (!isStarted()) {
-            configMenu();
+            configMenu("Set Starting Pose");
             telemetry.update();
         }
 
         setCurrentPosition(config_x, config_y, config_h);
 
+        // Target field pose
+        config_x = 35;
+        config_y = -30;
+        config_h = -90;
+
         while (opModeIsActive()) {
-            configMenu();
+            configMenu("Set Target Pose");
+            telemetry.addLine("Press a to driveToLocation");
             if (gamepad1.a)
                 driveToLocation(.2,config_x,config_y,config_h);
             //showNavigationTelemetry();
