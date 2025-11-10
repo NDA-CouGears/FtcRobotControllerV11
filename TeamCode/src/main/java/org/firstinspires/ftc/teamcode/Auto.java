@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Auto", group = "Tournament")
+//@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Auto", group = "Tournament")
 
 public class Auto extends RobotParent{
     int curMenu = 0;

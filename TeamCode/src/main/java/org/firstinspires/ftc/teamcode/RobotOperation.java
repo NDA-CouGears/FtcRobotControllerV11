@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
 public abstract class RobotOperation {
-    protected RobotParent robot;
-    public void init(RobotParent robot){
+    protected IterativeRobotParent robot;
+    public void init(IterativeRobotParent robot){
         this.robot = robot;
     }
 
