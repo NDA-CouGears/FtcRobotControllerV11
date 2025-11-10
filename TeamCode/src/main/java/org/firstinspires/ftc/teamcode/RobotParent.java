@@ -731,7 +731,7 @@ public abstract class RobotParent extends LinearOpMode {
                 while (headingError <= -180) headingError += 360;
 
                 // Multiply the error by the gain to determine the required steering correction/  Limit the result to +/- 1.0
-                turnSpeed = Range.clip(headingError * P_TURN_GAIN, -1, 1);
+                turnSpeed = Range.clip(headingError * P_TURN_GAIN, -maxDriveSpeed, maxDriveSpeed);
 
 
                 telemetry.addLine("turn speed: " + turnSpeed);
@@ -756,17 +756,17 @@ public abstract class RobotParent extends LinearOpMode {
                 double ySpeed = 0;
 
                 if (robotXError>1){
-                    xSpeed = Range.clip(robotXError * P_DRIVE_GAIN, 0.1, 1);
+                    xSpeed = Range.clip(robotXError * P_DRIVE_GAIN, 0.1, maxDriveSpeed);
                 }
                 else if (robotXError<-1){
-                    xSpeed = Range.clip(robotXError * P_DRIVE_GAIN, -1, -0.1);
+                    xSpeed = Range.clip(robotXError * P_DRIVE_GAIN, -maxDriveSpeed, -0.1);
                 }
 
                 if (robotYError>1){
-                    ySpeed = Range.clip(robotYError * P_DRIVE_GAIN, 0.1, 1);
+                    ySpeed = Range.clip(robotYError * P_DRIVE_GAIN, 0.1, maxDriveSpeed);
                 }
                 else if (robotYError<-1){
-                    ySpeed = Range.clip(robotYError * P_DRIVE_GAIN, -1, -0.1);
+                    ySpeed = Range.clip(robotYError * P_DRIVE_GAIN, -maxDriveSpeed, -0.1);
                 }
 
                 telemetry.addLine("x error: " + robotXError);

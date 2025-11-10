@@ -82,12 +82,15 @@ public class Auto extends RobotParent{
         config_h = -90;
 
         while (opModeIsActive()) {
-            configMenu("Set Target Pose");
-            telemetry.addLine("Press a to driveToLocation");
-            if (gamepad1.a)
-                driveToLocation(.2,config_x,config_y,config_h);
-            //showNavigationTelemetry();
-            //driveToAprilTag(.2,20,25,0,0,.03);
+            driveToLocation(0.6, -24, -24, 135);
+            Thread.sleep(500);
+            driveToLocation(0.6, -48, -48, 135);
+            Thread.sleep(500);
+
+            driveToLocation(0.6, 0, -48, -180);
+            Thread.sleep(500);
+            driveToLocation(0.6, 55, -15, -90);
+
             telemetry.update();
         }
 
