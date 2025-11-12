@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -36,6 +37,8 @@ public abstract class IterativeRobotParent extends OpMode {
     private boolean shootButtonPressed = false;
     private static final int MAX_SHOOT_TIME = 2;
     private ElapsedTime shootRunTime = new ElapsedTime();
+    private ElapsedTime overCurrentDuration = null;
+    protected boolean stalled = false;
     private SparkFunOTOS otosSensor;
     private AprilTagProcessor aprilTagProcessor;
     private VisionPortal aprilTagVisionPortal;
@@ -275,6 +278,27 @@ public abstract class IterativeRobotParent extends OpMode {
         return new Pose2D(DistanceUnit.INCH, x, y, AngleUnit.DEGREES, heading);
     }
 
+    protected boolean stallDetection(){
+        double currentCurrent = carousel.getCurrent(CurrentUnit.AMPS);
+        telemetry.addLine(String.format("current amps: %2.2f", currentCurrent));
+
+        if (currentCurrent > 9){
+            if (overCurrentDuration == null) {
+                overCurrentDuration = new ElapsedTime();
+                overCurrentDuration.reset();
+            }
+            else if (overCurrentDuration.milliseconds() > 100){
+                overCurrentDuration = null;
+                return true;
+            }
+        }
+        else {
+            overCurrentDuration = null;
+        }
+
+        return false;
+    }
+
     public void moveRobot(double x, double y, double yaw) {
         // make forward = positive y, right = positive x, and clockwise = positive yaw
         x=-x;
@@ -355,6 +379,13 @@ public abstract class IterativeRobotParent extends OpMode {
     }
 
     public void controlCarousel(){
+        if (stalled && gamepad2.right_trigger + gamepad2.left_trigger == 0){
+            stalled = false;
+        }
+        if (stalled){
+            carousel.setPower(0);
+            return;
+        }
         float RPM=30;
         float carouselSpeed = (gamepad2.right_trigger - gamepad2.left_trigger);
         // carouselSpeed * (rotations per second * ticks per rotation * gear ratio)

@@ -22,6 +22,11 @@ public class IterativeAuto extends IterativeRobotParent {
 
     @Override
     public void loop() {
+        if (stallDetection() || operations.isEmpty()){
+            operations.clear();
+            carousel.setPower(0);
+            return;
+        }
         if (curOperation == -1){
             curOperation++;
             RobotOperation robotCurOperation = operations.get(curOperation);

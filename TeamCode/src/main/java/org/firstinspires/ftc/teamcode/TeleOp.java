@@ -8,8 +8,9 @@ public class TeleOp extends IterativeRobotParent {
 
     @Override
     public void loop() {
-        
-
+        if (stallDetection()){
+            stalled = true;
+        }
         mecanumDrive();
         shootArtifact();
         controlCarousel();
