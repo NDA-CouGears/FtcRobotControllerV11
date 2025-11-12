@@ -135,6 +135,7 @@ public abstract class RobotParent extends LinearOpMode {
 
         leftShoot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightShoot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        carousel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         carousel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

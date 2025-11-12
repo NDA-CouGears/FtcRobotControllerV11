@@ -51,6 +51,9 @@ import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name = "Hardware Test", group = "Hardware")
 public class HardwareTest extends RobotParent {
+
+    int nextCarouselPos = 0;
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -135,17 +138,20 @@ public class HardwareTest extends RobotParent {
                 if (gamepad1.b) {
                     carouselArm.setPosition(positionB);
                 }
-                if (gamepad1.dpad_up) {
-                    hackCarousel(30);
-                }
-                if (gamepad1.dpad_right) {
-                    hackCarousel(60);
-                }
-                if (gamepad1.dpad_down) {
-                    hackCarousel(120);
-                }
-                if (gamepad1.dpad_left) {
-                    hackCarousel(240);
+                telemetry.addLine(String.format("Carousel Ecoder: %d", carousel.getCurrentPosition()));
+                if (!carousel.isBusy()) {
+                    if (gamepad1.dpad_up) {
+                        hackCarousel(30);
+                    }
+                    if (gamepad1.dpad_right) {
+                        hackCarousel(60);
+                    }
+                    if (gamepad1.dpad_down) {
+                        hackCarousel(120);
+                    }
+                    if (gamepad1.dpad_left) {
+                        hackCarousel(240);
+                    }
                 }
 
                 telemetry.addLine(String.format("Positions 1: %d; 2: %d", leftShoot.getCurrentPosition(), rightShoot.getCurrentPosition()));
@@ -164,19 +170,10 @@ public class HardwareTest extends RobotParent {
         // carouselSpeed * (rotations per second * ticks per rotation * gear ratio)
         float carouselVelocity = (RPM / 60 * 28 * 26.9f);
 
-        int targetPos = carousel.getCurrentPosition() - 251;
-        carousel.setTargetPosition(targetPos);
+        nextCarouselPos -= 251;
+        carousel.setTargetPosition(nextCarouselPos);
 
         carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         carousel.setVelocity(carouselVelocity);
-
-        while (carousel.isBusy() && (gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_right || gamepad1.dpad_left)) {
-        }
-
-        carousel.setPower(0);
-        carousel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        while (gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_right || gamepad1.dpad_left) {
-        }
     }
 }
