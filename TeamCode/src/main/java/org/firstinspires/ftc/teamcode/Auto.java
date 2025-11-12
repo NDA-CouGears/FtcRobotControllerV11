@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
-//@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Auto", group = "Tournament")
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
+//@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Auto", group = "Tournament")
+@Disabled
 public class Auto extends RobotParent{
     int curMenu = 0;
     double config_x = 0, config_y = 0, config_h = 0;

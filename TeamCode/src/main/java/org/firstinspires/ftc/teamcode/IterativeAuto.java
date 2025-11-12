@@ -14,6 +14,9 @@ public class IterativeAuto extends IterativeRobotParent {
         initAprilTag();
         setCurrentPosition(55, -15, -90);
         operations.add(new IterativeDriveToLocation(0.6, 10, -20, 45));
+        operations.add(new IterativeDriveToLocation(0.6, -40, -30, 135));
+        operations.add(new IterativeDriveToLocation(0.6, 0, -25, 90));
+        operations.add(new IterativeDriveToLocation(0.6, -20, -40, 0));
 
     }
 

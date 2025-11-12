@@ -51,12 +51,6 @@ import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name = "Hardware Test", group = "Hardware")
 public class HardwareTest extends RobotParent {
-
-    DcMotorEx motor1;
-    DcMotorEx motor2;
-
-    Servo testServo;
-
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -85,27 +79,27 @@ public class HardwareTest extends RobotParent {
         double positionA = 0, positionB = 0, curPos = 0;
         boolean configMode = true;
         boolean useEncoders = true;
-        boolean aButtonPressed = false;
+        boolean yButtonPressed = false;
         boolean xButtonPressed = false;
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             if (useEncoders) {
-                motor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                motor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                leftShoot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                rightShoot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             } else {
-                motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                leftShoot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                rightShoot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             }
 
 
-            if (gamepad1.a) {
-                if (!aButtonPressed) {
+            if (gamepad1.y) {
+                if (!yButtonPressed) {
                     configMode = !configMode;
-                    aButtonPressed = true;
+                    yButtonPressed = true;
                 }
             } else {
-                aButtonPressed = false;
+                yButtonPressed = false;
             }
             if (gamepad1.x) {
                 if (!xButtonPressed) {
@@ -124,7 +118,7 @@ public class HardwareTest extends RobotParent {
                 curPos += gamepad1.left_stick_y / 50.0;
                 curPos = Range.clip(curPos, 0, 1);
 
-                testServo.setPosition(curPos);
+                carouselArm.setPosition(curPos);
                 if (gamepad1.a) {
                     positionA = curPos;
                 }
@@ -141,6 +135,18 @@ public class HardwareTest extends RobotParent {
                 if (gamepad1.b) {
                     carouselArm.setPosition(positionB);
                 }
+                if (gamepad1.dpad_up) {
+                    hackCarousel(30);
+                }
+                if (gamepad1.dpad_right) {
+                    hackCarousel(60);
+                }
+                if (gamepad1.dpad_down) {
+                    hackCarousel(120);
+                }
+                if (gamepad1.dpad_left) {
+                    hackCarousel(240);
+                }
 
                 telemetry.addLine(String.format("Positions 1: %d; 2: %d", leftShoot.getCurrentPosition(), rightShoot.getCurrentPosition()));
                 telemetry.addLine(String.format("Power 1: %1.2f; 2: %1.2f", leftShoot.getPower(), rightShoot.getPower()));
@@ -151,6 +157,26 @@ public class HardwareTest extends RobotParent {
             }
 
             telemetry.update();
+        }
+    }
+
+    public void hackCarousel(float RPM) {
+        // carouselSpeed * (rotations per second * ticks per rotation * gear ratio)
+        float carouselVelocity = (RPM / 60 * 28 * 26.9f);
+
+        int targetPos = carousel.getCurrentPosition() - 251;
+        carousel.setTargetPosition(targetPos);
+
+        carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        carousel.setVelocity(carouselVelocity);
+
+        while (carousel.isBusy() && (gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_right || gamepad1.dpad_left)) {
+        }
+
+        carousel.setPower(0);
+        carousel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        while (gamepad1.dpad_up || gamepad1.dpad_down || gamepad1.dpad_right || gamepad1.dpad_left) {
         }
     }
 }

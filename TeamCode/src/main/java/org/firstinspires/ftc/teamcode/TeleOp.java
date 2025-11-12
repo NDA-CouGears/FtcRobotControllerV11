@@ -1,16 +1,18 @@
 package org.firstinspires.ftc.teamcode;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOp", group = "Tournament")
-public class TeleOp extends RobotParent {
+public class TeleOp extends IterativeRobotParent {
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void init() {
         initHardware();
-        waitForStart();
+    }
 
-        while (opModeIsActive()) {
-            mecanumDrive();
-            shootArtifact();
-            controlCarousel();
-            intakeBall();
-        }
+    @Override
+    public void loop() {
+        
+
+        mecanumDrive();
+        shootArtifact();
+        controlCarousel();
+        intakeBall();
     }
 }
