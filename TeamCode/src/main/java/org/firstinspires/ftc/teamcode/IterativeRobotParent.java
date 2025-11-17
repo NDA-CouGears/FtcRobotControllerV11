@@ -46,8 +46,8 @@ public abstract class IterativeRobotParent extends OpMode {
     private VisionPortal aprilTagVisionPortal;
     static final double P_TURN_GAIN = 0.02;// Larger is more responsive, but also less stable.
     static final double P_DRIVE_GAIN = 0.03;// Larger is more responsive, but also less stable.
-    private static final float SHOOT_GEAR_RATIO = 3.7f;
-    private static final float SHOOT_MAX_RPM = 1620f;
+    private static final float SHOOT_GEAR_RATIO = 1f;
+    private static final float SHOOT_MAX_RPM = 2000f;
     private static final float SHOOT_TICKS_PER_ROTATION = 28*SHOOT_GEAR_RATIO;
 
 
@@ -367,18 +367,22 @@ public abstract class IterativeRobotParent extends OpMode {
     }
 
     public void shootArtifact(){
-        if (gamepad2.left_bumper && !shootButtonPressed){
-            shootButtonPressed = true;
+        if (gamepad2.left_bumper /*&& !shootButtonPressed*/){
+            //shootButtonPressed = true;
             shootRunTime.reset();
             float motorVel = (SHOOT_MAX_RPM/60)*SHOOT_TICKS_PER_ROTATION;
             leftShoot.setVelocity(motorVel);
             rightShoot.setVelocity(motorVel);
         }
-        if (shootRunTime.seconds()>=MAX_SHOOT_TIME && shootButtonPressed){
-            shootButtonPressed = false;
+        else {
             leftShoot.setVelocity(0);
             rightShoot.setVelocity(0);
         }
+        /*if (shootRunTime.seconds()>=MAX_SHOOT_TIME && shootButtonPressed){
+            shootButtonPressed = false;
+            leftShoot.setVelocity(0);
+            rightShoot.setVelocity(0);
+        } */
     }
 
     public void intakeBall(){
