@@ -15,19 +15,31 @@ public class IterativeAuto extends IterativeRobotParent {
     public void init() {
         initHardware();
         initAprilTag();
-        setCurrentPosition(55, -15, -90);
-        /*
-        operations.add(new IterativeDriveToLocation(0.6, 10, -20, 45));
+        nearBlue();
+    }
+
+    private void addTest() {
+        operations.add(new SetStartingPosition(55,-15,-90));
+        operations.add(new IterativeScanObelisk());
+        operations.add(new IterativeDriveToLocation(0.6, 10, -20, -45));
+        operations.add(new IterativeOtisAprilTagCalibration());
         operations.add(new IterativeDriveToLocation(0.6, -40, -30, 135));
         operations.add(new IterativeDriveToLocation(0.6, 0, -25, 90));
         operations.add(new IterativeDriveToLocation(0.6, -20, -40, 0));
-
-         */
-        operations.add(new IterativeDriveToLocation(0.6, 10, -20, -45));
-        operations.add(new IterativeOtisAprilTagCalibration());
-        operations.add(new IterativeDriveToLocation(0.6, 10, -20, -45));
-
+        operations.add(new IterativeDriveToLocation(0.6, 55, -15, -90));
     }
+
+    private void nearBlue() {
+        operations.add(new IterativeScanObelisk());
+        operations.add(new SetStartingPosition(-24,-24,-117));
+        operations.add(new IterativeDriveToLocation(0.6,-24,-24,-45));
+        operations.add(new IterativeOtisAprilTagCalibration());
+        operations.add(new IterativeDriveToLocation(0.6, -48,-48,-45));
+        // shoot here
+        operations.add(new IterativeDriveToLocation(0.6, -55,-15,-90));
+    }
+
+    
 
     @Override
     public void loop() {
