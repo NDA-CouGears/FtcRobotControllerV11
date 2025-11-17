@@ -15,7 +15,7 @@ public class IterativeAuto extends IterativeRobotParent {
     public void init() {
         initHardware();
         initAprilTag();
-        nearBlue();
+        blueTasks(false);
     }
 
     private void addTest() {
@@ -29,9 +29,14 @@ public class IterativeAuto extends IterativeRobotParent {
         operations.add(new IterativeDriveToLocation(0.6, 55, -15, -90));
     }
 
-    private void nearBlue() {
+    private void blueTasks(boolean near) {
         operations.add(new IterativeScanObelisk());
-        operations.add(new SetStartingPosition(-24,-24,-117));
+        if (near) {
+            operations.add(new SetStartingPosition(-24, -24, -117));
+        }
+        else {
+            operations.add(new SetStartingPosition(55,-15,-90));
+        }
         operations.add(new IterativeDriveToLocation(0.6,-24,-24,-45));
         operations.add(new IterativeOtisAprilTagCalibration());
         operations.add(new IterativeDriveToLocation(0.6, -48,-48,-45));
@@ -39,7 +44,6 @@ public class IterativeAuto extends IterativeRobotParent {
         operations.add(new IterativeDriveToLocation(0.6, -55,-15,-90));
     }
 
-    
 
     @Override
     public void loop() {
