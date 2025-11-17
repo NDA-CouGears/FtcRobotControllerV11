@@ -17,8 +17,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class IterativeRobotParent extends OpMode {
@@ -261,7 +263,17 @@ public abstract class IterativeRobotParent extends OpMode {
 
     }   // end method initAprilTag()
 
+    public ArrayList<AprilTagDetection> getDetections(){
+        return aprilTagProcessor.getDetections();
+    }
+
     protected void setCurrentPosition(double x, double y, double heading) {
+        while(heading > 180){
+            heading -= 360;
+        }
+        while(heading < -180){
+            heading += 360;
+        }
         otosSensor.setPosition(new SparkFunOTOS.Pose2D(y, -x, heading - 90));
     }
 

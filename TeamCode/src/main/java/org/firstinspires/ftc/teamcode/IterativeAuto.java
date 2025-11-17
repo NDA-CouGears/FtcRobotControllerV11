@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 import java.util.ArrayList;
 import java.util.List;
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "IterativeAuto", group = "Tournament")
@@ -13,10 +16,16 @@ public class IterativeAuto extends IterativeRobotParent {
         initHardware();
         initAprilTag();
         setCurrentPosition(55, -15, -90);
+        /*
         operations.add(new IterativeDriveToLocation(0.6, 10, -20, 45));
         operations.add(new IterativeDriveToLocation(0.6, -40, -30, 135));
         operations.add(new IterativeDriveToLocation(0.6, 0, -25, 90));
         operations.add(new IterativeDriveToLocation(0.6, -20, -40, 0));
+
+         */
+        operations.add(new IterativeDriveToLocation(0.6, 10, -20, -45));
+        operations.add(new IterativeOtisAprilTagCalibration());
+        operations.add(new IterativeDriveToLocation(0.6, 10, -20, -45));
 
     }
 
@@ -40,6 +49,9 @@ public class IterativeAuto extends IterativeRobotParent {
             robotCurOperation = operations.get(curOperation);
             robotCurOperation.init(this);
         }
+        telemetry.addLine("position " + getFieldPosition().getX(DistanceUnit.INCH) + ", " + getFieldPosition().getY(DistanceUnit.INCH) + ", " + getFieldPosition().getHeading(AngleUnit.DEGREES));
+
+        telemetry.update();
     }
 
 }

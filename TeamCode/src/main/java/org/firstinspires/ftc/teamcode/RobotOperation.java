@@ -6,10 +6,8 @@ public abstract class RobotOperation {
         this.robot = robot;
     }
 
-    public void loop(){}
-    public boolean isFinished(){
-        return true;
-    }
+    public abstract void loop();
+    public abstract boolean isFinished();
 
     public void stop(){}
 }
