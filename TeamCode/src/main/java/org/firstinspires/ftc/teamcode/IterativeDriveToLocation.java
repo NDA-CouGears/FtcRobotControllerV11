@@ -102,7 +102,7 @@ public class IterativeDriveToLocation extends RobotOperation {
         robot.telemetry.addLine("x speed: " + xSpeed);
         robot.telemetry.addLine("y speed: " + ySpeed);
         robot.telemetry.addLine("h: " + h);
-        robot.telemetry.update();
+        //robot.telemetry.update();
 
         if (robot.gamepad1.y) {
             robot.moveRobot(0, 0, 0);

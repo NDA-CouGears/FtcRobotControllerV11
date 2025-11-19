@@ -144,7 +144,7 @@ public abstract class IterativeRobotParent extends OpMode {
         // clockwise (negative rotation) from the robot's orientation, the offset
         // would be {-5, 10, -90}. These can be any value, even the angle can be
         // tweaked slightly to compensate for imperfect mounting (eg. 1.3 degrees).
-        SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(-2, -2.75, 0);
+        SparkFunOTOS.Pose2D offset = new SparkFunOTOS.Pose2D(-7.5, -2.5, 90);
         otosSensor.setOffset(offset);
 
         // Here we can set the linear and angular scalars, which can compensate for
@@ -274,7 +274,7 @@ public abstract class IterativeRobotParent extends OpMode {
         while(heading < -180){
             heading += 360;
         }
-        otosSensor.setPosition(new SparkFunOTOS.Pose2D(y, -x, heading - 90));
+        otosSensor.setPosition(new SparkFunOTOS.Pose2D(x, y, heading));
     }
 
 
@@ -284,9 +284,9 @@ public abstract class IterativeRobotParent extends OpMode {
      */
     protected Pose2D getFieldPosition(){
         SparkFunOTOS.Pose2D otosPos = otosSensor.getPosition();
-        double heading = otosPos.h + 90;
-        double x = -otosPos.y;
-        double y = otosPos.x;
+        double heading = otosPos.h;
+        double x = otosPos.x;
+        double y = otosPos.y;
         return new Pose2D(DistanceUnit.INCH, x, y, AngleUnit.DEGREES, heading);
     }
 
@@ -313,8 +313,8 @@ public abstract class IterativeRobotParent extends OpMode {
 
     public void moveRobot(double x, double y, double yaw) {
         // make forward = positive y, right = positive x, and clockwise = positive yaw
-        x=-x;
-        // y=y;
+        //x=-x;
+        y=-y;
         yaw=-yaw;
 
         // Calculate wheel powers.

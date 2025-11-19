@@ -15,18 +15,33 @@ public class IterativeAuto extends IterativeRobotParent {
     public void init() {
         initHardware();
         initAprilTag();
-        blueTasks(false);
+        //blueTasks(false);
+        addTest();
     }
 
     private void addTest() {
-        operations.add(new SetStartingPosition(55,-15,-90));
-        operations.add(new IterativeScanObelisk());
+        operations.add(new SetStartingPosition(0,0,0));
+        //operations.add(new IterativeScanObelisk());
+        /*
         operations.add(new IterativeDriveToLocation(0.6, 10, -20, -45));
         operations.add(new IterativeOtisAprilTagCalibration());
         operations.add(new IterativeDriveToLocation(0.6, -40, -30, 135));
         operations.add(new IterativeDriveToLocation(0.6, 0, -25, 90));
         operations.add(new IterativeDriveToLocation(0.6, -20, -40, 0));
         operations.add(new IterativeDriveToLocation(0.6, 55, -15, -90));
+         */
+
+        operations.add(new IterativeDriveToLocation(0.6,0,10,0));
+        operations.add(new IterativeDriveToLocation(0.6, 10,10,0));
+        operations.add(new IterativeDriveToLocation(0.6,10,0,0));
+        operations.add(new IterativeDriveToLocation(0.6,0,0, 0));
+
+
+        operations.add(new IterativeDriveToLocation(
+                0.6,
+                0,
+                0,
+                90));
     }
 
     private void blueTasks(boolean near) {
