@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.util.Size;
+
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
@@ -19,6 +21,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.opencv.ImageRegion;
+import org.firstinspires.ftc.vision.opencv.PredominantColorProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +48,9 @@ public abstract class IterativeRobotParent extends OpMode {
     private SparkFunOTOS otosSensor;
     private AprilTagProcessor aprilTagProcessor;
     private VisionPortal aprilTagVisionPortal;
+    public PredominantColorProcessor colorSensor;
+
+    private VisionPortal ballVisionPortal;
     static final double P_TURN_GAIN = 0.02;// Larger is more responsive, but also less stable.
     static final double P_DRIVE_GAIN = 0.03;// Larger is more responsive, but also less stable.
     private static final float SHOOT_GEAR_RATIO = 1f;
@@ -81,6 +88,7 @@ public abstract class IterativeRobotParent extends OpMode {
         leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        carousel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -263,6 +271,20 @@ public abstract class IterativeRobotParent extends OpMode {
 
     }   // end method initAprilTag()
 
+    public void initBallCam(){
+        colorSensor = new PredominantColorProcessor.Builder()
+                .setRoi(ImageRegion.asUnityCenterCoordinates(-0.1, 0.1, 0.1, -0.1))
+                .setSwatches(
+                        PredominantColorProcessor.Swatch.ARTIFACT_GREEN,
+                        PredominantColorProcessor.Swatch.ARTIFACT_PURPLE)
+                .build();
+        ballVisionPortal = new VisionPortal.Builder()
+                .addProcessor(colorSensor)
+                .setCameraResolution(new Size(320, 240))
+                .setCamera(hardwareMap.get(WebcamName.class, "Ball Cam"))
+                .build();
+    }
+
     public ArrayList<AprilTagDetection> getDetections(){
         return aprilTagProcessor.getDetections();
     }
@@ -402,11 +424,14 @@ public abstract class IterativeRobotParent extends OpMode {
             carousel.setPower(0);
             return;
         }
+
+        carousel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         float RPM=30;
         float carouselSpeed = (gamepad2.right_trigger - gamepad2.left_trigger);
         // carouselSpeed * (rotations per second * ticks per rotation * gear ratio)
         float carouselVelocity = carouselSpeed * (RPM/60 * 28 * 26.9f);
         carousel.setVelocity(carouselVelocity);
+
 
         if (gamepad2.dpad_up){
             telemetry.addLine("carousel arm open");
@@ -418,6 +443,10 @@ public abstract class IterativeRobotParent extends OpMode {
         }
 
         telemetry.update();
+    }
+
+    public String scanBay(){
+
     }
 
 }

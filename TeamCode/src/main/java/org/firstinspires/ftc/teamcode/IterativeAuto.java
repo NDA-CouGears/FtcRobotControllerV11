@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -15,6 +17,7 @@ public class IterativeAuto extends IterativeRobotParent {
     public void init() {
         initHardware();
         initAprilTag();
+        initBallCam();
         //blueTasks(false);
         addTest();
     }
@@ -29,19 +32,16 @@ public class IterativeAuto extends IterativeRobotParent {
         operations.add(new IterativeDriveToLocation(0.6, 0, -25, 90));
         operations.add(new IterativeDriveToLocation(0.6, -20, -40, 0));
         operations.add(new IterativeDriveToLocation(0.6, 55, -15, -90));
-         */
-
         operations.add(new IterativeDriveToLocation(0.6,0,10,0));
         operations.add(new IterativeDriveToLocation(0.6, 10,10,0));
         operations.add(new IterativeDriveToLocation(0.6,10,0,0));
         operations.add(new IterativeDriveToLocation(0.6,0,0, 0));
+        operations.add(new IterativeDriveToLocation(0.6,0,0,90));
+         */
+        operations.add(new PrepareLoad(2));
+        operations.add(new PrepareLaunch(2));
 
 
-        operations.add(new IterativeDriveToLocation(
-                0.6,
-                0,
-                0,
-                90));
     }
 
     private void blueTasks(boolean near) {
