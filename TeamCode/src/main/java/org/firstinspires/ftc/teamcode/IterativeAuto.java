@@ -38,8 +38,9 @@ public class IterativeAuto extends IterativeRobotParent {
         operations.add(new IterativeDriveToLocation(0.6,0,0, 0));
         operations.add(new IterativeDriveToLocation(0.6,0,0,90));
          */
-        operations.add(new PrepareLoad(2));
-        operations.add(new PrepareLaunch(2));
+        //operations.add(new PrepareLoad(2));
+        //operations.add(new PrepareLaunch(2));
+        operations.add(new ScanBay(1));
 
 
     }
@@ -81,7 +82,7 @@ public class IterativeAuto extends IterativeRobotParent {
             robotCurOperation.init(this);
         }
         telemetry.addLine("position " + getFieldPosition().getX(DistanceUnit.INCH) + ", " + getFieldPosition().getY(DistanceUnit.INCH) + ", " + getFieldPosition().getHeading(AngleUnit.DEGREES));
-
+        telemetry.addLine(CarouselOperations.colors.get(0));
         telemetry.update();
     }
 

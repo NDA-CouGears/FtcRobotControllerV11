@@ -24,7 +24,7 @@ public class PrepareLoad extends CarouselOperations{
         robot.carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.carousel.setPower(.5);
         curPos = robot.carousel.getCurrentPosition();
-        if (robot.carousel.getCurrent(CurrentUnit.AMPS) == 0){
+        if (!robot.carousel.isBusy()){
             curPos = targetPos;
             finished = true;
         }

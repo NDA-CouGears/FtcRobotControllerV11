@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class CarouselOperations extends RobotOperation{
 
@@ -10,7 +11,7 @@ public class CarouselOperations extends RobotOperation{
     protected float zero;
     protected float targetPos;
     protected boolean finished= false;
-    ArrayList<String> colors = new ArrayList<String>();
+    public static ArrayList<String> colors = new ArrayList<String>(Arrays.asList(null, null, null));
     @Override
     public void loop() {
         offset = curPos % CTR;

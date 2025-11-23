@@ -1,28 +1,35 @@
 package org.firstinspires.ftc.teamcode;
 
-import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.opencv.PredominantColorProcessor;
 
 public class ScanBay extends CarouselOperations{
-    public ScanBay(int bay){
+    int bay;
+
+    public ScanBay(int bay) {
+        this.bay = bay;
+    }
+
+    @Override
+    public void loop() {
         String ball;
-        if (robot.colorSensor.getAnalysis().closestSwatch == PredominantColorProcessor.Swatch.ARTIFACT_GREEN){
+        PredominantColorProcessor.Swatch current = robot.colorSensor.getAnalysis().closestSwatch;
+        robot.telemetry.addLine(String.valueOf(current));
+        if (current == PredominantColorProcessor.Swatch.ARTIFACT_GREEN){
             ball = "g";
+            finished = true;
         }
-        else if (robot.colorSensor.getAnalysis().closestSwatch == PredominantColorProcessor.Swatch.ARTIFACT_GREEN){
+        else if (current == PredominantColorProcessor.Swatch.ARTIFACT_PURPLE){
             ball = "p";
+            finished = true;
         }
         else {
             ball = null;
         }
-        if (bay == 1){
-            colors.set(0,ball);
-        }
-        else if (bay == 2){
-            colors.set(1,ball);
-        }
-        else if (bay == 3){
-            colors.set(2,ball);
-        }
+        colors.set(bay-1, ball);
+    }
+
+    @Override
+    public boolean isFinished() {
+        return super.isFinished();
     }
 }

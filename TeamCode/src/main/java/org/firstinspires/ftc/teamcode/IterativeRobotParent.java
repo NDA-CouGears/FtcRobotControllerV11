@@ -250,7 +250,7 @@ public abstract class IterativeRobotParent extends OpMode {
         // builder.setCameraResolution(new Size(640, 480));
 
         // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
-        // builder.enableLiveView(true);
+        builder.enableLiveView(false);
 
         // Set the stream format; MJPEG uses less bandwidth than default YUY2.
         // builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);
@@ -276,7 +276,9 @@ public abstract class IterativeRobotParent extends OpMode {
                 .setRoi(ImageRegion.asUnityCenterCoordinates(-0.1, 0.1, 0.1, -0.1))
                 .setSwatches(
                         PredominantColorProcessor.Swatch.ARTIFACT_GREEN,
-                        PredominantColorProcessor.Swatch.ARTIFACT_PURPLE)
+                        PredominantColorProcessor.Swatch.ARTIFACT_PURPLE,
+                        PredominantColorProcessor.Swatch.RED,
+                        PredominantColorProcessor.Swatch.CYAN)
                 .build();
         ballVisionPortal = new VisionPortal.Builder()
                 .addProcessor(colorSensor)
@@ -476,8 +478,5 @@ public abstract class IterativeRobotParent extends OpMode {
         telemetry.update();
     }
 
-    public String scanBay(){
-
-    }
 
 }
