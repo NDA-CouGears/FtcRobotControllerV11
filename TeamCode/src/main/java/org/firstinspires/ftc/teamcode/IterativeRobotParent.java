@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -37,6 +36,7 @@ public abstract class IterativeRobotParent extends OpMode {
     private static final double CAROUSEL_ARM_OPEN = .5;
     private static final double CAROUSEL_ARM_CLOSED = .25;
     private boolean shootButtonPressed = false;
+    protected int shootingSpeed = 0;
     private static final int MAX_SHOOT_TIME = 2;
     private ElapsedTime shootRunTime = new ElapsedTime();
     private ElapsedTime overCurrentDuration = null;
@@ -367,10 +367,41 @@ public abstract class IterativeRobotParent extends OpMode {
     }
 
     public void shootArtifact(){
-        if (gamepad2.left_bumper /*&& !shootButtonPressed*/){
-            //shootButtonPressed = true;
+        if (gamepad2.left_bumper) {
+            if (!shootButtonPressed) {
+                shootButtonPressed = true;
+                if (shootingSpeed == 1) {
+                    shootingSpeed = 0;
+                }
+                else {
+                    shootingSpeed = 1;
+                }
+            }
+        }
+        else if (gamepad2.right_bumper){
+            if (!shootButtonPressed) {
+                shootButtonPressed = true;
+                if (shootingSpeed == 2) {
+                    shootingSpeed = 0;
+                }
+                else {
+                    shootingSpeed = 2;
+                }
+            }
+        }
+        else {
+            shootButtonPressed = false;
+        }
+
+        if (shootingSpeed == 1){
             shootRunTime.reset();
             float motorVel = (SHOOT_MAX_RPM/60)*SHOOT_TICKS_PER_ROTATION;
+            leftShoot.setVelocity(motorVel);
+            rightShoot.setVelocity(motorVel);
+        }
+        else if (shootingSpeed == 2){
+            shootRunTime.reset();
+            float motorVel = 1.25f*(SHOOT_MAX_RPM/60)*SHOOT_TICKS_PER_ROTATION;
             leftShoot.setVelocity(motorVel);
             rightShoot.setVelocity(motorVel);
         }
