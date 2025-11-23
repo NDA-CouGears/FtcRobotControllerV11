@@ -34,7 +34,7 @@ public abstract class IterativeRobotParent extends OpMode {
     protected Servo carouselArm = null;
     protected DcMotorEx intakeSpinny = null;
     public List<LynxModule> allHubs = null;
-    private static final double CAROUSEL_ARM_OPEN = .75;
+    private static final double CAROUSEL_ARM_OPEN = .5;
     private static final double CAROUSEL_ARM_CLOSED = .25;
     private boolean shootButtonPressed = false;
     private static final int MAX_SHOOT_TIME = 2;
