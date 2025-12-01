@@ -82,7 +82,7 @@ public abstract class IterativeRobotParent extends OpMode {
 
         leftShoot.setDirection(DcMotor.Direction.REVERSE);
         rightShoot.setDirection(DcMotor.Direction.FORWARD);
-        carousel.setDirection(DcMotorSimple.Direction.FORWARD);
+        carousel.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -277,8 +277,7 @@ public abstract class IterativeRobotParent extends OpMode {
                 .setSwatches(
                         PredominantColorProcessor.Swatch.ARTIFACT_GREEN,
                         PredominantColorProcessor.Swatch.ARTIFACT_PURPLE,
-                        PredominantColorProcessor.Swatch.RED,
-                        PredominantColorProcessor.Swatch.CYAN)
+                        PredominantColorProcessor.Swatch.WHITE)
                 .build();
         ballVisionPortal = new VisionPortal.Builder()
                 .addProcessor(colorSensor)

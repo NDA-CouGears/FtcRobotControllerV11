@@ -14,13 +14,19 @@ public class ScanBay extends CarouselOperations{
         String ball;
         PredominantColorProcessor.Swatch current = robot.colorSensor.getAnalysis().closestSwatch;
         robot.telemetry.addLine(String.valueOf(current));
+        int[] rgb = robot.colorSensor.getAnalysis().RGB;
+        robot.telemetry.addLine(String.format("r:%d; g:%d; b:%d;", rgb[0], rgb[1], rgb[2]));
+        int[] hsv = robot.colorSensor.getAnalysis().HSV;
+
+        robot.telemetry.addLine(String.format("h:%d; s:%d; v:%d;", hsv[0], hsv[1], hsv[2]));
+
         if (current == PredominantColorProcessor.Swatch.ARTIFACT_GREEN){
             ball = "g";
-            finished = true;
+            //finished = true;
         }
         else if (current == PredominantColorProcessor.Swatch.ARTIFACT_PURPLE){
             ball = "p";
-            finished = true;
+            //finished = true;
         }
         else {
             ball = null;

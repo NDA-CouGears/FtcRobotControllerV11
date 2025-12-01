@@ -40,6 +40,17 @@ public class IterativeAuto extends IterativeRobotParent {
          */
         //operations.add(new PrepareLoad(2));
         //operations.add(new PrepareLaunch(2));
+        //operations.add(new ScanBay(1));
+        /*
+        for (int i = 1; i < 9; i++){
+            operations.add(new PrepareLoad(i%3 + 1));
+            operations.add(new Sleep(2));
+            operations.add(new PrepareLaunch(i%3 + 1));
+            operations.add(new Sleep(2));
+
+        }
+
+         */
         operations.add(new ScanBay(1));
 
 
