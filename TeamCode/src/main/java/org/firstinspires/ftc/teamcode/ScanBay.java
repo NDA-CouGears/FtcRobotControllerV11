@@ -28,8 +28,5 @@ public class ScanBay extends CarouselOperations{
         colors.set(bay-1, ball);
     }
 
-    @Override
-    public boolean isFinished() {
-        return super.isFinished();
-    }
+
 }
