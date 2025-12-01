@@ -26,7 +26,7 @@ public class PrepareLaunch extends CarouselOperations{
         else if (bay == 3) {
             targetPos = zero + (2 * CTR / 3);
         }
-            robot.carousel.setTargetPosition((int)(targetPos+.5));
+        robot.carousel.setTargetPosition((int)(targetPos+.5));
         robot.carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.carousel.setPower(.5);
         curPos = robot.carousel.getCurrentPosition();
