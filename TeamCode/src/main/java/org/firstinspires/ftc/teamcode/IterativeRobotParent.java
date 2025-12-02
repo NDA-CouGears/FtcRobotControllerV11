@@ -491,9 +491,7 @@ public abstract class IterativeRobotParent extends OpMode {
     protected void operationLoop() {
         // If there is no active operation pull one from the list of pending operations
         if (activeOperation == null) {
-            if (pendingOperations.isEmpty()) {
-                requestOpModeStop();
-            } else {
+            if (!pendingOperations.isEmpty()) {
                 activeOperation = pendingOperations.removeFirst();
                 activeOperation.init(this);
             }
