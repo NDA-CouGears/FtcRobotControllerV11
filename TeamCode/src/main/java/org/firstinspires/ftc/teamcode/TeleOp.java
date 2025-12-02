@@ -63,7 +63,7 @@ public class TeleOp extends IterativeRobotParent {
             stalled = false;
         }
         if (stalled) {
-            carousel.setPower(0);
+            stopCarousel();
             return;
         }
 

@@ -3,9 +3,6 @@ package org.firstinspires.ftc.teamcode.operations;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 public class PrepareLaunch extends CarouselOperations {
-    /* private float launchB1 = zero + 0;
-    private float launchB2 = zero + (CTR/6);
-    private float launchB3 = zero + (2*CTR/3); */
     int bay;
 
     public PrepareLaunch(int bay){
@@ -16,23 +13,16 @@ public class PrepareLaunch extends CarouselOperations {
     public void loop() {
         super.loop();
         if (bay == 1){
-            targetPos = zero + CTR/2;
+            robot.setCarouselPosition(3);
         }
         else if (bay == 2){
-            targetPos = zero + (CTR/6);
+            robot.setCarouselPosition(1);
         }
         else if (bay == 3) {
-            targetPos = zero + (5 * CTR / 6);
-        }
-        if (targetPos < curPos){
-            targetPos += CTR;
+            robot.setCarouselPosition(5);
         }
 
-        robot.carousel.setTargetPosition((int)(targetPos+.5));
-        robot.carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.carousel.setPower(.5);
-        if (!robot.carousel.isBusy()){
-            curPos = targetPos;
+        if (!robot.isCarouselBusy()){
             finished = true;
         }
     }

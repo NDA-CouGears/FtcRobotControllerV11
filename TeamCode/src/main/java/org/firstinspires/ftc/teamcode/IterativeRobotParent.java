@@ -36,7 +36,7 @@ public abstract class IterativeRobotParent extends OpMode {
     private List<LynxModule> allHubs = null;
     private DcMotorEx leftShoot = null;
     private DcMotorEx rightShoot = null;
-    public DcMotorEx carousel = null;
+    protected DcMotorEx carousel = null;
     private Servo carouselArm = null;
     private DcMotorEx intakeSpinny = null;
     private static final double CAROUSEL_ARM_OPEN = .5;
@@ -337,6 +337,36 @@ public abstract class IterativeRobotParent extends OpMode {
         return false;
     }
 
+    public void stopCarousel() {
+        carousel.setPower(0);
+    }
+
+    /**
+     *
+     * @param sixths How many sixths of a rotation to move to where zero is the starting position
+     *               with bay 1 facing the intake. Only goes forward, never in reverse to avoid
+     *               jams. We use sixths because launch and load are 1/6 of a rotation off from
+     *               each other
+     */
+    public void setCarouselPosition(int sixths) {
+        // Ticks per revolution of carousel motor
+        float CTR = 751.8f;
+
+        int curPos = carousel.getCurrentPosition();
+        float offset = curPos % CTR;
+        float zero = curPos - offset;
+        float targetPos = zero + sixths*CTR/6;
+
+        // If our target is more than a little behind our current position go the long way around
+        // to prevent ball jams. Required based on hardware teams mechanical design
+        if (targetPos < (curPos-15)){
+            targetPos += CTR;
+        }
+
+        carousel.setTargetPosition((int)(targetPos+.5));
+        carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        carousel.setPower(.5);
+    }
 
     public void liftLaunchArm() {
         carouselArm.setPosition(CAROUSEL_ARM_OPEN);
@@ -371,6 +401,10 @@ public abstract class IterativeRobotParent extends OpMode {
 
     public void stopIntake() {
         intakeSpinny.setPower(0);
+    }
+
+    public boolean isCarouselBusy() {
+        return carousel.isBusy();
     }
 
     public void moveRobot(double x, double y, double yaw) {

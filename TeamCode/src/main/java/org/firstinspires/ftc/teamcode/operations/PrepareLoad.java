@@ -12,23 +12,16 @@ public class PrepareLoad extends CarouselOperations {
     public void loop() {
         super.loop();
         if (bay == 1){
-            targetPos = zero;
+            robot.setCarouselPosition(0);
         }
         else if (bay == 2){
-            targetPos = zero + (2*CTR/3);
+            robot.setCarouselPosition(4);
         }
         else if (bay == 3) {
-            targetPos = zero + (CTR / 3);
-        }
-        if (targetPos < curPos){
-            targetPos += CTR;
+            robot.setCarouselPosition(2);
         }
 
-        robot.carousel.setTargetPosition((int)(targetPos+.5));
-        robot.carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.carousel.setPower(.5);
-        if (!robot.carousel.isBusy()){
-            curPos = targetPos;
+        if (!robot.isCarouselBusy()){
             finished = true;
         }
     }

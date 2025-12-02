@@ -75,7 +75,7 @@ public class IterativeAuto extends IterativeRobotParent {
     public void loop() {
         // If there was a stall shut down the carousel motor and end the op mode
         if (stallDetection()){
-            carousel.setPower(0);
+            stopCarousel();
             clearOperations();
             requestOpModeStop();
             return;
