@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class TeleOp extends IterativeRobotParent {
     private boolean shootButtonPressed = false;
     private int shootingSpeed = 0;
-    private final ElapsedTime shootRunTime = new ElapsedTime();
 
     @Override
     public void init() {
@@ -48,32 +47,14 @@ public class TeleOp extends IterativeRobotParent {
             shootButtonPressed = false;
         }
 
-        if (shootingSpeed == 1) {
-            shootRunTime.reset();
-            float motorVel = (SHOOT_MAX_RPM / 60) * SHOOT_TICKS_PER_ROTATION;
-            leftShoot.setVelocity(motorVel);
-            rightShoot.setVelocity(motorVel);
-        } else if (shootingSpeed == 2) {
-            shootRunTime.reset();
-            float motorVel = 1.25f * (SHOOT_MAX_RPM / 60) * SHOOT_TICKS_PER_ROTATION;
-            leftShoot.setVelocity(motorVel);
-            rightShoot.setVelocity(motorVel);
-        } else {
-            leftShoot.setVelocity(0);
-            rightShoot.setVelocity(0);
-        }
-        /*if (shootRunTime.seconds()>=MAX_SHOOT_TIME && shootButtonPressed){
-            shootButtonPressed = false;
-            leftShoot.setVelocity(0);
-            rightShoot.setVelocity(0);
-        } */
+        setShootSpeed(shootingSpeed);
     }
 
     public void intakeBall() {
         if (gamepad2.a) {
-            intakeSpinny.setPower(50);
+            startIntake();
         } else {
-            intakeSpinny.setPower(0);
+            stopIntake();
         }
     }
 
@@ -96,10 +77,10 @@ public class TeleOp extends IterativeRobotParent {
 
         if (gamepad2.dpad_up) {
             telemetry.addLine("carousel arm open");
-            carouselArm.setPosition(CAROUSEL_ARM_OPEN);
-        } else if (carouselArm.getPosition() == CAROUSEL_ARM_OPEN) {
+            liftLaunchArm();
+        } else {
             telemetry.addLine("carousel arm closed");
-            carouselArm.setPosition(CAROUSEL_ARM_CLOSED);
+            lowerLaunchArm();
         }
 
         telemetry.update();

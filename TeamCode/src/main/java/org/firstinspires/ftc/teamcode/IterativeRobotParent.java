@@ -34,14 +34,13 @@ public abstract class IterativeRobotParent extends OpMode {
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
     private List<LynxModule> allHubs = null;
-    protected DcMotorEx leftShoot = null;
-    protected DcMotorEx rightShoot = null;
+    private DcMotorEx leftShoot = null;
+    private DcMotorEx rightShoot = null;
     public DcMotorEx carousel = null;
     protected Servo carouselArm = null;
-    protected DcMotorEx intakeSpinny = null;
-    public static final double CAROUSEL_ARM_OPEN = .5;
-    public static final double CAROUSEL_ARM_CLOSED = .25;
-    private static final int MAX_SHOOT_TIME = 2;
+    private DcMotorEx intakeSpinny = null;
+    private static final double CAROUSEL_ARM_OPEN = .5;
+    private static final double CAROUSEL_ARM_CLOSED = .25;
     private ElapsedTime overCurrentDuration = null;
     protected boolean stalled = false;
     private SparkFunOTOS otosSensor;
@@ -336,6 +335,42 @@ public abstract class IterativeRobotParent extends OpMode {
         }
 
         return false;
+    }
+
+
+    public void liftLaunchArm() {
+        carouselArm.setPosition(CAROUSEL_ARM_OPEN);
+    }
+
+    public void lowerLaunchArm() {
+        carouselArm.setPosition(CAROUSEL_ARM_CLOSED);
+    }
+
+    /**
+     *
+     * @param shootingSpeed 1 is for near, 2 is far, anything else is stop
+     */
+    public void setShootSpeed(int shootingSpeed) {
+        if (shootingSpeed == 1) {
+            float motorVel = (SHOOT_MAX_RPM / 60) * SHOOT_TICKS_PER_ROTATION;
+            leftShoot.setVelocity(motorVel);
+            rightShoot.setVelocity(motorVel);
+        } else if (shootingSpeed == 2) {
+            float motorVel = 1.25f * (SHOOT_MAX_RPM / 60) * SHOOT_TICKS_PER_ROTATION;
+            leftShoot.setVelocity(motorVel);
+            rightShoot.setVelocity(motorVel);
+        } else {
+            leftShoot.setVelocity(0);
+            rightShoot.setVelocity(0);
+        }
+    }
+
+    public void startIntake() {
+        intakeSpinny.setPower(50);
+    }
+
+    public void stopIntake() {
+        intakeSpinny.setPower(0);
     }
 
     public void moveRobot(double x, double y, double yaw) {
