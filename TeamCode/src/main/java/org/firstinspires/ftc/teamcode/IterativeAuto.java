@@ -53,12 +53,12 @@ public class IterativeAuto extends IterativeRobotParent {
         }
 
          */
-        addOperation(new PrepareLoad(1));
-        addOperation(new ScanBay(1));
-        addOperation(new PrepareLoad(2));
-        addOperation(new ScanBay(2));
         addOperation(new PrepareLoad(3));
-        addOperation(new ScanBay(3));
+        addOperation(new ScanBay(3, 0.2, 2));
+        addOperation(new PrepareLoad(2));
+        addOperation(new ScanBay(2, 0.2, 2));
+        addOperation(new PrepareLoad(1));
+        addOperation(new ScanBay(1, 0.2, 2));
         addOperation(new Sleep(10));
     }
 

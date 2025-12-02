@@ -452,7 +452,7 @@ public abstract class IterativeRobotParent extends OpMode {
     }
 
     protected boolean noPendingOperations() {
-        return pendingOperations.isEmpty();
+        return pendingOperations.isEmpty() && activeOperation == null;
     }
 
     protected void addOperation(RobotOperation newOp) {
