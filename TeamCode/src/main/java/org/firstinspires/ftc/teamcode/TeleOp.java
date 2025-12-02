@@ -52,9 +52,9 @@ public class TeleOp extends IterativeRobotParent {
 
     public void intakeBall() {
         if (gamepad2.a) {
-            startIntake();
+            setIntakeSpeed(1);
         } else {
-            stopIntake();
+            setIntakeSpeed(0);
         }
     }
 

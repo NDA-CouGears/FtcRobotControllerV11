@@ -16,8 +16,8 @@ public class ScanBay extends CarouselOperations {
 
     public ScanBay(int bay) {
         this.bay = bay;
-        this.maxWait = 0.5;
-        this.minWait = 0.1;
+        this.maxWait = 0.2;
+        this.minWait = 0.25;
     }
 
     public ScanBay(int bay, double minWait, double maxWait) {

@@ -395,12 +395,12 @@ public abstract class IterativeRobotParent extends OpMode {
         }
     }
 
-    public void startIntake() {
-        intakeSpinny.setPower(50);
-    }
-
-    public void stopIntake() {
-        intakeSpinny.setPower(0);
+    public void setIntakeSpeed(int speed) {
+        if (speed == 1) {
+            intakeSpinny.setPower(1);
+        } else {
+            intakeSpinny.setPower(0);
+        }
     }
 
     public boolean isCarouselBusy() {
