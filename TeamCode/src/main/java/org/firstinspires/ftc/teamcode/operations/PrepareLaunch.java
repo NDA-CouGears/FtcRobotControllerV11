@@ -1,12 +1,14 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.operations;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-
-public class PrepareLoad extends CarouselOperations{
+public class PrepareLaunch extends CarouselOperations {
+    /* private float launchB1 = zero + 0;
+    private float launchB2 = zero + (CTR/6);
+    private float launchB3 = zero + (2*CTR/3); */
     int bay;
-    public PrepareLoad(int bay){
+
+    public PrepareLaunch(int bay){
         this.bay = bay;
     }
 
@@ -14,13 +16,13 @@ public class PrepareLoad extends CarouselOperations{
     public void loop() {
         super.loop();
         if (bay == 1){
-            targetPos = zero;
+            targetPos = zero + CTR/2;
         }
         else if (bay == 2){
-            targetPos = zero + (2*CTR/3);
+            targetPos = zero + (CTR/6);
         }
         else if (bay == 3) {
-            targetPos = zero + (CTR / 3);
+            targetPos = zero + (5 * CTR / 6);
         }
         if (targetPos < curPos){
             targetPos += CTR;
@@ -34,5 +36,4 @@ public class PrepareLoad extends CarouselOperations{
             finished = true;
         }
     }
-
 }

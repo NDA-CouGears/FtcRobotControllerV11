@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.operations;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class CarouselOperations extends RobotOperation{
+public class CarouselOperations extends RobotOperation {
 
     protected static final float CTR = 751.8f;
     protected float curPos;

@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.operations;
 
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 import java.util.List;
 
-public class IterativeScanObelisk extends RobotOperation{
+public class IterativeScanObelisk extends RobotOperation {
     private AprilTagPoseFtc ftcPose;
 
     public enum OBELISK_PATTERN{

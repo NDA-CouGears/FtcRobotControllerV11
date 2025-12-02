@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.operations.CarouselOperations;
+import org.firstinspires.ftc.teamcode.operations.IterativeDriveToLocation;
+import org.firstinspires.ftc.teamcode.operations.IterativeOtisAprilTagCalibration;
+import org.firstinspires.ftc.teamcode.operations.IterativeScanObelisk;
+import org.firstinspires.ftc.teamcode.operations.ScanBay;
+import org.firstinspires.ftc.teamcode.operations.SetStartingPosition;
 
-import java.util.ArrayList;
-import java.util.List;
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "IterativeAuto", group = "Tournament")
 
 public class IterativeAuto extends IterativeRobotParent {

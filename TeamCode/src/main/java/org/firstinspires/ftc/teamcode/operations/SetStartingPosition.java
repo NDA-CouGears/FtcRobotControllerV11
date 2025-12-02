@@ -1,4 +1,6 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.operations;
+
+import org.firstinspires.ftc.teamcode.IterativeRobotParent;
 
 public class SetStartingPosition extends RobotOperation{
     double x;

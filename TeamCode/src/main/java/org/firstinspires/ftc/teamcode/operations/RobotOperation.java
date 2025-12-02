@@ -1,4 +1,6 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.operations;
+
+import org.firstinspires.ftc.teamcode.IterativeRobotParent;
 
 public abstract class RobotOperation {
     protected IterativeRobotParent robot;

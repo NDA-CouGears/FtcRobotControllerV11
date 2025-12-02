@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.operations;
 
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.List;
 
-public class IterativeOtisAprilTagCalibration extends RobotOperation{
+public class IterativeOtisAprilTagCalibration extends RobotOperation {
 
     boolean detected = false;
     @Override

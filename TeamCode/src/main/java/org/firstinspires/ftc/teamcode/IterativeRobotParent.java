@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -18,6 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.operations.RobotOperation;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -53,8 +53,8 @@ public abstract class IterativeRobotParent extends OpMode {
     public PredominantColorProcessor colorSensor;
 
     private VisionPortal ballVisionPortal;
-    static final double P_TURN_GAIN = 0.02;// Larger is more responsive, but also less stable.
-    static final double P_DRIVE_GAIN = 0.03;// Larger is more responsive, but also less stable.
+    public static final double P_TURN_GAIN = 0.02;// Larger is more responsive, but also less stable.
+    public static final double P_DRIVE_GAIN = 0.03;// Larger is more responsive, but also less stable.
     private static final float SHOOT_GEAR_RATIO = 1f;
     private static final float SHOOT_MAX_RPM = 2000f;
     private static final float SHOOT_TICKS_PER_ROTATION = 28 * SHOOT_GEAR_RATIO;
@@ -314,7 +314,7 @@ public abstract class IterativeRobotParent extends OpMode {
      *
      * @return field pose as computed from the OTOS sensor
      */
-    protected Pose2D getFieldPosition() {
+    public Pose2D getFieldPosition() {
         SparkFunOTOS.Pose2D otosPos = otosSensor.getPosition();
         double heading = otosPos.h;
         double x = otosPos.x;

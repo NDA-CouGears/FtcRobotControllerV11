@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.experiment;
 
 import android.graphics.Color;
 import android.util.Size;
@@ -6,93 +6,25 @@ import android.util.Size;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.util.SortOrder;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.opencv.Circle;
 import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor;
 import org.firstinspires.ftc.vision.opencv.ColorRange;
 import org.firstinspires.ftc.vision.opencv.ImageRegion;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-//@Disabled
-@TeleOp(name = "CircleLocator", group = "Concept")
-public class CircleLocator extends LinearOpMode{/*
- * Copyright (c) 2024 Phil Malone
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-    /*
-     * This OpMode illustrates how to use a video source (camera) to locate specifically colored regions.
-     * This sample is targeted towards circular blobs. To see rectangles, look at ConceptVisionColorLocator_Rectangle
-     *
-     * Unlike a "color sensor" which determines the color of nearby object, this "color locator"
-     * will search the Region Of Interest (ROI) in a camera image, and find any "blobs" of color that
-     * match the requested color range.  These blobs can be further filtered and sorted to find the one
-     * most likely to be the item the user is looking for.
-     *
-     * To perform this function, a VisionPortal runs a ColorBlobLocatorProcessor process.
-     *   The ColorBlobLocatorProcessor (CBLP) process is created first, and then the VisionPortal is built.
-     *   The (CBLP) analyses the ROI and locates pixels that match the ColorRange to form a "mask".
-     *   The matching pixels are then collected into contiguous "blobs" of pixels.
-     *   The outer boundaries of these blobs are called its "contour".  For each blob, the process then
-     *   creates the smallest possible circle that will fully encase the contour. The user can then call
-     *   getBlobs() to retrieve the list of Blobs, where each contains the contour and the circle.
-     *   Note: The default sort order for Blobs is ContourArea, in descending order, so the biggest
-     *   contours are listed first.
-     *
-     * A colored enclosing circle is drawn on the camera preview to show the location of each Blob
-     * The original Blob contour can also be added to the preview.
-     * This is helpful when configuring the ColorBlobLocatorProcessor parameters.
-     *
-     * Tip:  Connect an HDMI monitor to the Control Hub to view the Color Location process in real-time.
-     *       Or use a screen copy utility like ScrCpy.exe to view the video remotely.
-     *
-     * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
-     * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
-     */
+@TeleOp(name = "DriveToBall", group = "Concept")
+@Disabled
+public class DriveToBall extends LinearOpMode{
     private VisionPortal portal = null;
-
-    //for joystick experimenting w/ controller
-    /*
-    private int     myExposure  ;
-    private int     minExposure ;
-    private int     maxExposure ;
-    private int     myGain      ;
-    private int     minGain ;
-    private int     maxGain ;
-    boolean thisExpUp = false;
-    boolean thisExpDn = false;
-    boolean thisGainUp = false;
-    boolean thisGainDn = false;
-    boolean lastExpUp = false;
-    boolean lastExpDn = false;
-    boolean lastGainUp = false;
-    boolean lastGainDn = false;
-
-     */
-
         @Override
         public void runOpMode() {
             /* Build a "Color Locator" vision processor based on the ColorBlobLocatorProcessor class.
@@ -151,8 +83,24 @@ public class CircleLocator extends LinearOpMode{/*
              *        OPENING:    Will Erode and then Dilate which will make small noise blobs go away
              *        CLOSING:    Will Dilate and then Erode which will tend to fill in any small holes in blob edges.
              */
-            ColorBlobLocatorProcessor colorLocator = new ColorBlobLocatorProcessor.Builder()
+            ColorBlobLocatorProcessor greenColorLocator = new ColorBlobLocatorProcessor.Builder()
                     .setTargetColorRange(ColorRange.ARTIFACT_GREEN)   // Use a predefined color match
+                    .setContourMode(ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY)
+                    .setRoi(ImageRegion.asUnityCenterCoordinates(-1, 1, 1, -1))
+                    .setDrawContours(true)   // Show contours on the Stream Preview
+                    .setBoxFitColor(0)       // Disable the drawing of rectangles
+                    .setCircleFitColor(Color.rgb(255, 255, 0)) // Draw a circle
+                    .setBlurSize(5)          // Smooth the transitions between different colors in image
+
+                    // the following options have been added to fill in perimeter holes.
+                    .setDilateSize(15)       // Expand blobs to fill any divots on the edges
+                    .setErodeSize(15)        // Shrink blobs back to original size
+                    .setMorphOperationType(ColorBlobLocatorProcessor.MorphOperationType.CLOSING)
+
+                    .build();
+
+            ColorBlobLocatorProcessor purpleColorLocator = new ColorBlobLocatorProcessor.Builder()
+                    .setTargetColorRange(ColorRange.ARTIFACT_PURPLE)   // Use a predefined color match
                     .setContourMode(ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY)
                     .setRoi(ImageRegion.asUnityCenterCoordinates(-1, 1, 1, -1))
                     .setDrawContours(true)   // Show contours on the Stream Preview
@@ -184,7 +132,8 @@ public class CircleLocator extends LinearOpMode{/*
              *      .setCamera(BuiltinCameraDirection.BACK)    ... for a Phone Camera
              */
             portal = new VisionPortal.Builder()
-                    .addProcessor(colorLocator)
+                    .addProcessor(greenColorLocator)
+                    .addProcessor(purpleColorLocator)
                     .setCameraResolution(new Size(320, 240))
                     .setCamera(hardwareMap.get(WebcamName.class, "Ball Cam"))
                     .build();
@@ -196,11 +145,12 @@ public class CircleLocator extends LinearOpMode{/*
 
             setManualExposure(50, 0);
             // WARNING:  To view the stream preview on the Driver Station, this code runs in INIT mode.
-            while (opModeIsActive() || opModeInInit()) {
+            while (opModeInInit() || opModeIsActive()) {
                 telemetry.addData("preview on/off", "... Camera Stream\n");
 
                 // Read the current list
-                List<ColorBlobLocatorProcessor.Blob> blobs = colorLocator.getBlobs();
+                List<ColorBlobLocatorProcessor.Blob> greenBlobs = greenColorLocator.getBlobs();
+                List<ColorBlobLocatorProcessor.Blob> purpleBlobs = purpleColorLocator.getBlobs();
 
                 /*
                  * The list of Blobs can be filtered to remove unwanted Blobs.
@@ -237,95 +187,54 @@ public class CircleLocator extends LinearOpMode{/*
                  */
                 ColorBlobLocatorProcessor.Util.filterByCriteria(
                         ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA,
-                        50, 20000, blobs);  // filter out very small blobs.
+                        768, 20000, greenBlobs);  // filter out very small blobs.
 
                 ColorBlobLocatorProcessor.Util.filterByCriteria(
+                        ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA,
+                        768, 20000, purpleBlobs);  // filter out very small blobs.
+
+                List<ColorBlobLocatorProcessor.Blob> blobs = new ArrayList<ColorBlobLocatorProcessor.Blob>(purpleBlobs);
+                blobs.addAll(greenBlobs);
+
+                /*
+                ColorBlobLocatorProcessor.Util.filterByCriteria(
                         ColorBlobLocatorProcessor.BlobCriteria.BY_CIRCULARITY,
-                        0.6, 1, blobs);     /* filter out non-circular blobs.
-                 * NOTE: You may want to adjust the minimum value depending on your use case.
-                 * Circularity values will be affected by shadows, and will therefore vary based
-                 * on the location of the camera on your robot and venue lighting. It is strongly
-                 * encouraged to test your vision on the competition field if your event allows
-                 * sensor calibration time.
-                 */
-
-                /*
-                 * The list of Blobs can be sorted using the same Blob attributes as listed above.
-                 * No more than one sort call should be made.  Sorting can use ascending or descending order.
-                 * Here is an example.:
-                 *   ColorBlobLocatorProcessor.Util.sortByCriteria(
-                 *      ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA, SortOrder.DESCENDING, blobs);
-                 */
-
-                //for changing exposure/gain
-                /*
-                if (portal.getCameraState() == VisionPortal.CameraState.STREAMING) {
-                    ExposureControl exposureControl = portal.getCameraControl(ExposureControl.class);
-                    minExposure = (int) exposureControl.getMinExposure(TimeUnit.MILLISECONDS) + 1;
-                    maxExposure = (int) exposureControl.getMaxExposure(TimeUnit.MILLISECONDS);
-
-                    GainControl gainControl = portal.getCameraControl(GainControl.class);
-                    minGain = gainControl.getMinGain();
-                    maxGain = gainControl.getMaxGain();
-                }
+                        0.6, 1, blobs);
 
                  */
+
+
+                //Sorts by size NOT BY COLOR
+                 ColorBlobLocatorProcessor.Util.sortByCriteria(ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA, SortOrder.DESCENDING, blobs);
+
+
                 telemetry.addLine("Circularity Radius Center");
 
                 // Display the Blob's circularity, and the size (radius) and center location of its circleFit.
+                /*
+                int count = 0;
                 for (ColorBlobLocatorProcessor.Blob b : blobs) {
 
                     Circle circleFit = b.getCircle();
-                    telemetry.addLine(String.format("%5.3f      %3d     (%3d,%3d)",
-                            b.getCircularity(), (int) circleFit.getRadius(), (int) circleFit.getX(), (int) circleFit.getY()));
+                    count += circleFit.getRadius();
+                    //telemetry.addLine(String.format("%5.3f      %3d     (%3d,%3d)",
+                            //b.getCircularity(), (int) circleFit.getRadius(), (int) circleFit.getX(), (int) circleFit.getY()));
                 }
-
-                //telemetry for exposure/gain experimentation
-                /*
-                telemetry.addData("Exposure","%d  (%d - %d)", myExposure, minExposure, maxExposure);
-                telemetry.addData("Gain","%d  (%d - %d)", myGain, minGain, maxGain);
+                if (blobs.size() > 0){
+                    telemetry.addLine(String.format("%3d,", count/blobs.size()));
+                }
 
                  */
+                telemetry.addLine(String.format("b %3d", blobs.size()));
+                telemetry.addLine(String.format("g %3d", greenBlobs.size()));
+                telemetry.addLine(String.format("p %3d", purpleBlobs.size()));
 
-                //for joystick input for changing exposure/gain
-                // check to see if we need to change exposure or gain.
-                /*
-                thisExpUp = gamepad1.left_bumper;
-                thisExpDn = gamepad1.left_trigger > 0.25;
-                thisGainUp = gamepad1.right_bumper;
-                thisGainDn = gamepad1.right_trigger > 0.25;
+                
 
-                // look for clicks to change exposure
-                if (thisExpUp && !lastExpUp) {
-                    myExposure = Range.clip(myExposure + 1, minExposure, maxExposure);
-                    setManualExposure(myExposure, myGain);
-                } else if (thisExpDn && !lastExpDn) {
-                    myExposure = Range.clip(myExposure - 1, minExposure, maxExposure);
-                    setManualExposure(myExposure, myGain);
-                }
-
-                // look for clicks to change the gain
-                if (thisGainUp && !lastGainUp) {
-                    myGain = Range.clip(myGain + 1, minGain, maxGain );
-                    setManualExposure(myExposure, myGain);
-                } else if (thisGainDn && !lastGainDn) {
-                    myGain = Range.clip(myGain - 1, minGain, maxGain );
-                    setManualExposure(myExposure, myGain);
-                }
-
-                lastExpUp = thisExpUp;
-                lastExpDn = thisExpDn;
-                lastGainUp = thisGainUp;
-                lastGainDn = thisGainDn;
-
-                telemetry.update();
-                sleep(100); // Match the telemetry update interval.
-
-                 */
                 telemetry.update();
             }
-        }
 
+        }
     private boolean setManualExposure(int exposureMS, int gain) {
         // Ensure Vision Portal has been setup.
         if (portal == null) {
@@ -365,5 +274,7 @@ public class CircleLocator extends LinearOpMode{/*
         }
     }
     }
+
+
 
 

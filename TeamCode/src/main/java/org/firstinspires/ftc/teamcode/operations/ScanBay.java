@@ -1,8 +1,8 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.operations;
 
 import org.firstinspires.ftc.vision.opencv.PredominantColorProcessor;
 
-public class ScanBay extends CarouselOperations{
+public class ScanBay extends CarouselOperations {
     int bay;
 
     public ScanBay(int bay) {

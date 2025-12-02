@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode;
+
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOp", group = "Tournament")
 public class TeleOp extends IterativeRobotParent {
     @Override
@@ -15,5 +16,7 @@ public class TeleOp extends IterativeRobotParent {
         shootArtifact();
         controlCarousel();
         intakeBall();
+
+        operationLoop();
     }
 }
