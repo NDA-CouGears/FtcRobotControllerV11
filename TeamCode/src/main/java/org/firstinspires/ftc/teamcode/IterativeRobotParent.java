@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -24,6 +25,7 @@ import org.firstinspires.ftc.vision.opencv.ImageRegion;
 import org.firstinspires.ftc.vision.opencv.PredominantColorProcessor;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public abstract class IterativeRobotParent extends OpMode {
@@ -55,8 +57,10 @@ public abstract class IterativeRobotParent extends OpMode {
     static final double P_DRIVE_GAIN = 0.03;// Larger is more responsive, but also less stable.
     private static final float SHOOT_GEAR_RATIO = 1f;
     private static final float SHOOT_MAX_RPM = 2000f;
-    private static final float SHOOT_TICKS_PER_ROTATION = 28*SHOOT_GEAR_RATIO;
+    private static final float SHOOT_TICKS_PER_ROTATION = 28 * SHOOT_GEAR_RATIO;
 
+    private RobotOperation activeOperation;
+    private LinkedList<RobotOperation> pendingOperations = new LinkedList<RobotOperation>();
 
     public void initHardware() {
         leftFrontDrive = hardwareMap.get(DcMotor.class, "lf_drive"); // control hub 2
@@ -271,7 +275,7 @@ public abstract class IterativeRobotParent extends OpMode {
 
     }   // end method initAprilTag()
 
-    public void initBallCam(){
+    public void initBallCam() {
         colorSensor = new PredominantColorProcessor.Builder()
                 .setRoi(ImageRegion.asUnityCenterCoordinates(-0.7, 0.2, 0.7, -0.2))
                 .setSwatches(
@@ -281,7 +285,7 @@ public abstract class IterativeRobotParent extends OpMode {
                         PredominantColorProcessor.Swatch.BLACK,
                         PredominantColorProcessor.Swatch.RED,
                         PredominantColorProcessor.Swatch.BLUE
-                        )
+                )
                 .build();
         ballVisionPortal = new VisionPortal.Builder()
                 .addProcessor(colorSensor)
@@ -290,15 +294,15 @@ public abstract class IterativeRobotParent extends OpMode {
                 .build();
     }
 
-    public ArrayList<AprilTagDetection> getDetections(){
+    public ArrayList<AprilTagDetection> getDetections() {
         return aprilTagProcessor.getDetections();
     }
 
     protected void setCurrentPosition(double x, double y, double heading) {
-        while(heading > 180){
+        while (heading > 180) {
             heading -= 360;
         }
-        while(heading < -180){
+        while (heading < -180) {
             heading += 360;
         }
         otosSensor.setPosition(new SparkFunOTOS.Pose2D(x, y, heading));
@@ -307,9 +311,10 @@ public abstract class IterativeRobotParent extends OpMode {
 
     /**
      * Don't access the OTOS sensor except through this
+     *
      * @return field pose as computed from the OTOS sensor
      */
-    protected Pose2D getFieldPosition(){
+    protected Pose2D getFieldPosition() {
         SparkFunOTOS.Pose2D otosPos = otosSensor.getPosition();
         double heading = otosPos.h;
         double x = otosPos.x;
@@ -317,21 +322,19 @@ public abstract class IterativeRobotParent extends OpMode {
         return new Pose2D(DistanceUnit.INCH, x, y, AngleUnit.DEGREES, heading);
     }
 
-    protected boolean stallDetection(){
+    protected boolean stallDetection() {
         double currentCurrent = carousel.getCurrent(CurrentUnit.AMPS);
         telemetry.addLine(String.format("current amps: %2.2f", currentCurrent));
 
-        if (currentCurrent > 9){
+        if (currentCurrent > 9) {
             if (overCurrentDuration == null) {
                 overCurrentDuration = new ElapsedTime();
                 overCurrentDuration.reset();
-            }
-            else if (overCurrentDuration.milliseconds() > 100){
+            } else if (overCurrentDuration.milliseconds() > 100) {
                 overCurrentDuration = null;
                 return true;
             }
-        }
-        else {
+        } else {
             overCurrentDuration = null;
         }
 
@@ -341,8 +344,8 @@ public abstract class IterativeRobotParent extends OpMode {
     public void moveRobot(double x, double y, double yaw) {
         // make forward = positive y, right = positive x, and clockwise = positive yaw
         //x=-x;
-        y=-y;
-        yaw=-yaw;
+        y = -y;
+        yaw = -yaw;
 
         // Calculate wheel powers.
         double leftFrontPower = y - x - yaw;
@@ -393,46 +396,40 @@ public abstract class IterativeRobotParent extends OpMode {
         moveRobot(lateral, axial, yaw);
     }
 
-    public void shootArtifact(){
+    public void shootArtifact() {
         if (gamepad2.left_bumper) {
             if (!shootButtonPressed) {
                 shootButtonPressed = true;
                 if (shootingSpeed == 1) {
                     shootingSpeed = 0;
-                }
-                else {
+                } else {
                     shootingSpeed = 1;
                 }
             }
-        }
-        else if (gamepad2.right_bumper){
+        } else if (gamepad2.right_bumper) {
             if (!shootButtonPressed) {
                 shootButtonPressed = true;
                 if (shootingSpeed == 2) {
                     shootingSpeed = 0;
-                }
-                else {
+                } else {
                     shootingSpeed = 2;
                 }
             }
-        }
-        else {
+        } else {
             shootButtonPressed = false;
         }
 
-        if (shootingSpeed == 1){
+        if (shootingSpeed == 1) {
             shootRunTime.reset();
-            float motorVel = (SHOOT_MAX_RPM/60)*SHOOT_TICKS_PER_ROTATION;
+            float motorVel = (SHOOT_MAX_RPM / 60) * SHOOT_TICKS_PER_ROTATION;
             leftShoot.setVelocity(motorVel);
             rightShoot.setVelocity(motorVel);
-        }
-        else if (shootingSpeed == 2){
+        } else if (shootingSpeed == 2) {
             shootRunTime.reset();
-            float motorVel = 1.25f*(SHOOT_MAX_RPM/60)*SHOOT_TICKS_PER_ROTATION;
+            float motorVel = 1.25f * (SHOOT_MAX_RPM / 60) * SHOOT_TICKS_PER_ROTATION;
             leftShoot.setVelocity(motorVel);
             rightShoot.setVelocity(motorVel);
-        }
-        else {
+        } else {
             leftShoot.setVelocity(0);
             rightShoot.setVelocity(0);
         }
@@ -443,37 +440,35 @@ public abstract class IterativeRobotParent extends OpMode {
         } */
     }
 
-    public void intakeBall(){
-        if (gamepad2.a){
+    public void intakeBall() {
+        if (gamepad2.a) {
             intakeSpinny.setPower(50);
-        }
-        else{
+        } else {
             intakeSpinny.setPower(0);
         }
     }
 
-    public void controlCarousel(){
-        if (stalled && gamepad2.right_trigger + gamepad2.left_trigger == 0){
+    public void controlCarousel() {
+        if (stalled && gamepad2.right_trigger + gamepad2.left_trigger == 0) {
             stalled = false;
         }
-        if (stalled){
+        if (stalled) {
             carousel.setPower(0);
             return;
         }
 
         carousel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        float RPM=30;
+        float RPM = 30;
         float carouselSpeed = (gamepad2.right_trigger - gamepad2.left_trigger);
         // carouselSpeed * (rotations per second * ticks per rotation * gear ratio)
-        float carouselVelocity = carouselSpeed * (RPM/60 * 28 * 26.9f);
+        float carouselVelocity = carouselSpeed * (RPM / 60 * 28 * 26.9f);
         carousel.setVelocity(carouselVelocity);
 
 
-        if (gamepad2.dpad_up){
+        if (gamepad2.dpad_up) {
             telemetry.addLine("carousel arm open");
             carouselArm.setPosition(CAROUSEL_ARM_OPEN);
-        }
-        else if (carouselArm.getPosition()==CAROUSEL_ARM_OPEN){
+        } else if (carouselArm.getPosition() == CAROUSEL_ARM_OPEN) {
             telemetry.addLine("carousel arm closed");
             carouselArm.setPosition(CAROUSEL_ARM_CLOSED);
         }
@@ -481,5 +476,38 @@ public abstract class IterativeRobotParent extends OpMode {
         telemetry.update();
     }
 
+    protected boolean noPendingOperations() {
+        return pendingOperations.isEmpty();
+    }
 
+    protected void addOperation(RobotOperation newOp) {
+        pendingOperations.add(newOp);
+    }
+
+    protected void clearOperations() {
+        pendingOperations.clear();
+    }
+
+    protected void operationLoop() {
+        // If there is no active operation pull one from the list of pending operations
+        if (activeOperation == null) {
+            if (pendingOperations.isEmpty()) {
+                requestOpModeStop();
+            } else {
+                activeOperation = pendingOperations.removeFirst();
+                activeOperation.init(this);
+            }
+        }
+
+        // If there is an active operation, call its loop
+        if (activeOperation != null) {
+            activeOperation.loop();
+
+            // If the current operation is finished stop it and clear the active operation field
+            if (activeOperation.isFinished()) {
+                activeOperation.stop();
+                activeOperation = null;
+            }
+        }
+    }
 }
