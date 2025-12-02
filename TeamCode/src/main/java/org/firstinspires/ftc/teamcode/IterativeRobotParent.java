@@ -37,7 +37,7 @@ public abstract class IterativeRobotParent extends OpMode {
     private DcMotorEx leftShoot = null;
     private DcMotorEx rightShoot = null;
     public DcMotorEx carousel = null;
-    protected Servo carouselArm = null;
+    private Servo carouselArm = null;
     private DcMotorEx intakeSpinny = null;
     private static final double CAROUSEL_ARM_OPEN = .5;
     private static final double CAROUSEL_ARM_CLOSED = .25;
