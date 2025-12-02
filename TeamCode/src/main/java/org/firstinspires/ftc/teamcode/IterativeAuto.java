@@ -22,6 +22,8 @@ public class IterativeAuto extends IterativeRobotParent {
         initBallCam();
         //blueTasks(false);
         addTest();
+
+        CarouselOperations.resetColors();
     }
 
     private void addTest() {
@@ -54,11 +56,11 @@ public class IterativeAuto extends IterativeRobotParent {
 
          */
         addOperation(new PrepareLoad(3));
-        addOperation(new ScanBay(3, 0.25, 2));
+        addOperation(new ScanBay(3, 0.5, 2));
         addOperation(new PrepareLoad(2));
-        addOperation(new ScanBay(2, 0.25, 2));
+        addOperation(new ScanBay(2, 0.5, 2));
         addOperation(new PrepareLoad(1));
-        addOperation(new ScanBay(1, 0.25, 2));
+        addOperation(new ScanBay(1, 0.5, 2));
         addOperation(new Sleep(10));
     }
 

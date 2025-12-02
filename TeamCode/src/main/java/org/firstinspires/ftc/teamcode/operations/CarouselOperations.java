@@ -7,6 +7,11 @@ public class CarouselOperations extends RobotOperation {
 
     protected boolean finished= false;
     public static ArrayList<String> colors = new ArrayList<String>(Arrays.asList(null, null, null));
+
+    public static void resetColors() {
+        colors = new ArrayList<String>(Arrays.asList(null, null, null));
+    }
+
     @Override
     public void loop() {
     }
