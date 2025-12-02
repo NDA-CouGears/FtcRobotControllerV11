@@ -29,22 +29,19 @@ import java.util.LinkedList;
 import java.util.List;
 
 public abstract class IterativeRobotParent extends OpMode {
-    protected DcMotor leftFrontDrive = null;
-    protected DcMotor leftBackDrive = null;
-    protected DcMotor rightFrontDrive = null;
-    protected DcMotor rightBackDrive = null;
+    private DcMotor leftFrontDrive = null;
+    private DcMotor leftBackDrive = null;
+    private DcMotor rightFrontDrive = null;
+    private DcMotor rightBackDrive = null;
+    private List<LynxModule> allHubs = null;
     protected DcMotorEx leftShoot = null;
     protected DcMotorEx rightShoot = null;
-    protected DcMotorEx carousel = null;
+    public DcMotorEx carousel = null;
     protected Servo carouselArm = null;
     protected DcMotorEx intakeSpinny = null;
-    public List<LynxModule> allHubs = null;
-    private static final double CAROUSEL_ARM_OPEN = .5;
-    private static final double CAROUSEL_ARM_CLOSED = .25;
-    private boolean shootButtonPressed = false;
-    protected int shootingSpeed = 0;
+    public static final double CAROUSEL_ARM_OPEN = .5;
+    public static final double CAROUSEL_ARM_CLOSED = .25;
     private static final int MAX_SHOOT_TIME = 2;
-    private ElapsedTime shootRunTime = new ElapsedTime();
     private ElapsedTime overCurrentDuration = null;
     protected boolean stalled = false;
     private SparkFunOTOS otosSensor;
@@ -55,9 +52,9 @@ public abstract class IterativeRobotParent extends OpMode {
     private VisionPortal ballVisionPortal;
     public static final double P_TURN_GAIN = 0.02;// Larger is more responsive, but also less stable.
     public static final double P_DRIVE_GAIN = 0.03;// Larger is more responsive, but also less stable.
-    private static final float SHOOT_GEAR_RATIO = 1f;
-    private static final float SHOOT_MAX_RPM = 2000f;
-    private static final float SHOOT_TICKS_PER_ROTATION = 28 * SHOOT_GEAR_RATIO;
+    public static final float SHOOT_GEAR_RATIO = 1f;
+    public static final float SHOOT_MAX_RPM = 2000f;
+    public static final float SHOOT_TICKS_PER_ROTATION = 28 * SHOOT_GEAR_RATIO;
 
     private RobotOperation activeOperation;
     private LinkedList<RobotOperation> pendingOperations = new LinkedList<RobotOperation>();
@@ -376,104 +373,13 @@ public abstract class IterativeRobotParent extends OpMode {
 
     }
 
-    private double signPreserveSquare(double value) {
+    protected double signPreserveSquare(double value) {
 
         if (value > 0) {
             return value * value;
         } else {
             return -(value * value);
         }
-    }
-
-    protected void mecanumDrive() {
-        //mecanum drive
-        double max;
-        // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-        double axial = signPreserveSquare(gamepad1.left_stick_y * -0.9); // Remember, this is reversed!
-        double lateral = signPreserveSquare(gamepad1.left_stick_x * 0.7); // Counteract imperfect strafing
-        double yaw = (signPreserveSquare(gamepad1.right_stick_x * 1)) * 0.5;
-
-        moveRobot(lateral, axial, yaw);
-    }
-
-    public void shootArtifact() {
-        if (gamepad2.left_bumper) {
-            if (!shootButtonPressed) {
-                shootButtonPressed = true;
-                if (shootingSpeed == 1) {
-                    shootingSpeed = 0;
-                } else {
-                    shootingSpeed = 1;
-                }
-            }
-        } else if (gamepad2.right_bumper) {
-            if (!shootButtonPressed) {
-                shootButtonPressed = true;
-                if (shootingSpeed == 2) {
-                    shootingSpeed = 0;
-                } else {
-                    shootingSpeed = 2;
-                }
-            }
-        } else {
-            shootButtonPressed = false;
-        }
-
-        if (shootingSpeed == 1) {
-            shootRunTime.reset();
-            float motorVel = (SHOOT_MAX_RPM / 60) * SHOOT_TICKS_PER_ROTATION;
-            leftShoot.setVelocity(motorVel);
-            rightShoot.setVelocity(motorVel);
-        } else if (shootingSpeed == 2) {
-            shootRunTime.reset();
-            float motorVel = 1.25f * (SHOOT_MAX_RPM / 60) * SHOOT_TICKS_PER_ROTATION;
-            leftShoot.setVelocity(motorVel);
-            rightShoot.setVelocity(motorVel);
-        } else {
-            leftShoot.setVelocity(0);
-            rightShoot.setVelocity(0);
-        }
-        /*if (shootRunTime.seconds()>=MAX_SHOOT_TIME && shootButtonPressed){
-            shootButtonPressed = false;
-            leftShoot.setVelocity(0);
-            rightShoot.setVelocity(0);
-        } */
-    }
-
-    public void intakeBall() {
-        if (gamepad2.a) {
-            intakeSpinny.setPower(50);
-        } else {
-            intakeSpinny.setPower(0);
-        }
-    }
-
-    public void controlCarousel() {
-        if (stalled && gamepad2.right_trigger + gamepad2.left_trigger == 0) {
-            stalled = false;
-        }
-        if (stalled) {
-            carousel.setPower(0);
-            return;
-        }
-
-        carousel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        float RPM = 30;
-        float carouselSpeed = (gamepad2.right_trigger - gamepad2.left_trigger);
-        // carouselSpeed * (rotations per second * ticks per rotation * gear ratio)
-        float carouselVelocity = carouselSpeed * (RPM / 60 * 28 * 26.9f);
-        carousel.setVelocity(carouselVelocity);
-
-
-        if (gamepad2.dpad_up) {
-            telemetry.addLine("carousel arm open");
-            carouselArm.setPosition(CAROUSEL_ARM_OPEN);
-        } else if (carouselArm.getPosition() == CAROUSEL_ARM_OPEN) {
-            telemetry.addLine("carousel arm closed");
-            carouselArm.setPosition(CAROUSEL_ARM_CLOSED);
-        }
-
-        telemetry.update();
     }
 
     protected boolean noPendingOperations() {
