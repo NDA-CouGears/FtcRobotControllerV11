@@ -6,8 +6,11 @@ import org.firstinspires.ftc.teamcode.operations.CarouselOperations;
 import org.firstinspires.ftc.teamcode.operations.IterativeDriveToLocation;
 import org.firstinspires.ftc.teamcode.operations.IterativeOtisAprilTagCalibration;
 import org.firstinspires.ftc.teamcode.operations.IterativeScanObelisk;
+import org.firstinspires.ftc.teamcode.operations.ParallelOperation;
+import org.firstinspires.ftc.teamcode.operations.PrepareLoad;
 import org.firstinspires.ftc.teamcode.operations.ScanBay;
 import org.firstinspires.ftc.teamcode.operations.SetStartingPosition;
+import org.firstinspires.ftc.teamcode.operations.Sleep;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "IterativeAuto", group = "Tournament")
 
@@ -50,9 +53,13 @@ public class IterativeAuto extends IterativeRobotParent {
         }
 
          */
+        addOperation(new PrepareLoad(1));
         addOperation(new ScanBay(1));
-
-
+        addOperation(new PrepareLoad(2));
+        addOperation(new ScanBay(2));
+        addOperation(new PrepareLoad(3));
+        addOperation(new ScanBay(3));
+        addOperation(new Sleep(10));
     }
 
     private void blueTasks(boolean near) {
@@ -90,7 +97,7 @@ public class IterativeAuto extends IterativeRobotParent {
         }
 
         telemetry.addLine("position " + getFieldPosition().getX(DistanceUnit.INCH) + ", " + getFieldPosition().getY(DistanceUnit.INCH) + ", " + getFieldPosition().getHeading(AngleUnit.DEGREES));
-        telemetry.addLine(CarouselOperations.colors.get(0));
+        telemetry.addLine(String.format("Bay 1:%s 2:%s 3:%s", CarouselOperations.colors.get(0),CarouselOperations.colors.get(1),CarouselOperations.colors.get(2)));
         telemetry.update();
     }
 

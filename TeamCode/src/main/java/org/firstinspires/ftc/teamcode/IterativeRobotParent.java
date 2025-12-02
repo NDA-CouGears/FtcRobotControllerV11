@@ -294,7 +294,7 @@ public abstract class IterativeRobotParent extends OpMode {
         return aprilTagProcessor.getDetections();
     }
 
-    protected void setCurrentPosition(double x, double y, double heading) {
+    public void setCurrentPosition(double x, double y, double heading) {
         while (heading > 180) {
             heading -= 360;
         }

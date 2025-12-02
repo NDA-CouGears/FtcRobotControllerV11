@@ -34,11 +34,11 @@ public class ScanBay extends CarouselOperations {
         */
         if (hsv[0] < 100){
             ball = "g";
-            //finished = true;
+            finished = true;
         }
         else if (hsv[1] > 100){
             ball = "p";
-            //finished = true;
+            finished = true;
         }
         else {
             ball = null;
