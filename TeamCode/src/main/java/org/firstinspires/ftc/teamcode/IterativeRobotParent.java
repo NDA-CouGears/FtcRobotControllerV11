@@ -17,7 +17,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.operations.ParallelOperation;
+import org.firstinspires.ftc.teamcode.operations.PrepareLaunch;
 import org.firstinspires.ftc.teamcode.operations.RobotOperation;
+import org.firstinspires.ftc.teamcode.operations.SetShootSpeed;
+import org.firstinspires.ftc.teamcode.operations.Sleep;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -482,5 +486,15 @@ public abstract class IterativeRobotParent extends OpMode {
                 activeOperation = null;
             }
         }
+    }
+
+    public void shootThree(int speed){
+        addOperation(new ParallelOperation(true,
+                new SetShootSpeed(speed),
+                new PrepareLaunch(1),
+                new Sleep(2)));
+
+
+
     }
 }

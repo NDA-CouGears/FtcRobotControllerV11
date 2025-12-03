@@ -7,6 +7,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class TeleOp extends IterativeRobotParent {
     private boolean shootButtonPressed = false;
     private int shootingSpeed = 0;
+    private int currentCarPos = 0;
+    private boolean carButtonPressed = false;
+    private boolean intakeButtonPressed = false;
+    private boolean intakeOn = false;
 
     @Override
     public void init() {
@@ -46,15 +50,22 @@ public class TeleOp extends IterativeRobotParent {
         } else {
             shootButtonPressed = false;
         }
-
         setShootSpeed(shootingSpeed);
     }
 
     public void intakeBall() {
-        if (gamepad2.a) {
-            setIntakeSpeed(1);
-        } else {
-            setIntakeSpeed(0);
+        if (gamepad2.a && !intakeButtonPressed) {
+            intakeButtonPressed = true;
+            intakeOn = !intakeOn;
+            if (intakeOn){
+                setIntakeSpeed(1);
+            }
+            else {
+                setIntakeSpeed(0);
+            }
+        }
+        else if (!gamepad2.a) {
+            intakeButtonPressed = false;
         }
     }
 
@@ -67,18 +78,20 @@ public class TeleOp extends IterativeRobotParent {
             return;
         }
 
-        carousel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        float RPM = 30;
-        float carouselSpeed = (gamepad2.right_trigger - gamepad2.left_trigger);
-        // carouselSpeed * (rotations per second * ticks per rotation * gear ratio)
-        float carouselVelocity = carouselSpeed * (RPM / 60 * 28 * 26.9f);
-        carousel.setVelocity(carouselVelocity);
-
+        if (gamepad2.left_trigger > .2 && !carButtonPressed){
+            carButtonPressed = true;
+            currentCarPos = (currentCarPos + 1) % 6;
+            setCarouselPosition(currentCarPos);
+        }
+        else if (gamepad2.left_trigger <= .2) {
+            carButtonPressed = false;
+        }
 
         if (gamepad2.dpad_up) {
             telemetry.addLine("carousel arm open");
             liftLaunchArm();
-        } else {
+        }
+        else {
             telemetry.addLine("carousel arm closed");
             lowerLaunchArm();
         }
