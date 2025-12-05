@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.experiment.ConfigManager;
 import org.firstinspires.ftc.teamcode.operations.CarouselOperations;
 import org.firstinspires.ftc.teamcode.operations.IterativeDriveToLocation;
 import org.firstinspires.ftc.teamcode.operations.IterativeOtisAprilTagCalibration;
@@ -15,15 +16,33 @@ import org.firstinspires.ftc.teamcode.operations.Sleep;
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "IterativeAuto", group = "Tournament")
 
 public class IterativeAuto extends IterativeRobotParent {
+    public ConfigManager config = new ConfigManager();
+
     @Override
     public void init() {
+        config.load();
+
         initHardware();
         initAprilTag();
         initBallCam();
-        //blueTasks(false);
-        addTest();
+
+        if (config.testMode) {
+            addTest();
+        }
+        else if (config.blueAlliance) {
+            blueTasks(config.startNear);
+        }
+        else {
+            redTasks(config.startNear);
+        }
 
         CarouselOperations.resetColors();
+    }
+
+    @Override
+    public void init_loop() {
+        super.init_loop();
+        config.displayMenu(telemetry, gamepad1);
     }
 
     private void addTest() {
@@ -66,6 +85,9 @@ public class IterativeAuto extends IterativeRobotParent {
 
     private void blueTasks(boolean near) {
         addOperation(new IterativeScanObelisk());
+        if (config.startDelay > 0) {
+            addOperation(new Sleep(config.startDelay));
+        }
         if (near) {
             addOperation(new SetStartingPosition(-24, -24, -117));
         }
@@ -79,6 +101,18 @@ public class IterativeAuto extends IterativeRobotParent {
         addOperation(new IterativeDriveToLocation(0.6, -55,-15,-90));
     }
 
+    private void redTasks(boolean near) {
+        addOperation(new IterativeScanObelisk());
+        if (config.startDelay > 0) {
+            addOperation(new Sleep(config.startDelay));
+        }
+        if (near) {
+            addOperation(new SetStartingPosition(-24, 24, -37));
+        }
+        else {
+            addOperation(new SetStartingPosition(55,-15,-90));
+        }
+    }
 
     @Override
     public void loop() {
