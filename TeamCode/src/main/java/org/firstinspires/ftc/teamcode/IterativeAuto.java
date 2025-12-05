@@ -26,16 +26,6 @@ public class IterativeAuto extends IterativeRobotParent {
         initAprilTag();
         initBallCam();
 
-        if (config.testMode) {
-            addTest();
-        }
-        else if (config.blueAlliance) {
-            blueTasks(config.startNear);
-        }
-        else {
-            redTasks(config.startNear);
-        }
-
         CarouselOperations.resetColors();
     }
 
@@ -111,6 +101,20 @@ public class IterativeAuto extends IterativeRobotParent {
         }
         else {
             addOperation(new SetStartingPosition(55,-15,-90));
+        }
+    }
+
+    @Override
+    public void start() {
+        super.start();
+        if (config.testMode) {
+            addTest();
+        }
+        else if (config.blueAlliance) {
+            blueTasks(config.startNear);
+        }
+        else {
+            redTasks(config.startNear);
         }
     }
 
