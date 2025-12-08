@@ -18,12 +18,21 @@ public class IterativeDriveToLocation extends RobotOperation {
     boolean finished;
 
     public IterativeDriveToLocation(double maxDriveSpeed,
-                                    double x_target_position, double y_target_position,
-                                    double target_heading) {
+                                    double x_target_position,
+                                    double y_target_position,
+                                    double target_heading,
+                                    boolean isRed) {
         this.maxDriveSpeed = maxDriveSpeed;
-        this.x_target_position = x_target_position;
-        this.y_target_position = y_target_position;
-        this.target_heading = target_heading;
+        if (!isRed) {
+            this.x_target_position = x_target_position;
+            this.y_target_position = y_target_position;
+            this.target_heading = target_heading;
+        }
+        else {
+            this.x_target_position = x_target_position;
+            this.y_target_position = -y_target_position;
+            this.target_heading = 180-target_heading;
+        }
 
     }
 

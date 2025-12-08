@@ -45,7 +45,7 @@ public abstract class IterativeRobotParent extends OpMode {
     private Servo carouselArm = null;
     private DcMotorEx intakeSpinny = null;
     private static final double CAROUSEL_ARM_OPEN = .5;
-    private static final double CAROUSEL_ARM_CLOSED = .25;
+    private static final double CAROUSEL_ARM_CLOSED = .27;
     private ElapsedTime overCurrentDuration = null;
     protected boolean stalled = false;
     private SparkFunOTOS otosSensor;
@@ -483,6 +483,7 @@ public abstract class IterativeRobotParent extends OpMode {
 
         // If there is an active operation, call its loop
         if (activeOperation != null) {
+            telemetry.addLine("Running:" + activeOperation.getClass());
             activeOperation.loop();
 
             // If the current operation is finished stop it and clear the active operation field

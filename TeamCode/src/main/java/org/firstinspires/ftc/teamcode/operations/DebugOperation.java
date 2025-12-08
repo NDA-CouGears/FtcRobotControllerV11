@@ -23,7 +23,7 @@ public class DebugOperation extends RobotOperation {
         double x = cur_position.getX(DistanceUnit.INCH);
         double y = cur_position.getY(DistanceUnit.INCH);
         double h = cur_position.getHeading(AngleUnit.DEGREES);
-        robot.telemetry.addLine(String.format("OTIS (x,y,h):%2.1f %2.1f %2.1f", x, y, h));
+        robot.telemetry.addLine(String.format("OTOS (x,y,h):%2.1f %2.1f %2.1f", x, y, h));
 
         PredominantColorProcessor.Result ballData = robot.getBallAnalysis();
         PredominantColorProcessor.Swatch swatch = ballData.closestSwatch;
@@ -37,11 +37,13 @@ public class DebugOperation extends RobotOperation {
 
         List<AprilTagDetection> detections = robot.getDetections();
         for (AprilTagDetection detection : detections) {
+            if (detection.metadata == null)
+                continue;
+
             // Show location data for goals and just id for obelisk
             if (!detection.metadata.name.contains("Obelisk")) {
                 x = detection.robotPose.getPosition().x;
                 y = detection.robotPose.getPosition().y;
-                // +180 because the intake is considered the front but the tag camera is other side
                 h = detection.robotPose.getOrientation().getYaw() + 180;
                 robot.telemetry.addLine(
                         String.format("Tag (id,x,y,h):%s %2.1f %2.1f %2.1f",

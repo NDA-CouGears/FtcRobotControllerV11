@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.operations;
 
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.IterativeRobotParent;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
@@ -7,12 +10,19 @@ import java.util.List;
 
 public class IterativeScanObelisk extends RobotOperation {
     private AprilTagPoseFtc ftcPose;
+    private ElapsedTime runtime = new ElapsedTime();
 
     public enum OBELISK_PATTERN{
         GPP,
         PGP,
         PPG,
         unknown}
+
+    @Override
+    public void init(IterativeRobotParent robot) {
+        super.init(robot);
+        runtime.reset();
+    }
 
     public static OBELISK_PATTERN curPattern = OBELISK_PATTERN.unknown;
     @Override
@@ -32,6 +42,9 @@ public class IterativeScanObelisk extends RobotOperation {
                     break;
             }
 
+        }
+        if (runtime.seconds()>2){
+            curPattern = OBELISK_PATTERN.PPG;
         }
     }
     @Override

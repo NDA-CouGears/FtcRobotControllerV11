@@ -5,6 +5,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.experiment.ConfigManager;
 import org.firstinspires.ftc.teamcode.operations.CarouselOperations;
 import org.firstinspires.ftc.teamcode.operations.ControlArm;
+import org.firstinspires.ftc.teamcode.operations.DebugOperation;
 import org.firstinspires.ftc.teamcode.operations.IterativeDriveToLocation;
 import org.firstinspires.ftc.teamcode.operations.IterativeOtisAprilTagCalibration;
 import org.firstinspires.ftc.teamcode.operations.IterativeScanObelisk;
@@ -53,7 +54,7 @@ public class IterativeAuto extends IterativeRobotParent {
         addOperation(new Sleep(2));
     }
 
-    private void blueTasks(boolean near) {
+    private void tasks(boolean near, boolean isRed) {
         /**
          * I think we have agreed on four phases to auto that we will get as far into as possible
          * with the time we have:
@@ -73,7 +74,7 @@ public class IterativeAuto extends IterativeRobotParent {
          * - Add drive to balls and intake them
          * - Reuse shoot three balls by color from phase 2
          * - Requires
-         * -- fine tuning april tag calibration
+         * -- fine tuning april tag calibration, use builder.setCameraPose to match camera position
          * -- fine tuning scan bay for accuracy and consistency
          * -- adding intake operations
          *
@@ -85,26 +86,24 @@ public class IterativeAuto extends IterativeRobotParent {
             addOperation(new Sleep(config.startDelay));
         }
         if (near) {
-            addOperation(new SetStartingPosition(-24, -24, -117));
+            addOperation(new SetStartingPosition(-24, -24, 63, isRed));
+            addOperation(new IterativeDriveToLocation(0.6,-24,-24,-45, isRed));
         }
         else {
-            addOperation(new SetStartingPosition(55,-15,-90));
+            addOperation(new SetStartingPosition(61,-14,90, isRed));
+            addOperation(new IterativeDriveToLocation(0.6,55,-14,-60, isRed));
         }
-        addOperation(new IterativeDriveToLocation(0.6,-24,-24,-45));
-        addOperation(new IterativeOtisAprilTagCalibration());
-        addOperation(new IterativeDriveToLocation(0.6, -48,-48,-45));
+        addOperation(new DebugOperation());
+        //addOperation(new IterativeOtisAprilTagCalibration());
+        //addOperation(new IterativeDriveToLocation(0.6, -48,-48,-45, isRed));
         // shoot here
-        addOperation(new IterativeDriveToLocation(0.6, -55,-15,-90));
-    }
-
-    private void redTasks(boolean near) {
-        /**
-         * Since red is just a mirror of blue around the X axis ee should be able to make red
-         * operations programmatically from blue by:
-         * x = x
-         * y = -y
-         * h = 180-h
-         */
+        shootThree(near? 1: 2);
+        if (near){
+            addOperation(new IterativeDriveToLocation(0.6, -55,-15,-90, isRed));
+        }
+        else {
+            addOperation(new IterativeDriveToLocation(0.6, 55, -38, -60, isRed));
+        }
     }
 
     @Override
@@ -113,11 +112,8 @@ public class IterativeAuto extends IterativeRobotParent {
         if (config.testMode) {
             addTest();
         }
-        else if (config.blueAlliance) {
-            blueTasks(config.startNear);
-        }
         else {
-            redTasks(config.startNear);
+            tasks(config.startNear, !config.blueAlliance);
         }
     }
 
@@ -139,8 +135,6 @@ public class IterativeAuto extends IterativeRobotParent {
             requestOpModeStop();
         }
 
-        telemetry.addLine("position " + getFieldPosition().getX(DistanceUnit.INCH) + ", " + getFieldPosition().getY(DistanceUnit.INCH) + ", " + getFieldPosition().getHeading(AngleUnit.DEGREES));
-        telemetry.addLine(String.format("Bay 1:%s 2:%s 3:%s", CarouselOperations.colors.get(0),CarouselOperations.colors.get(1),CarouselOperations.colors.get(2)));
         telemetry.update();
     }
 

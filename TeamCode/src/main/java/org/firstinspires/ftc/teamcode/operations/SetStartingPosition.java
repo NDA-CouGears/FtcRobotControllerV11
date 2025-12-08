@@ -6,10 +6,17 @@ public class SetStartingPosition extends RobotOperation{
     double x;
     double y;
     double heading;
-    public SetStartingPosition(double x, double y, double heading){
-        this.x = x;
-        this.y = y;
-        this.heading = heading;
+    public SetStartingPosition(double x, double y, double heading, boolean isRed){
+        if (!isRed) {
+            this.x = x;
+            this.y = y;
+            this.heading = heading;
+        }
+        else {
+            this.x = x;
+            this.y = -y;
+            this.heading = 180 - heading;
+        }
     }
 
     @Override
