@@ -3,6 +3,13 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.operations.ControlArm;
+import org.firstinspires.ftc.teamcode.operations.ParallelOperation;
+import org.firstinspires.ftc.teamcode.operations.PrepareLaunch;
+import org.firstinspires.ftc.teamcode.operations.SetShootSpeed;
+import org.firstinspires.ftc.teamcode.operations.SetStartingPosition;
+import org.firstinspires.ftc.teamcode.operations.Sleep;
+
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOp", group = "Tournament")
 public class TeleOp extends IterativeRobotParent {
     private boolean shootButtonPressed = false;
@@ -11,6 +18,7 @@ public class TeleOp extends IterativeRobotParent {
     private boolean carButtonPressed = false;
     private boolean intakeButtonPressed = false;
     private boolean intakeOn = false;
+    private boolean xPressed = false;
 
     @Override
     public void init() {
@@ -38,7 +46,9 @@ public class TeleOp extends IterativeRobotParent {
                     shootingSpeed = 1;
                 }
             }
-        } else if (gamepad2.right_bumper) {
+            setShootSpeed(shootingSpeed);
+        }
+        else if (gamepad2.right_bumper) {
             if (!shootButtonPressed) {
                 shootButtonPressed = true;
                 if (shootingSpeed == 2) {
@@ -47,10 +57,19 @@ public class TeleOp extends IterativeRobotParent {
                     shootingSpeed = 2;
                 }
             }
-        } else {
+            setShootSpeed(shootingSpeed);
+        }
+        else {
             shootButtonPressed = false;
         }
-        setShootSpeed(shootingSpeed);
+
+        if (gamepad2.x && !xPressed) {
+            xPressed = true;
+            shootThree(shootingSpeed);
+        }
+        else if (!gamepad2.x) {
+            xPressed = false;
+        }
     }
 
     public void intakeBall() {
@@ -93,7 +112,9 @@ public class TeleOp extends IterativeRobotParent {
         }
         else {
             telemetry.addLine("carousel arm closed");
-            lowerLaunchArm();
+            if (noPendingOperations()) {
+                lowerLaunchArm();
+            }
         }
 
         telemetry.update();

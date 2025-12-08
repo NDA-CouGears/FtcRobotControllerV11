@@ -17,6 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.operations.ControlArm;
 import org.firstinspires.ftc.teamcode.operations.ParallelOperation;
 import org.firstinspires.ftc.teamcode.operations.PrepareLaunch;
 import org.firstinspires.ftc.teamcode.operations.RobotOperation;
@@ -489,12 +490,12 @@ public abstract class IterativeRobotParent extends OpMode {
     }
 
     public void shootThree(int speed){
-        addOperation(new ParallelOperation(true,
-                new SetShootSpeed(speed),
-                new PrepareLaunch(1),
-                new Sleep(2)));
-
-
-
+        for (int i = 1; i <= 3; i++) {
+            addOperation(new ParallelOperation(true,
+                    new SetShootSpeed(speed),
+                    new PrepareLaunch(i),
+                    new Sleep(2)));
+            addOperation(new ControlArm());
+        }
     }
 }
