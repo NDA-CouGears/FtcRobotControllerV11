@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.operations;
 
+import android.annotation.SuppressLint;
+
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.IterativeRobotParent;
@@ -32,6 +34,7 @@ public class ScanBay extends CarouselOperations {
         scanTime.reset();
     }
 
+    @SuppressLint("DefaultLocale")
     @Override
     public void loop() {
         // If we have been scanning longer than our configured timeout give up
@@ -41,11 +44,12 @@ public class ScanBay extends CarouselOperations {
         }
 
         String ball;
-        PredominantColorProcessor.Swatch current = robot.colorSensor.getAnalysis().closestSwatch;
+        PredominantColorProcessor.Result ballData = robot.getBallAnalysis();
+        PredominantColorProcessor.Swatch current = ballData.closestSwatch;
         robot.telemetry.addLine(String.valueOf(current));
-        int[] rgb = robot.colorSensor.getAnalysis().RGB;
+        int[] rgb = ballData.RGB;
         robot.telemetry.addLine(String.format("r:%d; g:%d; b:%d;", rgb[0], rgb[1], rgb[2]));
-        int[] hsv = robot.colorSensor.getAnalysis().HSV;
+        int[] hsv = ballData.HSV;
         robot.telemetry.addLine(String.format("h:%d; s:%d; v:%d;", hsv[0], hsv[1], hsv[2]));
 
         if (hsv[0] < 100){
