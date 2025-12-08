@@ -51,7 +51,7 @@ public abstract class IterativeRobotParent extends OpMode {
     private SparkFunOTOS otosSensor;
     private AprilTagProcessor aprilTagProcessor;
     private VisionPortal aprilTagVisionPortal;
-    public PredominantColorProcessor colorSensor;
+    private PredominantColorProcessor colorSensor;
 
     private VisionPortal ballVisionPortal;
     public static final double P_TURN_GAIN = 0.02;// Larger is more responsive, but also less stable.
@@ -293,6 +293,10 @@ public abstract class IterativeRobotParent extends OpMode {
                 .setCameraResolution(new Size(320, 240))
                 .setCamera(hardwareMap.get(WebcamName.class, "Ball Cam"))
                 .build();
+    }
+
+    public PredominantColorProcessor.Result getBallAnalysis() {
+        return colorSensor.getAnalysis();
     }
 
     public ArrayList<AprilTagDetection> getDetections() {
