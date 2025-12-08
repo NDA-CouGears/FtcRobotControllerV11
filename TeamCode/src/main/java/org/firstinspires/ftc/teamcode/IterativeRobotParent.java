@@ -18,6 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.operations.ControlArm;
+import org.firstinspires.ftc.teamcode.operations.DebugOperation;
 import org.firstinspires.ftc.teamcode.operations.ParallelOperation;
 import org.firstinspires.ftc.teamcode.operations.PrepareLaunch;
 import org.firstinspires.ftc.teamcode.operations.RobotOperation;
@@ -116,7 +117,7 @@ public abstract class IterativeRobotParent extends OpMode {
         allHubs = hardwareMap.getAll(LynxModule.class);
 
         for (LynxModule module : allHubs) {
-            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+            module.setBulkCachingMode(LynxModule.BulkCachingMode.OFF);
         }
 
         initOtos();
@@ -376,6 +377,15 @@ public abstract class IterativeRobotParent extends OpMode {
         carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         carousel.setPower(.5);
     }
+    public void addCaroselTelemetry(){
+        float CTR = 751.8f;
+        int curPos = carousel.getCurrentPosition();
+        float offset = curPos % CTR;
+        float zero = curPos - offset;
+        telemetry.addLine(String.format("curPos" + curPos));
+        telemetry.addLine(String.format("offset" + offset));
+        telemetry.addLine(String.format("zero" + zero));
+    }
 
     public void liftLaunchArm() {
         carouselArm.setPosition(CAROUSEL_ARM_OPEN);
@@ -483,7 +493,7 @@ public abstract class IterativeRobotParent extends OpMode {
 
         // If there is an active operation, call its loop
         if (activeOperation != null) {
-            telemetry.addLine("Running:" + activeOperation.getClass());
+            telemetry.addLine(String.format("Ops %d current %s", pendingOperations.size(), activeOperation.getClass()));
             activeOperation.loop();
 
             // If the current operation is finished stop it and clear the active operation field
@@ -495,12 +505,11 @@ public abstract class IterativeRobotParent extends OpMode {
     }
 
     public void shootThree(int speed){
+        addOperation(new SetShootSpeed(speed));
         for (int i = 1; i <= 3; i++) {
-            addOperation(new ParallelOperation(true,
-                    new SetShootSpeed(speed),
-                    new PrepareLaunch(i),
-                    new Sleep(2)));
+            addOperation(new PrepareLaunch(i));
             addOperation(new ControlArm());
+            addOperation(new Sleep(.75));
         }
     }
 }

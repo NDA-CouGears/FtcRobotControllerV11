@@ -53,6 +53,7 @@ public class DebugOperation extends RobotOperation {
                 robot.telemetry.addLine(String.format("Tag (id):%s", detection.metadata.name));
             }
         }
+        robot.addCaroselTelemetry();
     }
 
     @Override

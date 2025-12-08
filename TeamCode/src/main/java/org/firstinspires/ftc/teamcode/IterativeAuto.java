@@ -40,18 +40,8 @@ public class IterativeAuto extends IterativeRobotParent {
     }
 
     private void addTest() {
-        addOperation(new PrepareLoad(1));
-        addOperation(new Sleep(2));
-        addOperation(new PrepareLoad(2));
-        addOperation(new Sleep(2));
-        addOperation(new PrepareLoad(3));
-        addOperation(new Sleep(2));
         addOperation(new PrepareLaunch(1));
-        addOperation(new Sleep(2));
         addOperation(new PrepareLaunch(2));
-        addOperation(new Sleep(2));
-        addOperation(new PrepareLaunch(3));
-        addOperation(new Sleep(2));
     }
 
     private void tasks(boolean near, boolean isRed) {
@@ -64,6 +54,8 @@ public class IterativeAuto extends IterativeRobotParent {
          * - Drive to shooting position and shoot three balls, no regard for color
          * - Is shooting position always same as starting position? Like should we start far but
          * shoot near if our partner is not in the way and our near shots are more accurate?
+         * - Look into DriveToLocation stall when it gets close
+         * - Turn caching back on and see what we need to do to correctly handle isBusy in carousel
          *
          * Phase 2: phase 1 plus shoot order by color
          * - Add obelisk scan and shoot correct colors to phase 1
@@ -93,7 +85,6 @@ public class IterativeAuto extends IterativeRobotParent {
             addOperation(new SetStartingPosition(61,-14,90, isRed));
             addOperation(new IterativeDriveToLocation(0.6,55,-14,-60, isRed));
         }
-        addOperation(new DebugOperation());
         //addOperation(new IterativeOtisAprilTagCalibration());
         //addOperation(new IterativeDriveToLocation(0.6, -48,-48,-45, isRed));
         // shoot here

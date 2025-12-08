@@ -125,6 +125,7 @@ public class IterativeDriveToLocation extends RobotOperation {
         } else {
             robot.moveRobot(xSpeed, ySpeed, -turnSpeed); // negated turnSpeed b/c field has counterclockwise as positive
         }
+        // change the field errors to robot errors here so they're all calculated with the same type??
         if (Math.abs(fieldXError) < 1 && Math.abs(fieldYError) < 1 && Math.abs(headingError) < 1) {
             robot.moveRobot(0, 0, 0);
             finished = true;
