@@ -19,6 +19,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.operations.ControlArm;
 import org.firstinspires.ftc.teamcode.operations.DebugOperation;
+import org.firstinspires.ftc.teamcode.operations.IterativeScanObelisk;
 import org.firstinspires.ftc.teamcode.operations.ParallelOperation;
 import org.firstinspires.ftc.teamcode.operations.PrepareLaunch;
 import org.firstinspires.ftc.teamcode.operations.RobotOperation;
@@ -352,7 +353,6 @@ public abstract class IterativeRobotParent extends OpMode {
     }
 
     /**
-     *
      * @param sixths How many sixths of a rotation to move to where zero is the starting position
      *               with bay 1 facing the intake. Only goes forward, never in reverse to avoid
      *               jams. We use sixths because launch and load are 1/6 of a rotation off from
@@ -365,19 +365,20 @@ public abstract class IterativeRobotParent extends OpMode {
         int curPos = carousel.getCurrentPosition();
         float offset = curPos % CTR;
         float zero = curPos - offset;
-        float targetPos = zero + sixths*CTR/6;
+        float targetPos = zero + sixths * CTR / 6;
 
         // If our target is more than a little behind our current position go the long way around
         // to prevent ball jams. Required based on hardware teams mechanical design
-        if (targetPos < (curPos-15)){
+        if (targetPos < (curPos - 15)) {
             targetPos += CTR;
         }
 
-        carousel.setTargetPosition((int)(targetPos+.5));
+        carousel.setTargetPosition((int) (targetPos + .5));
         carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         carousel.setPower(.5);
     }
-    public void addCaroselTelemetry(){
+
+    public void addCaroselTelemetry() {
         float CTR = 751.8f;
         int curPos = carousel.getCurrentPosition();
         float offset = curPos % CTR;
@@ -396,7 +397,6 @@ public abstract class IterativeRobotParent extends OpMode {
     }
 
     /**
-     *
      * @param shootingSpeed 1 is for near, 2 is far, anything else is stop
      */
     public void setShootSpeed(int shootingSpeed) {
@@ -504,10 +504,37 @@ public abstract class IterativeRobotParent extends OpMode {
         }
     }
 
-    public void shootThree(int speed){
+    public void shootThree(int speed) {
         addOperation(new SetShootSpeed(speed));
         for (int i = 1; i <= 3; i++) {
             addOperation(new PrepareLaunch(i));
+            addOperation(new ControlArm());
+            addOperation(new Sleep(.75));
+        }
+    }
+
+    public void shootInOrderStart(int speed) {
+        addOperation(new SetShootSpeed(speed));
+        if (IterativeScanObelisk.curPattern == IterativeScanObelisk.OBELISK_PATTERN.PPG) {
+            shootThree(speed);
+        } else if (IterativeScanObelisk.curPattern == IterativeScanObelisk.OBELISK_PATTERN.PGP) {
+            addOperation(new PrepareLaunch(2));
+            addOperation(new ControlArm());
+            addOperation(new Sleep(.75));
+            addOperation(new PrepareLaunch(3));
+            addOperation(new ControlArm());
+            addOperation(new Sleep(.75));
+            addOperation(new PrepareLaunch(1));
+            addOperation(new ControlArm());
+            addOperation(new Sleep(.75));
+        } else if (IterativeScanObelisk.curPattern == IterativeScanObelisk.OBELISK_PATTERN.GPP) {
+            addOperation(new PrepareLaunch(3));
+            addOperation(new ControlArm());
+            addOperation(new Sleep(.75));
+            addOperation(new PrepareLaunch(1));
+            addOperation(new ControlArm());
+            addOperation(new Sleep(.75));
+            addOperation(new PrepareLaunch(2));
             addOperation(new ControlArm());
             addOperation(new Sleep(.75));
         }

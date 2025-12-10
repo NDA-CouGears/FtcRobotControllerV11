@@ -92,15 +92,15 @@ public class IterativeDriveToLocation extends RobotOperation {
         double xSpeed = 0;
         double ySpeed = 0;
 
-        if (robotXError > 1) {
+        if (robotXError > 0.1) {
             xSpeed = Range.clip(robotXError * IterativeRobotParent.P_DRIVE_GAIN, 0.1, maxDriveSpeed);
-        } else if (robotXError < -1) {
+        } else if (robotXError < -0.1) {
             xSpeed = Range.clip(robotXError * IterativeRobotParent.P_DRIVE_GAIN, -maxDriveSpeed, -0.1);
         }
 
-        if (robotYError > 1) {
+        if (robotYError > 0.1) {
             ySpeed = Range.clip(robotYError * IterativeRobotParent.P_DRIVE_GAIN, 0.1, maxDriveSpeed);
-        } else if (robotYError < -1) {
+        } else if (robotYError < -0.1) {
             ySpeed = Range.clip(robotYError * IterativeRobotParent.P_DRIVE_GAIN, -maxDriveSpeed, -0.1);
         }
 

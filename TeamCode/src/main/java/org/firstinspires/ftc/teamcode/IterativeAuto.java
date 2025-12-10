@@ -49,15 +49,14 @@ public class IterativeAuto extends IterativeRobotParent {
          * I think we have agreed on four phases to auto that we will get as far into as possible
          * with the time we have:
          *
-         * Phase 1:
+         * Phase 1: done!! :)
          * - Support red/blue near and far start
          * - Drive to shooting position and shoot three balls, no regard for color
          * - Is shooting position always same as starting position? Like should we start far but
          * shoot near if our partner is not in the way and our near shots are more accurate?
          * - Look into DriveToLocation stall when it gets close
-         * - Turn caching back on and see what we need to do to correctly handle isBusy in carousel
          *
-         * Phase 2: phase 1 plus shoot order by color
+         * Phase 2: phase 1 plus shoot order by color (done!! :) )
          * - Add obelisk scan and shoot correct colors to phase 1
          * - Requires a new PrepareLaunch that takes a color instead of a bay
          *
@@ -85,10 +84,11 @@ public class IterativeAuto extends IterativeRobotParent {
             addOperation(new SetStartingPosition(61,-14,90, isRed));
             addOperation(new IterativeDriveToLocation(0.6,55,-14,-60, isRed));
         }
-        //addOperation(new IterativeOtisAprilTagCalibration());
+        addOperation(new IterativeScanObelisk());
+        addOperation(new IterativeOtisAprilTagCalibration());
         //addOperation(new IterativeDriveToLocation(0.6, -48,-48,-45, isRed));
         // shoot here
-        shootThree(near? 1: 2);
+        shootInOrderStart(near? 1: 2);
         if (near){
             addOperation(new IterativeDriveToLocation(0.6, -55,-15,-90, isRed));
         }

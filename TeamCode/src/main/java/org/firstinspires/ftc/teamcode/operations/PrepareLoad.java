@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 public class PrepareLoad extends CarouselOperations {
     int bay;
+    boolean posSet;
     public PrepareLoad(int bay){
         this.bay = bay;
     }
@@ -11,14 +12,15 @@ public class PrepareLoad extends CarouselOperations {
     @Override
     public void loop() {
         super.loop();
-        if (bay == 1){
-            robot.setCarouselPosition(0);
-        }
-        else if (bay == 2){
-            robot.setCarouselPosition(2);
-        }
-        else if (bay == 3) {
-            robot.setCarouselPosition(4);
+        if (!posSet) {
+            posSet = true;
+            if (bay == 1) {
+                robot.setCarouselPosition(0);
+            } else if (bay == 2) {
+                robot.setCarouselPosition(2);
+            } else if (bay == 3) {
+                robot.setCarouselPosition(4);
+            }
         }
 
         if (!robot.isCarouselBusy()){
