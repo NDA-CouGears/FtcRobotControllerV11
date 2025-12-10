@@ -15,6 +15,7 @@ public class ConfigManager {
     public boolean blueAlliance = true;
     public boolean startNear = false;
     public int startDelay = 0;
+    public int intakeLine = 1;
 
     public void save() {
         try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
@@ -23,6 +24,7 @@ public class ConfigManager {
             json.put("blueAlliance", blueAlliance);
             json.put("startNear", startNear);
             json.put("startDelay", startDelay);
+            json.put("intakeLine", intakeLine);
             writer.write(json.toString(2)); // pretty print with indent
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -43,6 +45,8 @@ public class ConfigManager {
             blueAlliance = json.getBoolean("blueAlliance");
             startNear = json.getBoolean("startNear");
             startDelay = json.getInt("startDelay");
+            if (json.has("intakeLine"))
+                intakeLine = json.getInt("intakeLine");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -60,6 +64,7 @@ public class ConfigManager {
         telemetry.addLine(String.format("%s startNear %b", curMenu == 1 ? "*" : "-", startNear));
         telemetry.addLine(String.format("%s delay %d", curMenu == 2 ? "*" : "-", startDelay));
         telemetry.addLine(String.format("%s testMode %b", curMenu == 3 ? "*" : "-", testMode));
+        telemetry.addLine(String.format("%s intakeLine %d", curMenu == 4 ? "*" : "-", intakeLine));
 
         // Do not allow another input after the dpad was pressed until it is released
         if (dpadPressed &&
@@ -111,6 +116,11 @@ public class ConfigManager {
                 case 3:
                     testMode = !testMode;
                     break;
+                case 4:
+                    intakeLine += (int) delta;
+                    if (intakeLine > 3 || intakeLine < 1){
+                        intakeLine = 1;
+                    }
             }
         }
 

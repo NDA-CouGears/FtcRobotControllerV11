@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.operations.ParallelOperation;
 import org.firstinspires.ftc.teamcode.operations.PrepareLaunch;
 import org.firstinspires.ftc.teamcode.operations.PrepareLoad;
 import org.firstinspires.ftc.teamcode.operations.ScanBay;
+import org.firstinspires.ftc.teamcode.operations.SetIntakeSpeed;
 import org.firstinspires.ftc.teamcode.operations.SetShootSpeed;
 import org.firstinspires.ftc.teamcode.operations.SetStartingPosition;
 import org.firstinspires.ftc.teamcode.operations.Sleep;
@@ -72,28 +73,46 @@ public class IterativeAuto extends IterativeRobotParent {
          * Phase 4: phase three but for more rows of balls
          * - Add configuration for which lines to go for
          */
+        addOperation(new SetShootSpeed(2));
         addOperation(new IterativeScanObelisk());
+
         if (config.startDelay > 0) {
             addOperation(new Sleep(config.startDelay));
         }
+
         if (near) {
-            addOperation(new SetStartingPosition(-24, -24, 63, isRed));
-            addOperation(new IterativeDriveToLocation(0.6,-24,-24,-45, isRed));
+            addOperation(new SetStartingPosition(-36, -36, 45, isRed));
+            addOperation(new IterativeDriveToLocation(0.6,-36,-36,-45, isRed));
         }
         else {
             addOperation(new SetStartingPosition(61,-14,90, isRed));
             addOperation(new IterativeDriveToLocation(0.6,55,-14,-60, isRed));
         }
-        addOperation(new IterativeScanObelisk());
-        addOperation(new IterativeOtisAprilTagCalibration());
+
+        //addOperation(new IterativeOtisAprilTagCalibration());
         //addOperation(new IterativeDriveToLocation(0.6, -48,-48,-45, isRed));
         // shoot here
         shootInOrderStart(near? 1: 2);
-        if (near){
-            addOperation(new IterativeDriveToLocation(0.6, -55,-15,-90, isRed));
-        }
-        else {
-            addOperation(new IterativeDriveToLocation(0.6, 55, -38, -60, isRed));
+        int xPos = -12;
+        if (true) {
+            if (config.intakeLine == 1) {
+                xPos = -12;
+            } else if (config.intakeLine == 2) {
+                xPos = 12;
+            } else if (config.intakeLine == 3) {
+                xPos = 36;
+            }
+            addOperation(new IterativeDriveToLocation(0.6, xPos, -28, 180, isRed));
+            addOperation(new SetIntakeSpeed(1));
+            for (int i = 1; i <= 3; i++) {
+                addOperation(new PrepareLoad(i));
+                addOperation(new ParallelOperation(false,
+                        new IterativeDriveToLocation(0.2, xPos, -28 - (5*i), 180, isRed),
+                        new ScanBay(i, .2, 2)));
+            }
+            addOperation(new SetIntakeSpeed(0));
+            addOperation(new IterativeDriveToLocation(0.6,-36,-36, -45, isRed));
+            shootThree(1);
         }
     }
 
@@ -114,7 +133,8 @@ public class IterativeAuto extends IterativeRobotParent {
         if (stallDetection()){
             stopCarousel();
             clearOperations();
-            requestOpModeStop();
+            //requestOpModeStop();
+            addOperation(new DebugOperation("stall"));
             return;
         }
 

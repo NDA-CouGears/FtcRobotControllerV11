@@ -257,7 +257,7 @@ public abstract class IterativeRobotParent extends OpMode {
         // builder.setCameraResolution(new Size(640, 480));
 
         // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
-        builder.enableLiveView(false);
+        builder.enableLiveView(true);
 
         // Set the stream format; MJPEG uses less bandwidth than default YUY2.
         // builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);
@@ -291,6 +291,7 @@ public abstract class IterativeRobotParent extends OpMode {
                 )
                 .build();
         ballVisionPortal = new VisionPortal.Builder()
+                .enableLiveView(false)
                 .addProcessor(colorSensor)
                 .setCameraResolution(new Size(320, 240))
                 .setCamera(hardwareMap.get(WebcamName.class, "Ball Cam"))
@@ -515,6 +516,7 @@ public abstract class IterativeRobotParent extends OpMode {
 
     public void shootInOrderStart(int speed) {
         addOperation(new SetShootSpeed(speed));
+        addOperation(new Sleep(4));
         if (IterativeScanObelisk.curPattern == IterativeScanObelisk.OBELISK_PATTERN.PPG) {
             shootThree(speed);
         } else if (IterativeScanObelisk.curPattern == IterativeScanObelisk.OBELISK_PATTERN.PGP) {

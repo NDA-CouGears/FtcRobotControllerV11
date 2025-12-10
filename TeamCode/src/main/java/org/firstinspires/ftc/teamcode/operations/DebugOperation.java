@@ -12,13 +12,18 @@ import java.util.List;
 
 public class DebugOperation extends RobotOperation {
     boolean isFinished = false;
+    String name;
+
+    public DebugOperation(String name) {
+        this.name = name;
+    }
 
     @SuppressLint("DefaultLocale")
     @Override
     public void loop() {
         if (robot.gamepad1.x || robot.gamepad1.y || robot.gamepad1.a || robot.gamepad1.b)
             isFinished = true;
-
+        robot.telemetry.addLine(name);
         Pose2D cur_position = robot.getFieldPosition();
         double x = cur_position.getX(DistanceUnit.INCH);
         double y = cur_position.getY(DistanceUnit.INCH);
