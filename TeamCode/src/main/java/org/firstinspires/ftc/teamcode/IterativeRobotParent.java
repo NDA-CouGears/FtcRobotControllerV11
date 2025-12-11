@@ -71,19 +71,22 @@ public abstract class IterativeRobotParent extends OpMode {
     private final ElapsedTime operationsRunTime = new ElapsedTime();
 
     private static class OperationData {
+        static int opCount = 0;
         RobotOperation op;
+        int opId;
         double startTime = -1;
         double endTime = -1;
         int loopCount;
 
         public OperationData(RobotOperation op) {
+            opId = opCount++;
             this.op = op;
         }
 
         @NonNull
         @Override
         public String toString() {
-            return(String.format(Locale.US, "%s:%3.2f-%3.2f:%d",op,startTime,endTime,loopCount));
+            return(String.format(Locale.US, "%d:%s:%3.2f-%3.2f:%d",opId,op,startTime,endTime,loopCount));
         }
     }
 
