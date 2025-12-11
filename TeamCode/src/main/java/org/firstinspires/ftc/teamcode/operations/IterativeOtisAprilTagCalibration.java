@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode.operations;
 
+import androidx.annotation.NonNull;
+
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.List;
+import java.util.Locale;
 
 public class IterativeOtisAprilTagCalibration extends RobotOperation {
 
@@ -23,6 +26,12 @@ public class IterativeOtisAprilTagCalibration extends RobotOperation {
                 return;
             }
         }
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return(String.format(Locale.US, "%s:%b",getClass().getSimpleName(), detected));
     }
 
     @Override

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.operations;
 
+import androidx.annotation.NonNull;
+
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -7,6 +9,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.IterativeRobotParent;
+
+import java.util.Locale;
 
 public class IterativeDriveToLocation extends RobotOperation {
     ElapsedTime runtime;
@@ -34,6 +38,12 @@ public class IterativeDriveToLocation extends RobotOperation {
             this.target_heading = 180-target_heading;
         }
 
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return(String.format(Locale.US, "%s(%2.2f, %2.2f, %2.2f):%b",getClass().getSimpleName(), x_target_position, y_target_position, target_heading, finished));
     }
 
     public void init(IterativeRobotParent robot) {

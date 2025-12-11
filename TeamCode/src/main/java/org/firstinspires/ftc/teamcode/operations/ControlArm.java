@@ -1,8 +1,12 @@
 package org.firstinspires.ftc.teamcode.operations;
 
+import androidx.annotation.NonNull;
+
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.IterativeRobotParent;
+
+import java.util.Locale;
 
 public class ControlArm extends RobotOperation{
     ElapsedTime time = new ElapsedTime();
@@ -22,6 +26,12 @@ public class ControlArm extends RobotOperation{
     public void init(IterativeRobotParent robot) {
         super.init(robot);
         time.reset();
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return(String.format(Locale.US, "%s(%d, %2.2f):%b",getClass().getSimpleName(), currentPhase, maxWait, finished));
     }
 
     @Override

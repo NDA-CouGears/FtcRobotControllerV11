@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode.operations;
 
+import androidx.annotation.NonNull;
+
 import org.firstinspires.ftc.teamcode.IterativeRobotParent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 
 /**
  * An operation that can run multiple other operations at the same time. It can be configured to
@@ -26,6 +29,18 @@ public class ParallelOperation extends RobotOperation {
     public ParallelOperation(boolean waitForAll, RobotOperation... ops) {
         this.waitForAll = waitForAll;
         operations.addAll(Arrays.asList(ops));
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        StringBuilder childStrings = new StringBuilder();
+        for (RobotOperation op:operations) {
+            childStrings.append("[");
+            childStrings.append(op);
+            childStrings.append("]");
+        }
+        return(childStrings.toString());
     }
 
     @Override

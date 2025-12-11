@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.operations;
 
+import androidx.annotation.NonNull;
+
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.IterativeRobotParent;
@@ -7,6 +9,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 
 import java.util.List;
+import java.util.Locale;
 
 public class IterativeScanObelisk extends RobotOperation {
     private AprilTagPoseFtc ftcPose;
@@ -22,6 +25,12 @@ public class IterativeScanObelisk extends RobotOperation {
     public void init(IterativeRobotParent robot) {
         super.init(robot);
         runtime.reset();
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return(String.format(Locale.US, "%s(%s)",getClass().getSimpleName(), curPattern));
     }
 
     public static OBELISK_PATTERN curPattern = OBELISK_PATTERN.unknown;

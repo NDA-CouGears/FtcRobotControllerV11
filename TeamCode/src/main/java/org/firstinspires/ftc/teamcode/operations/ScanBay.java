@@ -2,10 +2,14 @@ package org.firstinspires.ftc.teamcode.operations;
 
 import android.annotation.SuppressLint;
 
+import androidx.annotation.NonNull;
+
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.IterativeRobotParent;
 import org.firstinspires.ftc.vision.opencv.PredominantColorProcessor;
+
+import java.util.Locale;
 
 /**
  *
@@ -26,6 +30,12 @@ public class ScanBay extends CarouselOperations {
         this.bay = bay;
         this.minWait = minWait;
         this.maxWait = maxWait;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return(String.format(Locale.US, "%s(%d,%f,%f)",getClass().getSimpleName(), bay, minWait, maxWait));
     }
 
     @Override

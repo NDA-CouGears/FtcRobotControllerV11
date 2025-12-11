@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.operations;
 
 import android.annotation.SuppressLint;
 
+import androidx.annotation.NonNull;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -9,6 +11,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.opencv.PredominantColorProcessor;
 
 import java.util.List;
+import java.util.Locale;
 
 public class DebugOperation extends RobotOperation {
     boolean isFinished = false;
@@ -16,6 +19,12 @@ public class DebugOperation extends RobotOperation {
 
     public DebugOperation(String name) {
         this.name = name;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return(String.format(Locale.US, "%s(%s)",getClass().getSimpleName(), name));
     }
 
     @SuppressLint("DefaultLocale")

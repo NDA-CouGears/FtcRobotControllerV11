@@ -1,6 +1,10 @@
 package org.firstinspires.ftc.teamcode.operations;
 
+import androidx.annotation.NonNull;
+
 import org.firstinspires.ftc.teamcode.IterativeRobotParent;
+
+import java.util.Locale;
 
 public class SetStartingPosition extends RobotOperation{
     double x;
@@ -17,6 +21,12 @@ public class SetStartingPosition extends RobotOperation{
             this.y = -y;
             this.heading = 180 - heading;
         }
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return(String.format(Locale.US, "%s(%2.2f, %2.2f, %2.2f)",getClass().getSimpleName(), x, y, heading));
     }
 
     @Override

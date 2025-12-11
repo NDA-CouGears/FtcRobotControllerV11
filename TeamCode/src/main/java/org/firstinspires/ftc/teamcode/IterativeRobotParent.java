@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.annotation.SuppressLint;
 import android.util.Size;
 
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -34,6 +35,7 @@ import org.firstinspires.ftc.vision.opencv.PredominantColorProcessor;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 public abstract class IterativeRobotParent extends OpMode {
     private DcMotor leftFrontDrive = null;
@@ -63,7 +65,9 @@ public abstract class IterativeRobotParent extends OpMode {
     public static final float SHOOT_TICKS_PER_ROTATION = 28 * SHOOT_GEAR_RATIO;
 
     private RobotOperation activeOperation;
+
     private LinkedList<RobotOperation> pendingOperations = new LinkedList<RobotOperation>();
+    private LinkedList<RobotOperation> completeOperations = new LinkedList<RobotOperation>();
 
     public void initHardware() {
         leftFrontDrive = hardwareMap.get(DcMotor.class, "lf_drive"); // control hub 2
@@ -483,6 +487,17 @@ public abstract class IterativeRobotParent extends OpMode {
         pendingOperations.clear();
     }
 
+    protected void displayOperations() {
+        telemetry.addLine("----- OPERATIONS -----");
+        telemetry.addLine(String.format(Locale.US, "PENDING: %d", pendingOperations.size()));
+        telemetry.addLine(String.format(Locale.US, "CURRENT: %s", activeOperation));
+        telemetry.addLine("COMPLETED:");
+        for (RobotOperation op:completeOperations) {
+            telemetry.addLine(op.toString());
+        }
+        telemetry.addLine("-------------------------------");
+    }
+
     protected void operationLoop() {
         // If there is no active operation pull one from the list of pending operations
         if (activeOperation == null) {
@@ -494,15 +509,20 @@ public abstract class IterativeRobotParent extends OpMode {
 
         // If there is an active operation, call its loop
         if (activeOperation != null) {
-            telemetry.addLine(String.format("Ops %d current %s", pendingOperations.size(), activeOperation.getClass()));
             activeOperation.loop();
 
             // If the current operation is finished stop it and clear the active operation field
             if (activeOperation.isFinished()) {
+                // For debugging we track all operations that have been run to completion, we can
+                // dump them out using displayOperations or review them in the debugger
+                completeOperations.add(activeOperation);
                 activeOperation.stop();
                 activeOperation = null;
             }
         }
+
+        // While developing and debugging show extra info about the operation queue
+        displayOperations();
     }
 
     public void shootThree(int speed) {
