@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode;
 import android.annotation.SuppressLint;
 import android.util.Size;
 
+import androidx.annotation.NonNull;
+
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
@@ -19,9 +21,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.operations.ControlArm;
-import org.firstinspires.ftc.teamcode.operations.DebugOperation;
 import org.firstinspires.ftc.teamcode.operations.IterativeScanObelisk;
-import org.firstinspires.ftc.teamcode.operations.ParallelOperation;
 import org.firstinspires.ftc.teamcode.operations.PrepareLaunch;
 import org.firstinspires.ftc.teamcode.operations.RobotOperation;
 import org.firstinspires.ftc.teamcode.operations.SetShootSpeed;
@@ -64,10 +64,28 @@ public abstract class IterativeRobotParent extends OpMode {
     public static final float SHOOT_MAX_RPM = 2000f;
     public static final float SHOOT_TICKS_PER_ROTATION = 28 * SHOOT_GEAR_RATIO;
 
-    private RobotOperation activeOperation;
+    private OperationData activeOperation;
 
-    private LinkedList<RobotOperation> pendingOperations = new LinkedList<RobotOperation>();
-    private LinkedList<RobotOperation> completeOperations = new LinkedList<RobotOperation>();
+    private final LinkedList<OperationData> pendingOperations = new LinkedList<OperationData>();
+    private final LinkedList<OperationData> completeOperations = new LinkedList<OperationData>();
+    private final ElapsedTime operationsRunTime = new ElapsedTime();
+
+    private static class OperationData {
+        RobotOperation op;
+        double startTime = -1;
+        double endTime = -1;
+        int loopCount;
+
+        public OperationData(RobotOperation op) {
+            this.op = op;
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return(String.format(Locale.US, "%s:%3.2f-%3.2f:%d",op,startTime,endTime,loopCount));
+        }
+    }
 
     public void initHardware() {
         leftFrontDrive = hardwareMap.get(DcMotor.class, "lf_drive"); // control hub 2
@@ -480,7 +498,7 @@ public abstract class IterativeRobotParent extends OpMode {
     }
 
     protected void addOperation(RobotOperation newOp) {
-        pendingOperations.add(newOp);
+        pendingOperations.add(new OperationData(newOp));
     }
 
     protected void clearOperations() {
@@ -492,7 +510,7 @@ public abstract class IterativeRobotParent extends OpMode {
         telemetry.addLine(String.format(Locale.US, "PENDING: %d", pendingOperations.size()));
         telemetry.addLine(String.format(Locale.US, "CURRENT: %s", activeOperation));
         telemetry.addLine("COMPLETED:");
-        for (RobotOperation op:completeOperations) {
+        for (OperationData op:completeOperations) {
             telemetry.addLine(op.toString());
         }
         telemetry.addLine("-------------------------------");
@@ -503,20 +521,24 @@ public abstract class IterativeRobotParent extends OpMode {
         if (activeOperation == null) {
             if (!pendingOperations.isEmpty()) {
                 activeOperation = pendingOperations.removeFirst();
-                activeOperation.init(this);
+                activeOperation.startTime = operationsRunTime.seconds();
+                activeOperation.op.init(this);
+
             }
         }
 
         // If there is an active operation, call its loop
         if (activeOperation != null) {
-            activeOperation.loop();
+            activeOperation.loopCount++;
+            activeOperation.op.loop();
 
             // If the current operation is finished stop it and clear the active operation field
-            if (activeOperation.isFinished()) {
+            if (activeOperation.op.isFinished()) {
                 // For debugging we track all operations that have been run to completion, we can
                 // dump them out using displayOperations or review them in the debugger
+                activeOperation.endTime = operationsRunTime.seconds();
                 completeOperations.add(activeOperation);
-                activeOperation.stop();
+                activeOperation.op.stop();
                 activeOperation = null;
             }
         }
