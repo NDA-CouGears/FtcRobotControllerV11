@@ -73,7 +73,7 @@ public class IterativeAuto extends IterativeRobotParent {
          * Phase 4: phase three but for more rows of balls
          * - Add configuration for which lines to go for
          */
-        addOperation(new SetShootSpeed(2));
+        addOperation(new SetShootSpeed(near? 1: 2));
         addOperation(new IterativeScanObelisk());
 
         if (config.startDelay > 0) {
@@ -143,7 +143,7 @@ public class IterativeAuto extends IterativeRobotParent {
 
         // If there are no more operations shutdown this op mode
         if (noPendingOperations()) {
-            requestOpModeStop();
+            //requestOpModeStop();
         }
 
         telemetry.update();
