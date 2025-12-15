@@ -60,8 +60,8 @@ public class ConfigManager {
 
         // Display current menu state
         telemetry.addLine("dpad.y to select, dpad.x to change value");
-        telemetry.addLine(String.format("%s blueAlliance %b", curMenu == 0 ? "*" : "-", blueAlliance));
-        telemetry.addLine(String.format("%s startNear %b", curMenu == 1 ? "*" : "-", startNear));
+        telemetry.addLine(String.format("%s alliance %s", curMenu == 0 ? "*" : "-", blueAlliance ? "BLUE" : "RED"));
+        telemetry.addLine(String.format("%s start %s", curMenu == 1 ? "*" : "-", startNear ? "NEAR" : "FAR"));
         telemetry.addLine(String.format("%s delay %d", curMenu == 2 ? "*" : "-", startDelay));
         telemetry.addLine(String.format("%s testMode %b", curMenu == 3 ? "*" : "-", testMode));
         telemetry.addLine(String.format("%s intakeLine %d", curMenu == 4 ? "*" : "-", intakeLine));
