@@ -20,6 +20,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.operations.ControlArm;
+import org.firstinspires.ftc.teamcode.operations.DebugOperation;
 import org.firstinspires.ftc.teamcode.operations.IterativeDriveToLocation;
 import org.firstinspires.ftc.teamcode.operations.ParallelOperation;
 import org.firstinspires.ftc.teamcode.operations.PrepareLaunch;
@@ -588,8 +589,9 @@ public abstract class IterativeRobotParent extends OpMode {
         for (int i = 1; i <= 3; i++) {
             addOperation(new PrepareLoad(i));
             addOperation(new ParallelOperation(false,
-                    new IterativeDriveToLocation(0.5, xPos, -28 - (5*i), 180, isRed),
-                    new ScanBay(i, .2, 2)));
+                    new IterativeDriveToLocation(0.5, xPos, -28 - (5*i), 180, isRed)/*,
+                    new ScanBay(i, .2, 2)*/));
+            addOperation(new DebugOperation("intake "+i));
         }
         addOperation(new SetIntakeSpeed(0));
         addOperation(new IterativeDriveToLocation(0.6,-36,-36, -45, isRed));

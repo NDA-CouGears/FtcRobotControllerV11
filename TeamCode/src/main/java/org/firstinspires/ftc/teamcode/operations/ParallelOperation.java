@@ -40,6 +40,7 @@ public class ParallelOperation extends RobotOperation {
             childStrings.append(op);
             childStrings.append("]");
         }
+        childStrings.append(waitForAll);
         return(childStrings.toString());
     }
 
