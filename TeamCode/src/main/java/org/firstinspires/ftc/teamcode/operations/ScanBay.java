@@ -62,10 +62,10 @@ public class ScanBay extends CarouselOperations {
         int[] hsv = ballData.HSV;
         robot.telemetry.addLine(String.format("h:%d; s:%d; v:%d;", hsv[0], hsv[1], hsv[2]));
 
-        if (hsv[0] < 100){
+        if (current == PredominantColorProcessor.Swatch.ARTIFACT_GREEN){
             ball = "g";
         }
-        else if (hsv[1] > 100){
+        else if (current == PredominantColorProcessor.Swatch.ARTIFACT_PURPLE){
             ball = "p";
         }
         else {

@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.annotation.SuppressLint;
 import android.util.Size;
 
 import androidx.annotation.NonNull;
@@ -21,9 +20,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.operations.ControlArm;
-import org.firstinspires.ftc.teamcode.operations.IterativeScanObelisk;
+import org.firstinspires.ftc.teamcode.operations.IterativeDriveToLocation;
+import org.firstinspires.ftc.teamcode.operations.ParallelOperation;
 import org.firstinspires.ftc.teamcode.operations.PrepareLaunch;
+import org.firstinspires.ftc.teamcode.operations.PrepareLaunchColor;
+import org.firstinspires.ftc.teamcode.operations.PrepareLoad;
 import org.firstinspires.ftc.teamcode.operations.RobotOperation;
+import org.firstinspires.ftc.teamcode.operations.ScanBay;
+import org.firstinspires.ftc.teamcode.operations.SetIntakeSpeed;
 import org.firstinspires.ftc.teamcode.operations.SetShootSpeed;
 import org.firstinspires.ftc.teamcode.operations.Sleep;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -427,11 +431,11 @@ public abstract class IterativeRobotParent extends OpMode {
      */
     public void setShootSpeed(int shootingSpeed) {
         if (shootingSpeed == 1) {
-            float motorVel = (SHOOT_MAX_RPM / 60) * SHOOT_TICKS_PER_ROTATION;
+            float motorVel = (SHOOT_MAX_RPM / 60f) * SHOOT_TICKS_PER_ROTATION;
             leftShoot.setVelocity(motorVel);
             rightShoot.setVelocity(motorVel);
         } else if (shootingSpeed == 2) {
-            float motorVel = 1.25f * (SHOOT_MAX_RPM / 60) * SHOOT_TICKS_PER_ROTATION;
+            float motorVel = 1.2f * (SHOOT_MAX_RPM / 60f) * SHOOT_TICKS_PER_ROTATION;
             leftShoot.setVelocity(motorVel);
             rightShoot.setVelocity(motorVel);
         } else {
@@ -561,29 +565,35 @@ public abstract class IterativeRobotParent extends OpMode {
 
     public void shootInOrderStart(int speed) {
         addOperation(new SetShootSpeed(speed));
-        addOperation(new Sleep(4));
-        if (IterativeScanObelisk.curPattern == IterativeScanObelisk.OBELISK_PATTERN.PPG) {
-            shootThree(speed);
-        } else if (IterativeScanObelisk.curPattern == IterativeScanObelisk.OBELISK_PATTERN.PGP) {
-            addOperation(new PrepareLaunch(2));
-            addOperation(new ControlArm());
-            addOperation(new Sleep(.75));
-            addOperation(new PrepareLaunch(3));
-            addOperation(new ControlArm());
-            addOperation(new Sleep(.75));
-            addOperation(new PrepareLaunch(1));
-            addOperation(new ControlArm());
-            addOperation(new Sleep(.75));
-        } else if (IterativeScanObelisk.curPattern == IterativeScanObelisk.OBELISK_PATTERN.GPP) {
-            addOperation(new PrepareLaunch(3));
-            addOperation(new ControlArm());
-            addOperation(new Sleep(.75));
-            addOperation(new PrepareLaunch(1));
-            addOperation(new ControlArm());
-            addOperation(new Sleep(.75));
-            addOperation(new PrepareLaunch(2));
-            addOperation(new ControlArm());
-            addOperation(new Sleep(.75));
+
+        addOperation(new PrepareLaunchColor(1));
+        addOperation(new ControlArm());
+        addOperation(new PrepareLaunchColor(2));
+        addOperation(new ControlArm());
+        addOperation(new PrepareLaunchColor(3));
+        addOperation(new ControlArm());
+    }
+
+    public void intakeTasks(int intakeLine, boolean isRed){
+        int xPos = -12;
+        if (intakeLine == 1) {
+            xPos = -12;
+        } else if (intakeLine == 2) {
+            xPos = 12;
+        } else if (intakeLine == 3) {
+            xPos = 36;
         }
+        addOperation(new IterativeDriveToLocation(0.6, xPos, -28, 180, isRed));
+        addOperation(new SetIntakeSpeed(1));
+        for (int i = 1; i <= 3; i++) {
+            addOperation(new PrepareLoad(i));
+            addOperation(new ParallelOperation(false,
+                    new IterativeDriveToLocation(0.5, xPos, -28 - (5*i), 180, isRed),
+                    new ScanBay(i, .2, 2)));
+        }
+        addOperation(new SetIntakeSpeed(0));
+        addOperation(new IterativeDriveToLocation(0.6,-36,-36, -45, isRed));
+        shootThree(1);
+        addOperation(new SetShootSpeed(0));
     }
 }

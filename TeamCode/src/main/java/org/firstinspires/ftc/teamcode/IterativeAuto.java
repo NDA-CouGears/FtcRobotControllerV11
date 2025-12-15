@@ -62,7 +62,7 @@ public class IterativeAuto extends IterativeRobotParent {
          * - Requires a new PrepareLaunch that takes a color instead of a bay
          *
          * Phase 3: phase 2 plus intake and shoot more
-         * - Add april tag otis calibration
+         * - Add april tag otos calibration
          * - Add drive to balls and intake them
          * - Reuse shoot three balls by color from phase 2
          * - Requires
@@ -74,17 +74,20 @@ public class IterativeAuto extends IterativeRobotParent {
          * - Add configuration for which lines to go for
          */
         addOperation(new SetShootSpeed(near? 1: 2));
-        addOperation(new IterativeScanObelisk());
+
 
         if (config.startDelay > 0) {
             addOperation(new Sleep(config.startDelay));
         }
 
         if (near) {
-            addOperation(new SetStartingPosition(-36, -36, 45, isRed));
-            addOperation(new IterativeDriveToLocation(0.6,-36,-36,-45, isRed));
+            addOperation(new SetStartingPosition(-48, -48, 45, isRed));
+            addOperation(new IterativeDriveToLocation(0.6,-36,-36,45, isRed));
+            addOperation(new IterativeScanObelisk());
+            addOperation(new IterativeDriveToLocation(0.6, -36, -36, -45, isRed));
         }
         else {
+            addOperation(new IterativeScanObelisk());
             addOperation(new SetStartingPosition(61,-14,90, isRed));
             addOperation(new IterativeDriveToLocation(0.6,55,-14,-60, isRed));
         }
@@ -93,26 +96,9 @@ public class IterativeAuto extends IterativeRobotParent {
         //addOperation(new IterativeDriveToLocation(0.6, -48,-48,-45, isRed));
         // shoot here
         shootInOrderStart(near? 1: 2);
-        int xPos = -12;
+
         if (true) {
-            if (config.intakeLine == 1) {
-                xPos = -12;
-            } else if (config.intakeLine == 2) {
-                xPos = 12;
-            } else if (config.intakeLine == 3) {
-                xPos = 36;
-            }
-            addOperation(new IterativeDriveToLocation(0.6, xPos, -28, 180, isRed));
-            addOperation(new SetIntakeSpeed(1));
-            for (int i = 1; i <= 3; i++) {
-                addOperation(new PrepareLoad(i));
-                addOperation(new ParallelOperation(false,
-                        new IterativeDriveToLocation(0.2, xPos, -28 - (5*i), 180, isRed),
-                        new ScanBay(i, .2, 2)));
-            }
-            addOperation(new SetIntakeSpeed(0));
-            addOperation(new IterativeDriveToLocation(0.6,-36,-36, -45, isRed));
-            shootThree(1);
+            intakeTasks(config.intakeLine, isRed);
         }
     }
 
