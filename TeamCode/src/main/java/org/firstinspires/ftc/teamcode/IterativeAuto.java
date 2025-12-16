@@ -41,7 +41,7 @@ public class IterativeAuto extends IterativeRobotParent {
     }
 
     private void addTest() {
-        addOperation(new ScanBay(1));
+        addOperation(new ScanBay(1,20, 30));
         addOperation(new DebugOperation("Post Scan"));
     }
 

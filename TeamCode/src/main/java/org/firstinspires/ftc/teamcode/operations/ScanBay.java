@@ -35,7 +35,7 @@ public class ScanBay extends CarouselOperations {
     @NonNull
     @Override
     public String toString() {
-        return(String.format(Locale.US, "%s(%d,%f,%f)",getClass().getSimpleName(), bay, minWait, maxWait, colors.get(bay-1), finished));
+        return(String.format(Locale.US, "%s(%d,%f,%f,%s,%b)",getClass().getSimpleName(), bay, minWait, maxWait, colors.get(bay-1), finished));
     }
 
     @Override
