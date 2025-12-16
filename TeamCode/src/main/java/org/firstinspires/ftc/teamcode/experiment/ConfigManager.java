@@ -81,7 +81,7 @@ public class ConfigManager {
         }
 
         // Navigate between menu options
-        if (gamepad.dpad_down && curMenu < 3) {
+        if (gamepad.dpad_down && curMenu < 4) {
             curMenu++;
             dpadPressed = true;
         } else if (gamepad.dpad_up && curMenu > 0) {

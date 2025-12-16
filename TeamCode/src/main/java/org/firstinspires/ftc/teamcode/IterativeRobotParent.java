@@ -582,20 +582,18 @@ public abstract class IterativeRobotParent extends OpMode {
         } else if (intakeLine == 2) {
             xPos = 12;
         } else if (intakeLine == 3) {
-            xPos = 36;
+            xPos = 35;
         }
-        addOperation(new IterativeDriveToLocation(0.6, xPos, -28, 180, isRed));
+        addOperation(new IterativeDriveToLocation(0.6, xPos, -34, 180, isRed));
         addOperation(new SetIntakeSpeed(1));
         for (int i = 1; i <= 3; i++) {
             addOperation(new PrepareLoad(i));
-            addOperation(new ParallelOperation(false,
-                    new IterativeDriveToLocation(0.5, xPos, -28 - (5*i), 180, isRed)/*,
-                    new ScanBay(i, .2, 2)*/));
-            addOperation(new DebugOperation("intake "+i));
+            addOperation(new ParallelOperation(true,
+                    new IterativeDriveToLocation(0.5, xPos, -34 - (5*i), 180, isRed),
+                    new ScanBay(i, .2, 2)));
+            //addOperation(new IterativeDriveToLocation(0.5, xPos, -28 - (5*i), 180, isRed));
+            //addOperation(new ScanBay(i, .2, 2));
         }
         addOperation(new SetIntakeSpeed(0));
-        addOperation(new IterativeDriveToLocation(0.6,-36,-36, -45, isRed));
-        shootThree(1);
-        addOperation(new SetShootSpeed(0));
     }
 }

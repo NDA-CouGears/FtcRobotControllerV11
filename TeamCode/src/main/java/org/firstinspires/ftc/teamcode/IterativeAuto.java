@@ -28,8 +28,8 @@ public class IterativeAuto extends IterativeRobotParent {
         config.load();
 
         initHardware();
-        initAprilTag();
         initBallCam();
+        initAprilTag();
 
         CarouselOperations.resetColors();
     }
@@ -42,8 +42,6 @@ public class IterativeAuto extends IterativeRobotParent {
 
     private void addTest() {
         addOperation(new SetStartingPosition(61,-14,90, false));
-        addOperation(new ScanBay(1,5, 30));
-        addOperation(new DebugOperation("Post Scan"));
         intakeTasks(3, false);
     }
 
@@ -83,15 +81,15 @@ public class IterativeAuto extends IterativeRobotParent {
         }
 
         if (near) {
-            addOperation(new SetStartingPosition(-48, -48, 45, isRed));
-            addOperation(new IterativeDriveToLocation(0.6,-36,-36,45, isRed));
+            addOperation(new SetStartingPosition(-59, -48, 45, isRed));
+            addOperation(new IterativeDriveToLocation(0.6,-36,-18,45, isRed));
             addOperation(new IterativeScanObelisk());
-            addOperation(new IterativeDriveToLocation(0.6, -36, -36, -45, isRed));
+            addOperation(new IterativeDriveToLocation(0.6, -36, -18, -30, isRed));
         }
         else {
             addOperation(new IterativeScanObelisk());
             addOperation(new SetStartingPosition(61,-14,90, isRed));
-            addOperation(new IterativeDriveToLocation(0.6,55,-14,-60, isRed));
+            addOperation(new IterativeDriveToLocation(0.6,55,-14,-70, isRed));
         }
 
         //addOperation(new IterativeOtisAprilTagCalibration());
@@ -99,9 +97,19 @@ public class IterativeAuto extends IterativeRobotParent {
         // shoot here
         shootInOrderStart(near? 1: 2);
 
-        if (true) {
-            intakeTasks(config.intakeLine, isRed);
+        intakeTasks(config.intakeLine, isRed);
+        if (near){
+            addOperation(new IterativeDriveToLocation(0.6,-45,-24, -20, isRed));
+            shootThree(1);
         }
+        else {
+            addOperation(new IterativeDriveToLocation(0.6, 55, -14, -70, isRed));
+            shootThree(2);
+            addOperation(new IterativeDriveToLocation(0.6, 25, -14, -70, isRed));
+        }
+        addOperation(new SetShootSpeed(0));
+
+
     }
 
     @Override
@@ -121,8 +129,8 @@ public class IterativeAuto extends IterativeRobotParent {
         if (stallDetection()){
             stopCarousel();
             clearOperations();
+            addOperation(new DebugOperation("stall detected"));
             //requestOpModeStop();
-            addOperation(new DebugOperation("stall"));
             return;
         }
 
