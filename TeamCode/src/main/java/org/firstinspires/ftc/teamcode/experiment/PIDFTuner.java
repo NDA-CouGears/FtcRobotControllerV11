@@ -39,9 +39,11 @@ public class PIDFTuner extends OpMode {
         leftShoot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightShoot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        PIDFCoefficients coefficients = new PIDFCoefficients(p, i, d, f);
-        rightShoot.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, coefficients);
-        leftShoot.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, coefficients);
+        PIDFCoefficients coefficients = rightShoot.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+        p = coefficients.p;
+        i = coefficients.i;
+        d = coefficients.d;
+        f = coefficients.f;
     }
 
     @Override
@@ -95,6 +97,7 @@ public class PIDFTuner extends OpMode {
         curMotor.setVelocity(speeds[curSpeed]);
 
         double readV = curMotor.getVelocity();
+        telemetry.addLine(String.format(Locale.US, "P: %.2f I:%.2f D:%.2f F:%.2f", p,i,d,f));
         telemetry.addLine(String.format(Locale.US, "Motor: %s", useLeftMotor ? "LEFT" : "RIGHT"));
         telemetry.addLine(String.format(Locale.US, "Target Speed: %.2f", speeds[curSpeed]));
         telemetry.addLine(String.format(Locale.US, "Actual Speed: %.2f", readV));
