@@ -10,6 +10,8 @@ import org.firstinspires.ftc.teamcode.operations.SetShootSpeed;
 import org.firstinspires.ftc.teamcode.operations.SetStartingPosition;
 import org.firstinspires.ftc.teamcode.operations.Sleep;
 
+import java.util.Locale;
+
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOp", group = "Tournament")
 public class TeleOp extends IterativeRobotParent {
     private boolean shootButtonPressed = false;
@@ -116,8 +118,6 @@ public class TeleOp extends IterativeRobotParent {
                 lowerLaunchArm();
             }
         }
-
-        telemetry.update();
     }
 
     @Override
@@ -131,5 +131,19 @@ public class TeleOp extends IterativeRobotParent {
         intakeBall();
 
         operationLoop();
+
+        // TEMPORARY: used to fine tune shoot speed
+        super.init_loop();
+        telemetry.addLine("Use gamepad1 dpad to adjust near RPM");
+        telemetry.addLine(String.format(Locale.US, "Near RPM: %f", SHOOT_MAX_RPM));
+        telemetry.addLine("Far RPM is near * 1.2");
+        if (gamepad1.dpadLeftWasPressed() || gamepad1.dpadDownWasPressed()) {
+            SHOOT_MAX_RPM -= 10;
+        }
+        if (gamepad1.dpadRightWasPressed() || gamepad1.dpadUpWasPressed()) {
+            SHOOT_MAX_RPM += 10;
+        }
+
+        telemetry.update();
     }
 }
