@@ -20,7 +20,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.operations.ControlArm;
-import org.firstinspires.ftc.teamcode.operations.DebugOperation;
 import org.firstinspires.ftc.teamcode.operations.IterativeDriveToLocation;
 import org.firstinspires.ftc.teamcode.operations.ParallelOperation;
 import org.firstinspires.ftc.teamcode.operations.PrepareLaunch;
@@ -53,7 +52,7 @@ public abstract class IterativeRobotParent extends OpMode {
     protected DcMotorEx carousel = null;
     private Servo carouselArm = null;
     private DcMotorEx intakeSpinny = null;
-    private static final double CAROUSEL_ARM_OPEN = .5;
+    private static final double CAROUSEL_ARM_OPEN = .615;
     private static final double CAROUSEL_ARM_CLOSED = .27;
     private ElapsedTime overCurrentDuration = null;
     protected boolean stalled = false;
@@ -409,7 +408,7 @@ public abstract class IterativeRobotParent extends OpMode {
         carousel.setPower(.5);
     }
 
-    public void addCaroselTelemetry() {
+    public void addCarouselTelemetry() {
         float CTR = 751.8f;
         int curPos = carousel.getCurrentPosition();
         float offset = curPos % CTR;
@@ -555,9 +554,9 @@ public abstract class IterativeRobotParent extends OpMode {
         displayOperations();
     }
 
-    public void shootThree(int speed) {
+    public void shootNum(int speed, int shoots) {
         addOperation(new SetShootSpeed(speed));
-        for (int i = 1; i <= 3; i++) {
+        for (int i = 1; i <= shoots; i++) {
             addOperation(new PrepareLaunch(i));
             addOperation(new ControlArm());
             addOperation(new Sleep(.75));
@@ -584,13 +583,15 @@ public abstract class IterativeRobotParent extends OpMode {
         } else if (intakeLine == 3) {
             xPos = 35;
         }
-        addOperation(new IterativeDriveToLocation(0.6, xPos, -34, 180, isRed));
-        addOperation(new SetIntakeSpeed(1));
+        addOperation(new ParallelOperation(true,
+                new IterativeDriveToLocation(0.8, xPos, -32, 180, isRed),
+                new SetIntakeSpeed(1), new PrepareLoad(1)));
         for (int i = 1; i <= 3; i++) {
             addOperation(new PrepareLoad(i));
             addOperation(new ParallelOperation(true,
-                    new IterativeDriveToLocation(0.5, xPos, -34 - (5*i), 180, isRed),
+                    new IterativeDriveToLocation(0.5, xPos, -32 - (5*i), 180, isRed),
                     new ScanBay(i, .2, 2)));
+            addOperation(new PrepareLoad(i+1));
             //addOperation(new IterativeDriveToLocation(0.5, xPos, -28 - (5*i), 180, isRed));
             //addOperation(new ScanBay(i, .2, 2));
         }

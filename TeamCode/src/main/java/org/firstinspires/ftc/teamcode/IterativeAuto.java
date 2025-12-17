@@ -1,19 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.experiment.ConfigManager;
 import org.firstinspires.ftc.teamcode.operations.CarouselOperations;
-import org.firstinspires.ftc.teamcode.operations.ControlArm;
 import org.firstinspires.ftc.teamcode.operations.DebugOperation;
 import org.firstinspires.ftc.teamcode.operations.IterativeDriveToLocation;
-import org.firstinspires.ftc.teamcode.operations.IterativeOtisAprilTagCalibration;
 import org.firstinspires.ftc.teamcode.operations.IterativeScanObelisk;
-import org.firstinspires.ftc.teamcode.operations.ParallelOperation;
-import org.firstinspires.ftc.teamcode.operations.PrepareLaunch;
-import org.firstinspires.ftc.teamcode.operations.PrepareLoad;
-import org.firstinspires.ftc.teamcode.operations.ScanBay;
-import org.firstinspires.ftc.teamcode.operations.SetIntakeSpeed;
 import org.firstinspires.ftc.teamcode.operations.SetShootSpeed;
 import org.firstinspires.ftc.teamcode.operations.SetStartingPosition;
 import org.firstinspires.ftc.teamcode.operations.Sleep;
@@ -41,7 +32,6 @@ public class IterativeAuto extends IterativeRobotParent {
     }
 
     private void addTest() {
-        tasksNoObelisk(config.startNear, !config.blueAlliance);
     }
 
     private void tasks(boolean near, boolean isRed) {
@@ -81,14 +71,14 @@ public class IterativeAuto extends IterativeRobotParent {
 
         if (near) {
             addOperation(new SetStartingPosition(-59, -48, 45, isRed));
-            addOperation(new IterativeDriveToLocation(0.6,-36,-18,45, isRed));
+            addOperation(new IterativeDriveToLocation(0.8,-36,-18,45, isRed));
             addOperation(new IterativeScanObelisk());
-            addOperation(new IterativeDriveToLocation(0.6, -36, -18, -30, isRed));
+            addOperation(new IterativeDriveToLocation(0.8, -36, -18, -30, isRed));
         }
         else {
             addOperation(new IterativeScanObelisk());
             addOperation(new SetStartingPosition(61,-14,90, isRed));
-            addOperation(new IterativeDriveToLocation(0.6,55,-14,-70, isRed));
+            addOperation(new IterativeDriveToLocation(0.8,55,-14,-70, isRed));
         }
 
         //addOperation(new IterativeOtisAprilTagCalibration());
@@ -98,44 +88,17 @@ public class IterativeAuto extends IterativeRobotParent {
 
         intakeTasks(config.intakeLine, isRed);
         if (near){
-            addOperation(new IterativeDriveToLocation(0.6,-45,-24, -20, isRed));
-            shootThree(1);
+            addOperation(new IterativeDriveToLocation(0.8,-45,-24, -20, isRed));
+            shootNum(1, 3);
         }
         else {
-            addOperation(new IterativeDriveToLocation(0.6, 55, -14, -70, isRed));
-            shootThree(2);
-            addOperation(new IterativeDriveToLocation(0.6, 25, -14, -70, isRed));
+            addOperation(new IterativeDriveToLocation(0.8, 55, -14, -70, isRed));
+            shootNum(2, 2);
+            addOperation(new IterativeDriveToLocation(0.8, 25, -14, -70, isRed));
         }
         addOperation(new SetShootSpeed(0));
 
 
-    }
-
-    private void tasksNoObelisk(boolean near, boolean isRed) {
-        addOperation(new SetShootSpeed(near? 1: 2));
-
-        if (config.startDelay > 0) {
-            addOperation(new Sleep(config.startDelay));
-        }
-
-        if (near) {
-            addOperation(new SetStartingPosition(-59, -48, 45, isRed));
-            addOperation(new IterativeDriveToLocation(0.6, -36, -18, -30, isRed));
-            shootInOrderStart(1);
-            intakeTasks(config.intakeLine, isRed);
-            addOperation(new IterativeDriveToLocation(0.6,-45,-24, -20, isRed));
-            shootThree(1);
-        }
-        else {
-            addOperation(new SetStartingPosition(61,-14,-90, isRed));
-            addOperation(new IterativeDriveToLocation(0.6,55,-14,-70, isRed));
-            shootInOrderStart(2);
-            intakeTasks(config.intakeLine, isRed);
-            addOperation(new IterativeDriveToLocation(0.6, 55, -14, -70, isRed));
-            shootThree(2);
-            addOperation(new IterativeDriveToLocation(0.6, 25, -14, -70, isRed));
-        }
-        addOperation(new SetShootSpeed(0));
     }
 
     @Override

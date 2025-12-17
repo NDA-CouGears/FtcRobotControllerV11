@@ -1,15 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.teamcode.operations.ControlArm;
-import org.firstinspires.ftc.teamcode.operations.ParallelOperation;
-import org.firstinspires.ftc.teamcode.operations.PrepareLaunch;
-import org.firstinspires.ftc.teamcode.operations.SetShootSpeed;
-import org.firstinspires.ftc.teamcode.operations.SetStartingPosition;
-import org.firstinspires.ftc.teamcode.operations.Sleep;
-
 import java.util.Locale;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOp", group = "Tournament")
@@ -31,9 +21,10 @@ public class TeleOp extends IterativeRobotParent {
         //mecanum drive
         double max;
         // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-        double axial = signPreserveSquare(gamepad1.left_stick_y * -0.9); // Remember, this is reversed!
-        double lateral = signPreserveSquare(gamepad1.left_stick_x * 0.7); // Counteract imperfect strafing
-        double yaw = (signPreserveSquare(gamepad1.right_stick_x * 1)) * 0.5;
+        // just negated everything to make driving easier with launch as temporary "front"
+        double axial = signPreserveSquare(gamepad1.left_stick_y * 0.9); // Remember, this is reversed!
+        double lateral = signPreserveSquare(gamepad1.left_stick_x * -0.7); // Counteract imperfect strafing
+        double yaw = (signPreserveSquare(gamepad1.right_stick_x * -1)) * 0.5;
 
         moveRobot(lateral, axial, yaw);
     }
@@ -67,7 +58,7 @@ public class TeleOp extends IterativeRobotParent {
 
         if (gamepad2.x && !xPressed) {
             xPressed = true;
-            shootThree(shootingSpeed);
+            shootNum(shootingSpeed, 3);
         }
         else if (!gamepad2.x) {
             xPressed = false;
