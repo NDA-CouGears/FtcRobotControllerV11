@@ -41,8 +41,7 @@ public class IterativeAuto extends IterativeRobotParent {
     }
 
     private void addTest() {
-        addOperation(new SetStartingPosition(61,-14,90, false));
-        intakeTasks(3, false);
+        tasksNoObelisk(config.startNear, !config.blueAlliance);
     }
 
     private void tasks(boolean near, boolean isRed) {
@@ -110,6 +109,33 @@ public class IterativeAuto extends IterativeRobotParent {
         addOperation(new SetShootSpeed(0));
 
 
+    }
+
+    private void tasksNoObelisk(boolean near, boolean isRed) {
+        addOperation(new SetShootSpeed(near? 1: 2));
+
+        if (config.startDelay > 0) {
+            addOperation(new Sleep(config.startDelay));
+        }
+
+        if (near) {
+            addOperation(new SetStartingPosition(-59, -48, 45, isRed));
+            addOperation(new IterativeDriveToLocation(0.6, -36, -18, -30, isRed));
+            shootInOrderStart(1);
+            intakeTasks(config.intakeLine, isRed);
+            addOperation(new IterativeDriveToLocation(0.6,-45,-24, -20, isRed));
+            shootThree(1);
+        }
+        else {
+            addOperation(new SetStartingPosition(61,-14,-90, isRed));
+            addOperation(new IterativeDriveToLocation(0.6,55,-14,-70, isRed));
+            shootInOrderStart(2);
+            intakeTasks(config.intakeLine, isRed);
+            addOperation(new IterativeDriveToLocation(0.6, 55, -14, -70, isRed));
+            shootThree(2);
+            addOperation(new IterativeDriveToLocation(0.6, 25, -14, -70, isRed));
+        }
+        addOperation(new SetShootSpeed(0));
     }
 
     @Override
