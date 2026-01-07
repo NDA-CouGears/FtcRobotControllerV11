@@ -24,7 +24,7 @@ public class TeleOp extends IterativeRobotParent {
         // just negated everything to make driving easier with launch as temporary "front"
         double axial = signPreserveSquare(gamepad1.left_stick_y * 0.9); // Remember, this is reversed!
         double lateral = signPreserveSquare(gamepad1.left_stick_x * -0.7); // Counteract imperfect strafing
-        double yaw = (signPreserveSquare(gamepad1.right_stick_x * -1)) * 0.5;
+        double yaw = (signPreserveSquare(gamepad1.right_stick_x * 1)) * 0.5;
 
         moveRobot(lateral, axial, yaw);
     }
