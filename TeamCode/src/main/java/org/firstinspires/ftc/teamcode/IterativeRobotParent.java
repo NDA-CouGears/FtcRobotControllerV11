@@ -559,7 +559,7 @@ public abstract class IterativeRobotParent extends OpMode {
         for (int i = 1; i <= shoots; i++) {
             addOperation(new PrepareLaunch(i));
             addOperation(new ControlArm());
-            addOperation(new Sleep(.75));
+            addOperation(new Sleep(.5));
         }
     }
 
@@ -584,12 +584,12 @@ public abstract class IterativeRobotParent extends OpMode {
             xPos = 35;
         }
         addOperation(new ParallelOperation(true,
-                new IterativeDriveToLocation(0.8, xPos, -32, 180, isRed),
+                new IterativeDriveToLocation(0.8, xPos, -27, 180, isRed),
                 new SetIntakeSpeed(1), new PrepareLoad(1)));
         for (int i = 1; i <= 3; i++) {
             addOperation(new PrepareLoad(i));
             addOperation(new ParallelOperation(true,
-                    new IterativeDriveToLocation(0.5, xPos, -32 - (5*i), 180, isRed),
+                    new IterativeDriveToLocation(0.5, xPos, -32 - (5*i) - 3, 180, isRed),
                     new ScanBay(i, .2, 2)));
             addOperation(new PrepareLoad(i+1));
             //addOperation(new IterativeDriveToLocation(0.5, xPos, -28 - (5*i), 180, isRed));

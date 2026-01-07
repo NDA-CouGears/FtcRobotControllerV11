@@ -1,12 +1,14 @@
 package org.firstinspires.ftc.teamcode.experiment;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
-
-import java.io.*;
-
 import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 
 public class ConfigManager {
     private static final File CONFIG_FILE = AppUtil.getInstance().getSettingsFile("robot_config.json");

@@ -31,7 +31,9 @@ public class IterativeAuto extends IterativeRobotParent {
         config.displayMenu(telemetry, gamepad1);
     }
 
-    private void addTest() {
+    private void addTest(boolean isRed) {
+        addOperation(new SetStartingPosition(61,-14,90, isRed));
+        addOperation(new IterativeDriveToLocation(0.8,41,-14, 90, isRed));
     }
 
     private void tasks(boolean near, boolean isRed) {
@@ -70,10 +72,10 @@ public class IterativeAuto extends IterativeRobotParent {
         }
 
         if (near) {
-            addOperation(new SetStartingPosition(-59, -48, 45, isRed));
-            addOperation(new IterativeDriveToLocation(0.8,-36,-18,45, isRed));
+            addOperation(new SetStartingPosition(-59, -46, 45, isRed));
+            addOperation(new IterativeDriveToLocation(0.8,-51,-31,35, isRed));
             addOperation(new IterativeScanObelisk());
-            addOperation(new IterativeDriveToLocation(0.8, -36, -18, -30, isRed));
+            addOperation(new IterativeDriveToLocation(0.8, -51, -31, -20, isRed));
         }
         else {
             addOperation(new IterativeScanObelisk());
@@ -88,7 +90,7 @@ public class IterativeAuto extends IterativeRobotParent {
 
         intakeTasks(config.intakeLine, isRed);
         if (near){
-            addOperation(new IterativeDriveToLocation(0.8,-45,-24, -20, isRed));
+            addOperation(new IterativeDriveToLocation(0.8,-51,-30, -20, isRed));
             shootNum(1, 3);
         }
         else {
@@ -105,7 +107,7 @@ public class IterativeAuto extends IterativeRobotParent {
     public void start() {
         super.start();
         if (config.testMode) {
-            addTest();
+            addTest(!config.blueAlliance);
         }
         else {
             tasks(config.startNear, !config.blueAlliance);
