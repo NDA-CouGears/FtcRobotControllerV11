@@ -73,27 +73,37 @@ public class IterativeAuto extends IterativeRobotParent {
 
         if (near) {
             addOperation(new SetStartingPosition(-59, -46, 45, isRed));
-            addOperation(new IterativeDriveToLocation(0.8,-51,-31,35, isRed));
-            addOperation(new IterativeScanObelisk());
-            addOperation(new IterativeDriveToLocation(0.8, -51, -31, -20, isRed));
+            if (config.scanObelisk) {
+                addOperation(new IterativeDriveToLocation(0.8, -51, -31, 35, isRed));
+                addOperation(new IterativeScanObelisk());
+            }
         }
         else {
-            addOperation(new IterativeScanObelisk());
             addOperation(new SetStartingPosition(61,-14,90, isRed));
+            if (config.scanObelisk) {
+                addOperation(new IterativeScanObelisk());
+            }
+        }
+
+        if (config.shootPos==1) {
+            addOperation(new IterativeDriveToLocation(0.8, -51, -31, -20, isRed));
+        }
+        else if (config.shootPos==2){
             addOperation(new IterativeDriveToLocation(0.8,55,-14,-70, isRed));
         }
+
 
         //addOperation(new IterativeOtisAprilTagCalibration());
         //addOperation(new IterativeDriveToLocation(0.6, -48,-48,-45, isRed));
         // shoot here
-        shootInOrderStart(near? 1: 2);
+        shootInOrderStart(config.shootPos==1? 1: 2);
 
         intakeTasks(config.intakeLine, isRed);
-        if (near){
+        if (config.shootPos == 1){
             addOperation(new IterativeDriveToLocation(0.8,-51,-30, -20, isRed));
             shootNum(1, 3);
         }
-        else {
+        else if (config.shootPos == 2){
             addOperation(new IterativeDriveToLocation(0.8, 55, -14, -70, isRed));
             shootNum(2, 2);
             addOperation(new IterativeDriveToLocation(0.8, 25, -14, -70, isRed));

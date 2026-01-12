@@ -16,8 +16,10 @@ public class ConfigManager {
     public boolean testMode = true;
     public boolean blueAlliance = true;
     public boolean startNear = false;
+    public boolean scanObelisk = true;
     public int startDelay = 0;
-    public int intakeLine = 1;
+    public int intakeLine = 0;
+    public int shootPos = 1;
 
     public void save() {
         try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
@@ -27,6 +29,8 @@ public class ConfigManager {
             json.put("startNear", startNear);
             json.put("startDelay", startDelay);
             json.put("intakeLine", intakeLine);
+            json.put("shootPos", shootPos);
+            json.put("scanObelisk", scanObelisk);
             writer.write(json.toString(2)); // pretty print with indent
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -47,8 +51,15 @@ public class ConfigManager {
             blueAlliance = json.getBoolean("blueAlliance");
             startNear = json.getBoolean("startNear");
             startDelay = json.getInt("startDelay");
-            if (json.has("intakeLine"))
+            if (json.has("intakeLine")) {
                 intakeLine = json.getInt("intakeLine");
+            }
+            if (json.has("shootPos")) {
+                shootPos = json.getInt("shootPos");
+            }
+            if (json.has("scanObelisk")) {
+                scanObelisk = json.getBoolean("scanObelisk");
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -60,6 +71,13 @@ public class ConfigManager {
     public void displayMenu(Telemetry telemetry, Gamepad gamepad) {
         boolean changed = false;
 
+        /*
+        list of config items:
+         - obelisk
+         - shoot pos
+         - allow intake line 0
+         */
+
         // Display current menu state
         telemetry.addLine("dpad.y to select, dpad.x to change value");
         telemetry.addLine(String.format("%s alliance %s", curMenu == 0 ? "*" : "-", blueAlliance ? "BLUE" : "RED"));
@@ -67,6 +85,9 @@ public class ConfigManager {
         telemetry.addLine(String.format("%s delay %d", curMenu == 2 ? "*" : "-", startDelay));
         telemetry.addLine(String.format("%s testMode %b", curMenu == 3 ? "*" : "-", testMode));
         telemetry.addLine(String.format("%s intakeLine %d", curMenu == 4 ? "*" : "-", intakeLine));
+        telemetry.addLine(String.format("%s shootPos %s", curMenu == 5 ? "*" : "-", (shootPos == 1)? "NEAR": "FAR"));
+        telemetry.addLine(String.format("%s obelisk %s", curMenu == 6 ? "*" : "-", scanObelisk? "SCAN": "IGNORE"));
+
 
         // Do not allow another input after the dpad was pressed until it is released
         if (dpadPressed &&
@@ -83,7 +104,7 @@ public class ConfigManager {
         }
 
         // Navigate between menu options
-        if (gamepad.dpad_down && curMenu < 4) {
+        if (gamepad.dpad_down && curMenu < 6) {
             curMenu++;
             dpadPressed = true;
         } else if (gamepad.dpad_up && curMenu > 0) {
@@ -109,6 +130,7 @@ public class ConfigManager {
                     break;
                 case 1:
                     startNear = !startNear;
+                    shootPos = startNear ? 1: 2;
                     break;
                 case 2:
                     startDelay += (int) delta;
@@ -120,9 +142,16 @@ public class ConfigManager {
                     break;
                 case 4:
                     intakeLine += (int) delta;
-                    if (intakeLine > 3 || intakeLine < 1){
-                        intakeLine = 1;
+                    if (intakeLine > 3 || intakeLine < 0){
+                        intakeLine = 0;
                     }
+                    break;
+                case 5:
+                    shootPos = shootPos==1 ? 2:1;
+                    break;
+                case 6:
+                    scanObelisk = !scanObelisk;
+                    break;
             }
         }
 

@@ -111,6 +111,12 @@ public class TeleOp extends IterativeRobotParent {
         }
     }
 
+    public void shoot(){
+        if (gamepad2.b){
+            shootNum(1, 3);
+        }
+    }
+
     @Override
     public void loop() {
         if (stallDetection()){
@@ -120,6 +126,7 @@ public class TeleOp extends IterativeRobotParent {
         shootArtifact();
         controlCarousel();
         intakeBall();
+        shoot();
 
         operationLoop();
 

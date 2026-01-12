@@ -575,6 +575,9 @@ public abstract class IterativeRobotParent extends OpMode {
     }
 
     public void intakeTasks(int intakeLine, boolean isRed){
+        if (intakeLine == 0){
+            return;
+        }
         int xPos = -12;
         if (intakeLine == 1) {
             xPos = -12;
