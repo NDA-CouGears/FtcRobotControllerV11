@@ -25,11 +25,11 @@ public class PrepareLoad extends CarouselOperations {
         if (!posSet) {
             posSet = true;
             if (bay == 1) {
-                robot.setCarouselPosition(0);
+                robot.setCarouselPosition(LOAD1);
             } else if (bay == 2) {
-                robot.setCarouselPosition(2);
+                robot.setCarouselPosition(LOAD2);
             } else if (bay == 3) {
-                robot.setCarouselPosition(4);
+                robot.setCarouselPosition(LOAD3);
             }
         }
 

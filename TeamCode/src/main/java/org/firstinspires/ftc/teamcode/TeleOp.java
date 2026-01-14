@@ -112,8 +112,12 @@ public class TeleOp extends IterativeRobotParent {
     }
 
     public void shoot(){
-        if (gamepad2.b){
+        boolean bPressed = gamepad2.bWasPressed();
+        if (bPressed && noPendingOperations()) {
             shootNum(1, 3);
+        }
+        else if (bPressed){
+            clearOperations();
         }
     }
 

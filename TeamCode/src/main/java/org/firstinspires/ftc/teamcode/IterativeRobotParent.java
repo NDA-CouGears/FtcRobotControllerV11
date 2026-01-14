@@ -19,6 +19,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.operations.CarouselOperations;
 import org.firstinspires.ftc.teamcode.operations.ControlArm;
 import org.firstinspires.ftc.teamcode.operations.IterativeDriveToLocation;
 import org.firstinspires.ftc.teamcode.operations.ParallelOperation;
@@ -67,6 +68,8 @@ public abstract class IterativeRobotParent extends OpMode {
     public static final float SHOOT_GEAR_RATIO = 1f;
     public static float SHOOT_MAX_RPM = 2000f;
     public static final float SHOOT_TICKS_PER_ROTATION = 28 * SHOOT_GEAR_RATIO;
+    public static final int SHOOT_NEAR = 1;
+    public static final int SHOOT_FAR = 2;
 
     private OperationData activeOperation;
 
@@ -566,6 +569,7 @@ public abstract class IterativeRobotParent extends OpMode {
     public void shootInOrderStart(int speed) {
         addOperation(new SetShootSpeed(speed));
 
+        // call prepare launch by color passing in index of pattern (e.g. index 3 for PPG is G, so it shoots bay 3 (holds G))
         addOperation(new PrepareLaunchColor(1));
         addOperation(new ControlArm());
         addOperation(new PrepareLaunchColor(2));

@@ -60,11 +60,11 @@ public class PrepareLaunchColor extends CarouselOperations {
                 }
             }
             if (bay == 1) {
-                robot.setCarouselPosition(3);
+                robot.setCarouselPosition(LAUNCH1);
             } else if (bay == 2) {
-                robot.setCarouselPosition(5);
+                robot.setCarouselPosition(LAUNCH2);
             } else if (bay == 3) {
-                robot.setCarouselPosition(1);
+                robot.setCarouselPosition(LAUNCH3);
             }
         }
 

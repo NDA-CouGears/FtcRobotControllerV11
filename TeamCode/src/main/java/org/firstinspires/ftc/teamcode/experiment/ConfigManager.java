@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
+import org.firstinspires.ftc.teamcode.IterativeRobotParent;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -19,7 +20,7 @@ public class ConfigManager {
     public boolean scanObelisk = true;
     public int startDelay = 0;
     public int intakeLine = 0;
-    public int shootPos = 1;
+    public int shootPos = IterativeRobotParent.SHOOT_NEAR;
 
     public void save() {
         try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
@@ -85,7 +86,7 @@ public class ConfigManager {
         telemetry.addLine(String.format("%s delay %d", curMenu == 2 ? "*" : "-", startDelay));
         telemetry.addLine(String.format("%s testMode %b", curMenu == 3 ? "*" : "-", testMode));
         telemetry.addLine(String.format("%s intakeLine %d", curMenu == 4 ? "*" : "-", intakeLine));
-        telemetry.addLine(String.format("%s shootPos %s", curMenu == 5 ? "*" : "-", (shootPos == 1)? "NEAR": "FAR"));
+        telemetry.addLine(String.format("%s shootPos %s", curMenu == 5 ? "*" : "-", (shootPos == IterativeRobotParent.SHOOT_NEAR)? "NEAR": "FAR"));
         telemetry.addLine(String.format("%s obelisk %s", curMenu == 6 ? "*" : "-", scanObelisk? "SCAN": "IGNORE"));
 
 
@@ -147,7 +148,7 @@ public class ConfigManager {
                     }
                     break;
                 case 5:
-                    shootPos = shootPos==1 ? 2:1;
+                    shootPos = shootPos==IterativeRobotParent.SHOOT_NEAR ? IterativeRobotParent.SHOOT_FAR:IterativeRobotParent.SHOOT_NEAR;
                     break;
                 case 6:
                     scanObelisk = !scanObelisk;
