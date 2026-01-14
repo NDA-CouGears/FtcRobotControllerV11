@@ -66,7 +66,7 @@ public abstract class IterativeRobotParent extends OpMode {
     public static final double P_TURN_GAIN = 0.02;// Larger is more responsive, but also less stable.
     public static final double P_DRIVE_GAIN = 0.03;// Larger is more responsive, but also less stable.
     public static final float SHOOT_GEAR_RATIO = 1f;
-    public static float SHOOT_MAX_RPM = 2000f;
+    public static float SHOOT_MAX_RPM = 3800f;
     public static final float SHOOT_TICKS_PER_ROTATION = 28 * SHOOT_GEAR_RATIO;
     public static final int SHOOT_NEAR = 1;
     public static final int SHOOT_FAR = 2;
@@ -604,4 +604,6 @@ public abstract class IterativeRobotParent extends OpMode {
         }
         addOperation(new SetIntakeSpeed(0));
     }
+
+
 }

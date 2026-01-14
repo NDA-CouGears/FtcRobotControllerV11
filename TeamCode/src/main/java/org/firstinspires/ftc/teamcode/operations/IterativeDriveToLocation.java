@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.operations;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.gamepad1;
+
 import androidx.annotation.NonNull;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -21,6 +23,8 @@ public class IterativeDriveToLocation extends RobotOperation {
     double target_heading;
     boolean finished;
 
+    boolean hold;
+
     public IterativeDriveToLocation(double maxDriveSpeed,
                                     double x_target_position,
                                     double y_target_position,
@@ -40,6 +44,11 @@ public class IterativeDriveToLocation extends RobotOperation {
 
     }
 
+    public IterativeDriveToLocation(double maxDriveSpeed) {
+        this.maxDriveSpeed = maxDriveSpeed;
+        hold = true;
+    }
+
     @NonNull
     @Override
     public String toString() {
@@ -49,6 +58,11 @@ public class IterativeDriveToLocation extends RobotOperation {
     public void init(IterativeRobotParent robot) {
         super.init(robot);
         runtime = new ElapsedTime();
+        if (hold){
+            x_target_position = robot.getFieldPosition().getX(DistanceUnit.INCH);
+            y_target_position = robot.getFieldPosition().getY(DistanceUnit.INCH);
+            target_heading = robot.getFieldPosition().getHeading(AngleUnit.DEGREES);
+        }
 
         // Set the required driving speed  (must be positive for RUN_TO_POSITION)
         // Start driving straight, and then enter the control loop
@@ -146,7 +160,13 @@ public class IterativeDriveToLocation extends RobotOperation {
     }
 
     public boolean isFinished() {
-        return finished;
+        if (!hold){
+            return finished;
+        }
+        if (hold && (gamepad1.xWasReleased())){
+            return true;
+        }
+        return false;
     }
 
     public void stop() {

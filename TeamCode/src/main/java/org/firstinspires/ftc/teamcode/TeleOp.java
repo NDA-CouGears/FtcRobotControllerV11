@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.operations.IterativeDriveToLocation;
+
 import java.util.Locale;
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOp", group = "Tournament")
@@ -131,6 +135,7 @@ public class TeleOp extends IterativeRobotParent {
         controlCarousel();
         intakeBall();
         shoot();
+        holdPosition();
 
         operationLoop();
 
@@ -148,4 +153,12 @@ public class TeleOp extends IterativeRobotParent {
 
         telemetry.update();
     }
+
+    public void holdPosition(){
+        if (gamepad1.xWasPressed()){
+            addOperation(new IterativeDriveToLocation(0.8));
+        }
+    }
+
+
 }
