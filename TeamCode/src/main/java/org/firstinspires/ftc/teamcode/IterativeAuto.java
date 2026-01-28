@@ -51,7 +51,7 @@ public class IterativeAuto extends IterativeRobotParent {
             // starting near logic: set near start pos and scan the obelisk (if we want)
             addOperation(new SetStartingPosition(-58, -46, 45, isRed));
             if (config.scanObelisk) {
-                addOperation(new IterativeDriveToLocation(0.8, -51, -31, 35, isRed));
+                addOperation(new IterativeDriveToLocation(1, -51, -31, 35, isRed));
                 addOperation(new IterativeScanObelisk());
             }
             else {
@@ -69,15 +69,15 @@ public class IterativeAuto extends IterativeRobotParent {
             }
         }
 
-        // drive to shoot position
+        // drive to shoot position in the beginning
         if (config.shootPos==SHOOT_NEAR) {
             if (!startNear){
-                addOperation(new IterativeDriveToLocation(0.8, -24, -14, 90, isRed));
+                addOperation(new IterativeDriveToLocation(1, -24, -14, 90, isRed));
             }
-            addOperation(new IterativeDriveToLocation(0.8, -51, -31, -20, isRed));
+            addOperation(new IterativeDriveToLocation(1, -51, -31, -20, isRed));
         }
         else if (config.shootPos==SHOOT_FAR){
-            addOperation(new IterativeDriveToLocation(0.8,55,-14,-70, isRed));
+            addOperation(new IterativeDriveToLocation(1,55,-14,-70, isRed));
         }
 
         // shoot in the beginning
@@ -87,16 +87,16 @@ public class IterativeAuto extends IterativeRobotParent {
         if (config.intakeLine > 0) {
             intakeTasks(config.intakeLine, isRed);
             if (config.shootPos == SHOOT_NEAR) {
-                addOperation(new IterativeDriveToLocation(0.8, -51, -31, -20, isRed));
+                addOperation(new IterativeDriveToLocation(1, -51, -31, -20, isRed));
                 shootNum(1, 3);
             } else if (config.shootPos == SHOOT_FAR) {
-                addOperation(new IterativeDriveToLocation(0.8, 55, -14, -70, isRed));
+                addOperation(new IterativeDriveToLocation(1, 55, -14, -70, isRed));
                 shootNum(2, 2);
-                addOperation(new IterativeDriveToLocation(0.8, 25, -14, -70, isRed));
+                addOperation(new IterativeDriveToLocation(1, 25, -14, -70, isRed));
             }
         }
         else if (config.shootPos == SHOOT_FAR){
-            addOperation(new IterativeDriveToLocation(0.8, 25, -14, -70, isRed));
+            addOperation(new IterativeDriveToLocation(1, 25, -14, -70, isRed));
         }
         addOperation(new SetShootSpeed(0));
 

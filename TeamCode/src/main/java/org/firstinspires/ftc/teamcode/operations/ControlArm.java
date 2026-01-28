@@ -15,7 +15,7 @@ public class ControlArm extends RobotOperation{
     boolean finished;
 
     public ControlArm() {
-        this.maxWait = 1;
+        this.maxWait = .7;
     }
 
     public ControlArm(double maxWait) {
