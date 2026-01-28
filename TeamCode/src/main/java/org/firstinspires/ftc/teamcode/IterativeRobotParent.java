@@ -559,10 +559,20 @@ public abstract class IterativeRobotParent extends OpMode {
 
     public void shootNum(int speed, int shoots) {
         addOperation(new SetShootSpeed(speed));
-        for (int i = 1; i <= shoots; i++) {
-            addOperation(new PrepareLaunch(i));
+        if (shoots >= 1) {
+            addOperation(new PrepareLaunch(2));
             addOperation(new ControlArm());
             addOperation(new Sleep(.5));
+            if (shoots >= 2) {
+                addOperation(new PrepareLaunch(3));
+                addOperation(new ControlArm());
+                addOperation(new Sleep(.5));
+                if (shoots >= 3) {
+                    addOperation(new PrepareLaunch(1));
+                    addOperation(new ControlArm());
+                    addOperation(new Sleep(.5));
+                }
+            }
         }
     }
 

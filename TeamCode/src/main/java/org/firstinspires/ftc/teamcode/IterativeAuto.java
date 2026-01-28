@@ -49,7 +49,7 @@ public class IterativeAuto extends IterativeRobotParent {
 
         if (startNear) {
             // starting near logic: set near start pos and scan the obelisk (if we want)
-            addOperation(new SetStartingPosition(-59, -46, 45, isRed));
+            addOperation(new SetStartingPosition(-58, -46, 45, isRed));
             if (config.scanObelisk) {
                 addOperation(new IterativeDriveToLocation(0.8, -51, -31, 35, isRed));
                 addOperation(new IterativeScanObelisk());
@@ -80,7 +80,7 @@ public class IterativeAuto extends IterativeRobotParent {
             addOperation(new IterativeDriveToLocation(0.8,55,-14,-70, isRed));
         }
 
-        // shoot
+        // shoot in the beginning
         shootInOrderStart(config.shootPos==SHOOT_NEAR? 1: 2);
 
         // intake and return to shooting position (if intake)
@@ -110,6 +110,7 @@ public class IterativeAuto extends IterativeRobotParent {
             addTest(!config.blueAlliance);
         }
         else {
+            //tasks();
             tasks();
         }
     }
