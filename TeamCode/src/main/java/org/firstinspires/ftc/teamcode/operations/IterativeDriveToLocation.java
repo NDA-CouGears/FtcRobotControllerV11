@@ -152,7 +152,9 @@ public class IterativeDriveToLocation extends RobotOperation {
         // change the field errors to robot errors here so they're all calculated with the same type??
         if (Math.abs(fieldXError) < 1 && Math.abs(fieldYError) < 1 && Math.abs(headingError) < 1) {
             robot.moveRobot(0, 0, 0);
-            finished = true;
+            if (!hold) {
+                finished = true;
+            }
 
         }
 
@@ -160,13 +162,7 @@ public class IterativeDriveToLocation extends RobotOperation {
     }
 
     public boolean isFinished() {
-        if (!hold){
-            return finished;
-        }
-        if (hold && (gamepad1.xWasReleased())){
-            return true;
-        }
-        return false;
+        return finished;
     }
 
     public void stop() {

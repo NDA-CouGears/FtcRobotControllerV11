@@ -15,6 +15,7 @@ public class TeleOp extends IterativeRobotParent {
     private boolean intakeButtonPressed = false;
     private boolean intakeOn = false;
     private boolean xPressed = false;
+    private IterativeDriveToLocation holdOp;
 
     @Override
     public void init() {
@@ -156,7 +157,11 @@ public class TeleOp extends IterativeRobotParent {
 
     public void holdPosition(){
         if (gamepad1.xWasPressed()){
-            addOperation(new IterativeDriveToLocation(0.8));
+            holdOp = new IterativeDriveToLocation(0.8);
+            addOperation(holdOp);
+        }
+        if (gamepad1.xWasReleased()){
+            holdOp.stop();
         }
     }
 
