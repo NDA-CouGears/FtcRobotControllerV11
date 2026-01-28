@@ -131,7 +131,9 @@ public class TeleOp extends IterativeRobotParent {
         if (stallDetection()){
             stalled = true;
         }
-        mecanumDrive();
+        if (holdOp==null) {
+            mecanumDrive();
+        }
         shootArtifact();
         controlCarousel();
         intakeBall();
@@ -162,6 +164,7 @@ public class TeleOp extends IterativeRobotParent {
         }
         if (gamepad1.xWasReleased()){
             holdOp.stop();
+            holdOp = null;
         }
     }
 
