@@ -19,9 +19,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.teamcode.operations.CarouselOperations;
 import org.firstinspires.ftc.teamcode.operations.ControlArm;
 import org.firstinspires.ftc.teamcode.operations.IterativeDriveToLocation;
+import org.firstinspires.ftc.teamcode.operations.NestedQOp;
 import org.firstinspires.ftc.teamcode.operations.ParallelOperation;
 import org.firstinspires.ftc.teamcode.operations.PrepareLaunch;
 import org.firstinspires.ftc.teamcode.operations.PrepareLaunchColor;
@@ -77,13 +77,13 @@ public abstract class IterativeRobotParent extends OpMode {
     private final LinkedList<OperationData> completeOperations = new LinkedList<OperationData>();
     private final ElapsedTime operationsRunTime = new ElapsedTime();
 
-    private static class OperationData {
+    public static class OperationData {
         static int opCount = 0;
-        RobotOperation op;
-        int opId;
-        double startTime = -1;
-        double endTime = -1;
-        int loopCount;
+        public RobotOperation op;
+        public int opId;
+        public double startTime = -1;
+        public double endTime = -1;
+        public int loopCount;
 
         public OperationData(RobotOperation op) {
             opId = opCount++;
@@ -522,6 +522,10 @@ public abstract class IterativeRobotParent extends OpMode {
         telemetry.addLine("COMPLETED:");
         for (OperationData op:completeOperations) {
             telemetry.addLine(op.toString());
+            if (op.op instanceof NestedQOp){
+                // cast the Operation Data object to NestedQOp to add NestedQOp completed ops list to telemetry
+                telemetry.addLine(((NestedQOp)op.op).opsToString());
+            }
         }
         telemetry.addLine("-------------------------------");
     }
@@ -533,7 +537,6 @@ public abstract class IterativeRobotParent extends OpMode {
                 activeOperation = pendingOperations.removeFirst();
                 activeOperation.startTime = operationsRunTime.seconds();
                 activeOperation.op.init(this);
-
             }
         }
 

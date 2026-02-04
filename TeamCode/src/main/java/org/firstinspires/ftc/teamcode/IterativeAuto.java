@@ -5,6 +5,7 @@ import org.firstinspires.ftc.teamcode.operations.CarouselOperations;
 import org.firstinspires.ftc.teamcode.operations.DebugOperation;
 import org.firstinspires.ftc.teamcode.operations.IterativeDriveToLocation;
 import org.firstinspires.ftc.teamcode.operations.IterativeScanObelisk;
+import org.firstinspires.ftc.teamcode.operations.NestedQOp;
 import org.firstinspires.ftc.teamcode.operations.SetShootSpeed;
 import org.firstinspires.ftc.teamcode.operations.SetStartingPosition;
 import org.firstinspires.ftc.teamcode.operations.Sleep;
@@ -31,9 +32,17 @@ public class IterativeAuto extends IterativeRobotParent {
         config.displayMenu(telemetry, gamepad1);
     }
 
-    private void addTest(boolean isRed) {
+    private void farTest(boolean isRed) {
         addOperation(new SetStartingPosition(61,-14,90, isRed));
         addOperation(new IterativeDriveToLocation(0.8,41,-14, 90, isRed));
+    }
+
+    private void addTest(boolean isRed){
+        addOperation(new SetStartingPosition(61,-14,90, isRed));
+        NestedQOp queue = new NestedQOp();
+        queue.addOperation(new IterativeDriveToLocation(0.8,41,-14, 90, isRed));
+        queue.addOperation(new IterativeDriveToLocation(0.8,0,0, 180, isRed));
+        addOperation(queue);
     }
 
     private void tasks() {
@@ -108,9 +117,9 @@ public class IterativeAuto extends IterativeRobotParent {
         super.start();
         if (config.testMode) {
             addTest(!config.blueAlliance);
+            // farTest(!config.blueAlliance);
         }
         else {
-            //tasks();
             tasks();
         }
     }
