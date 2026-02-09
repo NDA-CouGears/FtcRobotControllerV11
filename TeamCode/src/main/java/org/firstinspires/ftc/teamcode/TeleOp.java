@@ -1,8 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.operations.IterativeDriveToLocation;
+import org.firstinspires.ftc.teamcode.operations.NestedQOp;
+import org.firstinspires.ftc.teamcode.operations.ParallelOperation;
 
 import java.util.Locale;
 
@@ -16,6 +16,8 @@ public class TeleOp extends IterativeRobotParent {
     private boolean intakeOn = false;
     private boolean xPressed = false;
     private IterativeDriveToLocation holdOp;
+    private NestedQOp shootHoldQueue;
+
 
     @Override
     public void init() {
@@ -116,16 +118,6 @@ public class TeleOp extends IterativeRobotParent {
         }
     }
 
-    public void shoot(){
-        boolean bPressed = gamepad2.bWasPressed();
-        if (bPressed && noPendingOperations()) {
-            shootNum(1, 3);
-        }
-        else if (bPressed){
-            clearOperations();
-        }
-    }
-
     @Override
     public void loop() {
         if (stallDetection()){
@@ -137,8 +129,9 @@ public class TeleOp extends IterativeRobotParent {
         shootArtifact();
         controlCarousel();
         intakeBall();
-        shoot();
-        holdPosition();
+        //shootAndHold();
+        holdPositionShoot();
+        emergency();
 
         operationLoop();
 
@@ -157,8 +150,26 @@ public class TeleOp extends IterativeRobotParent {
         telemetry.update();
     }
 
-    public void holdPosition(){
+    public void holdPositionShoot(){
+        /*
+         - holding but shoot pressed
+         - shooting but hold pressed
+         */
+        if (Math.abs(gamepad1.left_stick_x) > 0.1
+                || Math.abs(gamepad1.left_stick_y) > 0.1
+                || Math.abs(gamepad1.right_stick_x) > 0.1
+                || Math.abs(gamepad1.right_stick_y) > 0.1) {
+            if (shootHoldQueue!=null) shootHoldQueue.stop();
+            if (holdOp!=null) holdOp.stop();
+            shootHoldQueue = null;
+            holdOp = null;
+        }
         if (gamepad1.xWasPressed()){
+            if (shootHoldQueue != null && holdOp != null){
+                shootHoldQueue.stop();
+                shootHoldQueue = null;
+                holdOp = null;
+            }
             holdOp = new IterativeDriveToLocation(0.8);
             addOperation(holdOp);
         }
@@ -166,7 +177,24 @@ public class TeleOp extends IterativeRobotParent {
             holdOp.stop();
             holdOp = null;
         }
+
+        boolean bPressed = gamepad2.bWasPressed();
+        if (bPressed) {
+            if (holdOp != null){
+                holdOp.stop();
+                holdOp = null;
+            }
+            shootHoldQueue = new NestedQOp();
+            shootNumQueue(1, 3, shootHoldQueue);
+            holdOp =  new IterativeDriveToLocation(0.8);
+            addOperation(new ParallelOperation(false, holdOp, shootHoldQueue));
+        }
+        if (shootHoldQueue !=null && shootHoldQueue.isFinished()){
+            holdOp = null;
+            shootHoldQueue = null;
+        }
     }
+
 
 
 }

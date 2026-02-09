@@ -6,6 +6,8 @@ import org.firstinspires.ftc.teamcode.operations.DebugOperation;
 import org.firstinspires.ftc.teamcode.operations.IterativeDriveToLocation;
 import org.firstinspires.ftc.teamcode.operations.IterativeScanObelisk;
 import org.firstinspires.ftc.teamcode.operations.NestedQOp;
+import org.firstinspires.ftc.teamcode.operations.ParallelOperation;
+import org.firstinspires.ftc.teamcode.operations.SetIntakeSpeed;
 import org.firstinspires.ftc.teamcode.operations.SetShootSpeed;
 import org.firstinspires.ftc.teamcode.operations.SetStartingPosition;
 import org.firstinspires.ftc.teamcode.operations.Sleep;
@@ -39,10 +41,11 @@ public class IterativeAuto extends IterativeRobotParent {
 
     private void addTest(boolean isRed){
         addOperation(new SetStartingPosition(61,-14,90, isRed));
-        NestedQOp queue = new NestedQOp();
-        queue.addOperation(new IterativeDriveToLocation(0.8,41,-14, 90, isRed));
-        queue.addOperation(new IterativeDriveToLocation(0.8,0,0, 180, isRed));
-        addOperation(queue);
+        NestedQOp queue1 = new NestedQOp();
+        queue1.addOperation(new IterativeDriveToLocation(0.8));
+        NestedQOp queue2 = new NestedQOp();
+        shootNumQueue(1, 3, queue2);
+        addOperation(new ParallelOperation(false, queue1, queue2));
     }
 
     private void tasks() {

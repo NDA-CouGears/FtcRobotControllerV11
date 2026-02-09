@@ -513,6 +513,16 @@ public abstract class IterativeRobotParent extends OpMode {
 
     protected void clearOperations() {
         pendingOperations.clear();
+        if (activeOperation != null){
+            activeOperation.op.stop();
+            activeOperation = null;
+        }
+    }
+
+    public void emergency(){
+        if (gamepad1.dpad_left){
+            clearOperations();
+        }
     }
 
     protected void displayOperations() {
@@ -574,6 +584,25 @@ public abstract class IterativeRobotParent extends OpMode {
                     addOperation(new PrepareLaunch(1));
                     addOperation(new ControlArm());
                     addOperation(new Sleep(.5));
+                }
+            }
+        }
+    }
+
+    public void shootNumQueue(int speed, int shoots, NestedQOp queue) {
+        queue.addOperation(new SetShootSpeed(speed));
+        if (shoots >= 1) {
+            queue.addOperation(new PrepareLaunch(2));
+            queue.addOperation(new ControlArm());
+            queue.addOperation(new Sleep(.5));
+            if (shoots >= 2) {
+                queue.addOperation(new PrepareLaunch(3));
+                queue.addOperation(new ControlArm());
+                queue.addOperation(new Sleep(.5));
+                if (shoots >= 3) {
+                    queue.addOperation(new PrepareLaunch(1));
+                    queue.addOperation(new ControlArm());
+                    queue.addOperation(new Sleep(.5));
                 }
             }
         }
