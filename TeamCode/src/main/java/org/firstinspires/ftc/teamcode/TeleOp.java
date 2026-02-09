@@ -179,7 +179,7 @@ public class TeleOp extends IterativeRobotParent {
         }
 
         boolean bPressed = gamepad2.bWasPressed();
-        if (bPressed) {
+        if (bPressed && (shootHoldQueue == null)) {
             if (holdOp != null){
                 holdOp.stop();
                 holdOp = null;
