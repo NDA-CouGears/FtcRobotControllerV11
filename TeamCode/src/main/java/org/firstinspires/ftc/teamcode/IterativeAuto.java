@@ -86,7 +86,7 @@ public class IterativeAuto extends IterativeRobotParent {
             if (!startNear){
                 addOperation(new IterativeDriveToLocation(1, -24, -14, 90, isRed));
             }
-            addOperation(new IterativeDriveToLocation(1, -51, -31, -20, isRed));
+            addOperation(new IterativeDriveToLocation(1, -49, -29, -25, isRed));
         }
         else if (config.shootPos==SHOOT_FAR){
             addOperation(new IterativeDriveToLocation(1,55,-14,-70, isRed));
@@ -99,7 +99,7 @@ public class IterativeAuto extends IterativeRobotParent {
         if (config.intakeLine > 0) {
             intakeTasks(config.intakeLine, isRed);
             if (config.shootPos == SHOOT_NEAR) {
-                addOperation(new IterativeDriveToLocation(1, -51, -31, -20, isRed));
+                addOperation(new IterativeDriveToLocation(1, -49, -29, -25, isRed));
                 shootNum(1, 3);
             } else if (config.shootPos == SHOOT_FAR) {
                 addOperation(new IterativeDriveToLocation(1, 55, -14, -70, isRed));

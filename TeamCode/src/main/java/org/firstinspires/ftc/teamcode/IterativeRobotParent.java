@@ -584,11 +584,11 @@ public abstract class IterativeRobotParent extends OpMode {
             addOperation(new PrepareLaunch(2));
             addOperation(new Sleep(.5));
             addOperation(new ControlArm());
-            addOperation(new Sleep(.3));
+            addOperation(new Sleep(.4));
             if (shoots >= 2) {
                 addOperation(new PrepareLaunch(3));
                 addOperation(new ControlArm());
-                addOperation(new Sleep(.3));
+                addOperation(new Sleep(.4));
                 if (shoots >= 3) {
                     addOperation(new PrepareLaunch(1));
                     addOperation(new ControlArm());
@@ -632,7 +632,7 @@ public abstract class IterativeRobotParent extends OpMode {
         if (intakeLine == 0){
             return;
         }
-        int xPos = -12;
+        int xPos = -13;
         // stay -12 if intake line is 1
         if (intakeLine == 2) {
             xPos = 12;
@@ -646,7 +646,7 @@ public abstract class IterativeRobotParent extends OpMode {
             addOperation(new PrepareLoad(i));
             addOperation(new ParallelOperation(true,
                     // the speed was originally .5 and the y target was -35-(5*i), just in case we want to go back
-                    new IterativeDriveToLocation(0.4, xPos, -32.5 - (5*i), 180, isRed),
+                    new IterativeDriveToLocation(0.4, xPos, -35 - (5*i), 180, isRed),
                     new ScanBay(i, .2, 2)));
             addOperation(new PrepareLoad(i+1));
             //addOperation(new IterativeDriveToLocation(0.5, xPos, -28 - (5*i), 180, isRed));
