@@ -67,7 +67,7 @@ public abstract class IterativeRobotParent extends OpMode {
     public static final double P_TURN_GAIN = 0.02;// Larger is more responsive, but also less stable.
     public static final double P_DRIVE_GAIN = 0.03;// Larger is more responsive, but also less stable.
     public static final float SHOOT_GEAR_RATIO = 1f;
-    public static float SHOOT_MAX_RPM = 4300f;
+    public static float SHOOT_MAX_RPM = 4600f;
     public static final float SHOOT_TICKS_PER_ROTATION = 28 * SHOOT_GEAR_RATIO;
     public static final int SHOOT_NEAR = 1;
     public static final int SHOOT_FAR = 2;
@@ -600,17 +600,17 @@ public abstract class IterativeRobotParent extends OpMode {
     public void shootNumQueue(int speed, int shoots, NestedQOp queue) {
         queue.addOperation(new SetShootSpeed(speed));
         if (shoots >= 1) {
+            queue.addOperation(new Sleep(.5));
             queue.addOperation(new PrepareLaunch(2));
             queue.addOperation(new ControlArm());
-            queue.addOperation(new Sleep(.5));
+            queue.addOperation(new Sleep(.4));
             if (shoots >= 2) {
                 queue.addOperation(new PrepareLaunch(3));
                 queue.addOperation(new ControlArm());
-                queue.addOperation(new Sleep(.5));
+                queue.addOperation(new Sleep(.4));
                 if (shoots >= 3) {
                     queue.addOperation(new PrepareLaunch(1));
                     queue.addOperation(new ControlArm());
-                    queue.addOperation(new Sleep(.5));
                 }
             }
         }
@@ -632,7 +632,7 @@ public abstract class IterativeRobotParent extends OpMode {
         if (intakeLine == 0){
             return;
         }
-        int xPos = -13;
+        int xPos = -12;
         // stay -12 if intake line is 1
         if (intakeLine == 2) {
             xPos = 12;
