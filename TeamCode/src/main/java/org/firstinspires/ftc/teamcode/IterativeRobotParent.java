@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -66,7 +67,7 @@ public abstract class IterativeRobotParent extends OpMode {
     public static final double P_TURN_GAIN = 0.02;// Larger is more responsive, but also less stable.
     public static final double P_DRIVE_GAIN = 0.03;// Larger is more responsive, but also less stable.
     public static final float SHOOT_GEAR_RATIO = 1f;
-    public static float SHOOT_MAX_RPM = 3800f;
+    public static float SHOOT_MAX_RPM = 4300f;
     public static final float SHOOT_TICKS_PER_ROTATION = 28 * SHOOT_GEAR_RATIO;
     public static final int SHOOT_NEAR = 1;
     public static final int SHOOT_FAR = 2;
@@ -147,6 +148,11 @@ public abstract class IterativeRobotParent extends OpMode {
         rightShoot.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         carousel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        PIDFCoefficients coefficients = new PIDFCoefficients(15f, 3f, 0f, 3.5f);
+        leftShoot.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, coefficients);
+        rightShoot.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, coefficients);
+
+
         allHubs = hardwareMap.getAll(LynxModule.class);
 
         for (LynxModule module : allHubs) {
@@ -158,6 +164,8 @@ public abstract class IterativeRobotParent extends OpMode {
         // Wait for the game to start (driver presses START)
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+
+
     }
 
     private void initOtos() {
@@ -574,16 +582,16 @@ public abstract class IterativeRobotParent extends OpMode {
         addOperation(new SetShootSpeed(speed));
         if (shoots >= 1) {
             addOperation(new PrepareLaunch(2));
-            addOperation(new ControlArm());
             addOperation(new Sleep(.5));
+            addOperation(new ControlArm());
+            addOperation(new Sleep(.3));
             if (shoots >= 2) {
                 addOperation(new PrepareLaunch(3));
                 addOperation(new ControlArm());
-                addOperation(new Sleep(.5));
+                addOperation(new Sleep(.3));
                 if (shoots >= 3) {
                     addOperation(new PrepareLaunch(1));
                     addOperation(new ControlArm());
-                    addOperation(new Sleep(.5));
                 }
             }
         }

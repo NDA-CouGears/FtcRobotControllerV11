@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import org.firstinspires.ftc.teamcode.operations.IterativeDriveToLocation;
 import org.firstinspires.ftc.teamcode.operations.NestedQOp;
 import org.firstinspires.ftc.teamcode.operations.ParallelOperation;
+import org.firstinspires.ftc.teamcode.operations.SetShootSpeed;
 
 import java.util.Locale;
 
@@ -188,6 +189,7 @@ public class TeleOp extends IterativeRobotParent {
             shootNumQueue(1, 3, shootHoldQueue);
             holdOp =  new IterativeDriveToLocation(0.8);
             addOperation(new ParallelOperation(false, holdOp, shootHoldQueue));
+            addOperation(new SetShootSpeed(0));
         }
         if (shootHoldQueue !=null && shootHoldQueue.isFinished()){
             holdOp = null;
