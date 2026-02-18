@@ -446,7 +446,7 @@ public abstract class IterativeRobotParent extends OpMode {
             leftShoot.setVelocity(motorVel);
             rightShoot.setVelocity(motorVel);
         } else if (shootingSpeed == 2) {
-            float motorVel = 1.2f * (SHOOT_MAX_RPM / 60f) * SHOOT_TICKS_PER_ROTATION;
+            float motorVel = 1.4f * (SHOOT_MAX_RPM / 60f) * SHOOT_TICKS_PER_ROTATION;
             leftShoot.setVelocity(motorVel);
             rightShoot.setVelocity(motorVel);
         } else {

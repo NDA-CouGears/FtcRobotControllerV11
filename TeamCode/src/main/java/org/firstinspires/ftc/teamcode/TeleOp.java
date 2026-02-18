@@ -156,6 +156,7 @@ public class TeleOp extends IterativeRobotParent {
          - holding but shoot pressed
          - shooting but hold pressed
          */
+        /*
         if (Math.abs(gamepad1.left_stick_x) > 0.1
                 || Math.abs(gamepad1.left_stick_y) > 0.1
                 || Math.abs(gamepad1.right_stick_x) > 0.1
@@ -174,21 +175,25 @@ public class TeleOp extends IterativeRobotParent {
             holdOp = new IterativeDriveToLocation(0.8);
             addOperation(holdOp);
         }
-        if (gamepad1.xWasReleased()){
+        if (gamepad1.xWasReleased() && holdOp!=null){
             holdOp.stop();
-            holdOp = null;
         }
+        */
+
 
         boolean bPressed = gamepad2.bWasPressed();
         if (bPressed && (shootHoldQueue == null)) {
+            /*
             if (holdOp != null){
                 holdOp.stop();
                 holdOp = null;
             }
+            */
             shootHoldQueue = new NestedQOp();
             shootNumQueue(1, 3, shootHoldQueue);
-            holdOp =  new IterativeDriveToLocation(0.8);
-            addOperation(new ParallelOperation(false, holdOp, shootHoldQueue));
+            // holdOp =  new IterativeDriveToLocation(0.8);
+            // addOperation(new ParallelOperation(false, holdOp, shootHoldQueue));
+            shootNum(1, 3);
             addOperation(new SetShootSpeed(0));
         }
         if (shootHoldQueue !=null && shootHoldQueue.isFinished()){

@@ -119,8 +119,8 @@ public class IterativeAuto extends IterativeRobotParent {
     public void start() {
         super.start();
         if (config.testMode) {
-            addTest(!config.blueAlliance);
-            // farTest(!config.blueAlliance);
+            // addTest(!config.blueAlliance);
+            farTest(!config.blueAlliance);
         }
         else {
             tasks();
