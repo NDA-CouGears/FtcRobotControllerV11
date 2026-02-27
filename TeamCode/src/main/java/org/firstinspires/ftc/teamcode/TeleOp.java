@@ -130,6 +130,7 @@ public class TeleOp extends IterativeRobotParent {
         shootArtifact();
         controlCarousel();
         intakeBall();
+        lights();
         //shootAndHold();
         holdPositionShoot();
         emergency();

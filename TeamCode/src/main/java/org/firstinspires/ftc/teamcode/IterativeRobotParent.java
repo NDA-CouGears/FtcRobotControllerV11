@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
 import android.util.Size;
 
 import androidx.annotation.NonNull;
@@ -49,8 +50,8 @@ public abstract class IterativeRobotParent extends OpMode {
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
     private List<LynxModule> allHubs = null;
-    private DcMotorEx leftShoot = null;
-    private DcMotorEx rightShoot = null;
+    protected DcMotorEx leftShoot = null;
+    protected DcMotorEx rightShoot = null;
     protected DcMotorEx carousel = null;
     private Servo carouselArm = null;
     private DcMotorEx intakeSpinny = null;
@@ -354,6 +355,19 @@ public abstract class IterativeRobotParent extends OpMode {
             heading += 360;
         }
         otosSensor.setPosition(new SparkFunOTOS.Pose2D(x, y, heading));
+    }
+
+    public void lights(){
+        if (leftShoot.getPower() > 0){
+            for (LynxModule module : allHubs) {
+                module.setConstant(Color.GREEN);
+            }
+        }
+        else {
+            for (LynxModule module : allHubs) {
+                module.setConstant(Color.RED);
+            }
+        }
     }
 
 
