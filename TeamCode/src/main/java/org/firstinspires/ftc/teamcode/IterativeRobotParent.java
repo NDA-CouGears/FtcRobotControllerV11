@@ -131,10 +131,10 @@ public abstract class IterativeRobotParent extends OpMode {
         rightBackDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         carousel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         leftShoot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightShoot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -460,7 +460,7 @@ public abstract class IterativeRobotParent extends OpMode {
             leftShoot.setVelocity(motorVel);
             rightShoot.setVelocity(motorVel);
         } else if (shootingSpeed == 2) {
-            float motorVel = 1.4f * (SHOOT_MAX_RPM / 60f) * SHOOT_TICKS_PER_ROTATION;
+            float motorVel = 1.24f * (SHOOT_MAX_RPM / 60f) * SHOOT_TICKS_PER_ROTATION;
             leftShoot.setVelocity(motorVel);
             rightShoot.setVelocity(motorVel);
         } else {

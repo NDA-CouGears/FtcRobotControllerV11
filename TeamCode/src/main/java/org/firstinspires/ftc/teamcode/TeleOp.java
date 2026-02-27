@@ -30,8 +30,8 @@ public class TeleOp extends IterativeRobotParent {
         double max;
         // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
         // just negated everything to make driving easier with launch as temporary "front"
-        double axial = signPreserveSquare(gamepad1.left_stick_y * 0.9); // Remember, this is reversed!
-        double lateral = signPreserveSquare(gamepad1.left_stick_x * -0.7); // Counteract imperfect strafing
+        double axial = signPreserveSquare(gamepad1.left_stick_y * 1); // Remember, this is reversed!
+        double lateral = signPreserveSquare(gamepad1.left_stick_x * -1); // Counteract imperfect strafing
         double yaw = (signPreserveSquare(gamepad1.right_stick_x)) * 0.5;
 
         moveRobot(lateral, axial, yaw);
