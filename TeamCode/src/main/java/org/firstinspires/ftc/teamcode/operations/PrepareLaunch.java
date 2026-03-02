@@ -37,6 +37,5 @@ public class PrepareLaunch extends CarouselOperations {
         if (!robot.isCarouselBusy()) {
             finished = true;
         }
-
     }
 }

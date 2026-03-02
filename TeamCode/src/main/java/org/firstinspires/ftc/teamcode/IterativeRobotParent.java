@@ -32,6 +32,7 @@ import org.firstinspires.ftc.teamcode.operations.RobotOperation;
 import org.firstinspires.ftc.teamcode.operations.ScanBay;
 import org.firstinspires.ftc.teamcode.operations.SetIntakeSpeed;
 import org.firstinspires.ftc.teamcode.operations.SetShootSpeed;
+import org.firstinspires.ftc.teamcode.operations.SetStartingPosition;
 import org.firstinspires.ftc.teamcode.operations.Sleep;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -68,7 +69,8 @@ public abstract class IterativeRobotParent extends OpMode {
     public static final double P_TURN_GAIN = 0.02;// Larger is more responsive, but also less stable.
     public static final double P_DRIVE_GAIN = 0.03;// Larger is more responsive, but also less stable.
     public static final float SHOOT_GEAR_RATIO = 1f;
-    public static float SHOOT_MAX_RPM = 3864f;
+    public static float SHOOT_TARGET_RPM = 3864f;
+    public static float SHOOT_MAX_RPM = 6000f;
     public static final float SHOOT_TICKS_PER_ROTATION = 28 * SHOOT_GEAR_RATIO;
     public static final int SHOOT_NEAR = 1;
     public static final int SHOOT_FAR = 2;
@@ -95,7 +97,7 @@ public abstract class IterativeRobotParent extends OpMode {
         @NonNull
         @Override
         public String toString() {
-            return(String.format(Locale.US, "%d:%s:%3.2f-%3.2f:%d",opId,op,startTime,endTime,loopCount));
+            return (String.format(Locale.US, "%d:%s:%3.2f-%3.2f:%d", opId, op, startTime, endTime, loopCount));
         }
     }
 
@@ -236,14 +238,16 @@ public abstract class IterativeRobotParent extends OpMode {
 
         // Reset the tracking algorithm - this resets the position to the origin,
         // but can also be used to recover from some rare tracking errors
-        otosSensor.resetTracking();
+        if (!SetStartingPosition.called) {
+            otosSensor.resetTracking();
 
-        // After resetting the tracking, the OTOS will report that the robot is at
-        // the origin. If your robot does not start at the origin, or you have
-        // another source of location information (eg. vision odometry), you can set
-        // the OTOS location to match and it will continue to track from there.
-        SparkFunOTOS.Pose2D currentPosition = new SparkFunOTOS.Pose2D(0, 0, 0);
-        otosSensor.setPosition(currentPosition);
+            // After resetting the tracking, the OTOS will report that the robot is at
+            // the origin. If your robot does not start at the origin, or you have
+            // another source of location information (eg. vision odometry), you can set
+            // the OTOS location to match and it will continue to track from there.
+            SparkFunOTOS.Pose2D currentPosition = new SparkFunOTOS.Pose2D(0, 0, 0);
+            otosSensor.setPosition(currentPosition);
+        }
 
         // Get the hardware and firmware version
         SparkFunOTOS.Version hwVersion = new SparkFunOTOS.Version();
@@ -357,13 +361,12 @@ public abstract class IterativeRobotParent extends OpMode {
         otosSensor.setPosition(new SparkFunOTOS.Pose2D(x, y, heading));
     }
 
-    public void lights(){
-        if (leftShoot.getPower() > 0){
+    public void lights() {
+        if (leftShoot.getPower() > 0) {
             for (LynxModule module : allHubs) {
                 module.setConstant(Color.GREEN);
             }
-        }
-        else {
+        } else {
             for (LynxModule module : allHubs) {
                 module.setConstant(Color.RED);
             }
@@ -456,16 +459,26 @@ public abstract class IterativeRobotParent extends OpMode {
      */
     public void setShootSpeed(int shootingSpeed) {
         if (shootingSpeed == 1) {
-            float motorVel = (SHOOT_MAX_RPM / 60f) * SHOOT_TICKS_PER_ROTATION;
+            float motorVel = (SHOOT_TARGET_RPM / 60f) * SHOOT_TICKS_PER_ROTATION;
             leftShoot.setVelocity(motorVel);
             rightShoot.setVelocity(motorVel);
         } else if (shootingSpeed == 2) {
-            float motorVel = 1.24f * (SHOOT_MAX_RPM / 60f) * SHOOT_TICKS_PER_ROTATION;
+            float motorVel = 1.24f * (SHOOT_TARGET_RPM / 60f) * SHOOT_TICKS_PER_ROTATION;
             leftShoot.setVelocity(motorVel);
             rightShoot.setVelocity(motorVel);
         } else {
             leftShoot.setVelocity(0);
             rightShoot.setVelocity(0);
+        }
+    }
+
+    public void setShootSpeedVar(double speed) {
+        if (speed == 0) {
+            leftShoot.setVelocity(0);
+            rightShoot.setVelocity(0);
+        } else {
+            double range = (SHOOT_MAX_RPM - SHOOT_TARGET_RPM) * speed;
+            double motorVel = (SHOOT_TARGET_RPM + range) / 60.0 * SHOOT_TICKS_PER_ROTATION;
         }
     }
 
@@ -535,14 +548,14 @@ public abstract class IterativeRobotParent extends OpMode {
 
     protected void clearOperations() {
         pendingOperations.clear();
-        if (activeOperation != null){
+        if (activeOperation != null) {
             activeOperation.op.stop();
             activeOperation = null;
         }
     }
 
-    public void emergency(){
-        if (gamepad1.dpad_left){
+    public void emergency() {
+        if (gamepad1.dpad_left) {
             clearOperations();
         }
     }
@@ -552,11 +565,11 @@ public abstract class IterativeRobotParent extends OpMode {
         telemetry.addLine(String.format(Locale.US, "PENDING: %d", pendingOperations.size()));
         telemetry.addLine(String.format(Locale.US, "CURRENT: %s", activeOperation));
         telemetry.addLine("COMPLETED:");
-        for (OperationData op:completeOperations) {
+        for (OperationData op : completeOperations) {
             telemetry.addLine(op.toString());
-            if (op.op instanceof NestedQOp){
+            if (op.op instanceof NestedQOp) {
                 // cast the Operation Data object to NestedQOp to add NestedQOp completed ops list to telemetry
-                telemetry.addLine(((NestedQOp)op.op).opsToString());
+                telemetry.addLine(((NestedQOp) op.op).opsToString());
             }
         }
         telemetry.addLine("-------------------------------");
@@ -651,8 +664,8 @@ public abstract class IterativeRobotParent extends OpMode {
         addOperation(new ControlArm());
     }
 
-    public void intakeTasks(int intakeLine, boolean isRed){
-        if (intakeLine == 0){
+    public void intakeTasks(int intakeLine, boolean isRed) {
+        if (intakeLine == 0) {
             return;
         }
         int xPos = -12;
@@ -669,16 +682,16 @@ public abstract class IterativeRobotParent extends OpMode {
             addOperation(new PrepareLoad(i));
             addOperation(new ParallelOperation(true,
                     // the speed was originally .5 and the y target was -35-(5*i), just in case we want to go back
-                    new IterativeDriveToLocation(0.4, xPos, -35 - (5*i), 180, isRed),
+                    new IterativeDriveToLocation(0.4, xPos, -35 - (5 * i), 180, isRed),
                     new ScanBay(i, .2, 2)));
-            addOperation(new PrepareLoad(i+1));
+            addOperation(new PrepareLoad(i + 1));
             //addOperation(new IterativeDriveToLocation(0.5, xPos, -28 - (5*i), 180, isRed));
             //addOperation(new ScanBay(i, .2, 2));
         }
         addOperation(new SetIntakeSpeed(0));
     }
 
-    public void enableEncoders(){
+    public void enableEncoders() {
         leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

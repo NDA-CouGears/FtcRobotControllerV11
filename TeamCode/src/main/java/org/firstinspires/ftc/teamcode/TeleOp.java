@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import org.firstinspires.ftc.teamcode.operations.IterativeDriveToLocation;
 import org.firstinspires.ftc.teamcode.operations.NestedQOp;
-import org.firstinspires.ftc.teamcode.operations.ParallelOperation;
 import org.firstinspires.ftc.teamcode.operations.SetShootSpeed;
 
 import java.util.Locale;
@@ -18,6 +17,7 @@ public class TeleOp extends IterativeRobotParent {
     private boolean xPressed = false;
     private IterativeDriveToLocation holdOp;
     private NestedQOp shootHoldQueue;
+    private double testShootSpeed = 0.5;
 
 
     @Override
@@ -134,22 +134,29 @@ public class TeleOp extends IterativeRobotParent {
         //shootAndHold();
         holdPositionShoot();
         emergency();
+        testShotRange();
 
         operationLoop();
 
         // TEMPORARY: used to fine tune shoot speed
         super.init_loop();
-        telemetry.addLine("Use gamepad1 dpad to adjust near RPM");
-        telemetry.addLine(String.format(Locale.US, "Near RPM: %f", SHOOT_MAX_RPM));
-        telemetry.addLine("Far RPM is near * 1.2");
-        if (gamepad1.dpadLeftWasPressed() || gamepad1.dpadDownWasPressed()) {
-            SHOOT_MAX_RPM -= 10;
-        }
-        if (gamepad1.dpadRightWasPressed() || gamepad1.dpadUpWasPressed()) {
-            SHOOT_MAX_RPM += 10;
-        }
 
         telemetry.update();
+    }
+
+    private void testShotRange(){
+        telemetry.addLine("Use gamepad1 dpad to adjust near shoot speed");
+        telemetry.addLine(String.format(Locale.US, "speed: %f", testShootSpeed));
+        if (gamepad1.dpadLeftWasPressed() || gamepad1.dpadDownWasPressed()) {
+            testShootSpeed -= 0.05;
+        }
+        if (gamepad1.dpadRightWasPressed() || gamepad1.dpadUpWasPressed()) {
+            testShootSpeed += 0.05;
+        }
+
+        if (gamepad1.aWasPressed()){
+            setShootSpeedVar(testShootSpeed);
+        }
     }
 
     public void holdPositionShoot(){
