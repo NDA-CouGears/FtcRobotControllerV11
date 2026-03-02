@@ -479,6 +479,8 @@ public abstract class IterativeRobotParent extends OpMode {
         } else {
             double range = (SHOOT_MAX_RPM - SHOOT_TARGET_RPM) * speed;
             double motorVel = (SHOOT_TARGET_RPM + range) / 60.0 * SHOOT_TICKS_PER_ROTATION;
+            leftShoot.setVelocity(motorVel);
+            rightShoot.setVelocity(motorVel);
         }
     }
 
