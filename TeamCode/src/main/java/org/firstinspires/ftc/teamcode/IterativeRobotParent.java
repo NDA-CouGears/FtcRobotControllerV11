@@ -548,6 +548,15 @@ public abstract class IterativeRobotParent extends OpMode {
         telemetry.addLine("-------------------------------");
     }
 
+    /*
+    protected void handleStall() {
+        if (activeOperation.op instanceof PrepareLaunch) {
+            PrepareLaunch op = (PrepareLaunch) activeOperation.op;
+            op.
+        }
+    }
+    
+     */
     protected void operationLoop() {
         // If there is no active operation pull one from the list of pending operations
         if (activeOperation == null) {
@@ -653,6 +662,14 @@ public abstract class IterativeRobotParent extends OpMode {
             //addOperation(new ScanBay(i, .2, 2));
         }
         addOperation(new SetIntakeSpeed(0));
+    }
+
+    public void enableEncoders(){
+        leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBackDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
     }
 
 

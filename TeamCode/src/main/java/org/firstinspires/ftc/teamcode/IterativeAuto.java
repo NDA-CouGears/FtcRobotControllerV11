@@ -22,6 +22,7 @@ public class IterativeAuto extends IterativeRobotParent {
         config.load();
 
         initHardware();
+        enableEncoders();
         initBallCam();
         initAprilTag();
 
