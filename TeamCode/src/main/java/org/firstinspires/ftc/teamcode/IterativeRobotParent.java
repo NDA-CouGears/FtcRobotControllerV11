@@ -472,8 +472,14 @@ public abstract class IterativeRobotParent extends OpMode {
         }
     }
 
+    /** Precondition:
+     * if speed < 0, turn off
+     * if shooting, speed should be 0 <= speed <= 1
+     * 0 is near, 1 is max (far, maybe?)
+     * @param speed
+     */
     public void setShootSpeedVar(double speed) {
-        if (speed == 0) {
+        if (speed < 0) {
             leftShoot.setVelocity(0);
             rightShoot.setVelocity(0);
         } else {
@@ -616,7 +622,7 @@ public abstract class IterativeRobotParent extends OpMode {
         displayOperations();
     }
 
-    public void shootNum(int speed, int shoots) {
+    public void shootNum(double speed, int shoots) {
         addOperation(new SetShootSpeed(speed));
         if (shoots >= 1) {
             addOperation(new PrepareLaunch(2));
@@ -635,7 +641,7 @@ public abstract class IterativeRobotParent extends OpMode {
         }
     }
 
-    public void shootNumQueue(int speed, int shoots, NestedQOp queue) {
+    public void shootNumQueue(double speed, int shoots, NestedQOp queue) {
         queue.addOperation(new SetShootSpeed(speed));
         if (shoots >= 1) {
             queue.addOperation(new Sleep(.5));
@@ -654,7 +660,7 @@ public abstract class IterativeRobotParent extends OpMode {
         }
     }
 
-    public void shootInOrderStart(int speed) {
+    public void shootInOrderStart(double speed) {
         addOperation(new SetShootSpeed(speed));
 
         // call prepare launch by color passing in index of pattern (e.g. index 3 for PPG is G, so it shoots bay 3 (holds G))

@@ -789,7 +789,7 @@ public abstract class RobotParent extends LinearOpMode {
                     moveRobot(xSpeed * runtime.seconds(), ySpeed * runtime.seconds(), -turnSpeed * runtime.seconds());
                 }
                 else{
-                    moveRobot(xSpeed, ySpeed, -turnSpeed); // negated turnSpeed b/c field has counterclockwise as positive
+                    moveRobot(xSpeed, ySpeed, -turnSpeed); // negated turnSpeed bc field has counterclockwise as positive
                 }
                 if (Math.abs(fieldXError) < 1 && Math.abs(fieldYError) < 1 && Math.abs(headingError) < 1){
                     break;

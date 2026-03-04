@@ -16,6 +16,8 @@ import org.firstinspires.ftc.teamcode.operations.Sleep;
 
 public class IterativeAuto extends IterativeRobotParent {
     public ConfigManager config = new ConfigManager();
+    public final double NEAR = 0;
+    public final double FAR = .4;
 
     @Override
     public void init() {
@@ -45,7 +47,7 @@ public class IterativeAuto extends IterativeRobotParent {
         NestedQOp queue1 = new NestedQOp();
         queue1.addOperation(new IterativeDriveToLocation(0.8));
         NestedQOp queue2 = new NestedQOp();
-        shootNumQueue(1, 3, queue2);
+        shootNumQueue(NEAR, 3, queue2);
         addOperation(new ParallelOperation(false, queue1, queue2));
     }
 
@@ -54,7 +56,7 @@ public class IterativeAuto extends IterativeRobotParent {
         boolean startNear = config.startNear;
         boolean isRed = !config.blueAlliance;
 
-        addOperation(new SetShootSpeed(startNear ? 1: 2));
+        addOperation(new SetShootSpeed(startNear ? NEAR: FAR));
 
         if (config.startDelay > 0) {
             addOperation(new Sleep(config.startDelay));
@@ -72,7 +74,7 @@ public class IterativeAuto extends IterativeRobotParent {
         }
         else {
             // starting far logic: set far start pos and scan the obelisk (if we want)
-            addOperation(new SetStartingPosition(61,-14,90, isRed));
+            addOperation(new SetStartingPosition(61,-31.5,90, isRed));
             if (config.scanObelisk) {
                 addOperation(new IterativeScanObelisk());
             }
@@ -89,28 +91,30 @@ public class IterativeAuto extends IterativeRobotParent {
             addOperation(new IterativeDriveToLocation(1, -49, -29, -25, isRed));
         }
         else if (config.shootPos==SHOOT_FAR){
-            addOperation(new IterativeDriveToLocation(1,55,-14,-70, isRed));
+            addOperation(new IterativeDriveToLocation(1,-6,-18,-55, isRed));
         }
 
         // shoot in the beginning
-        shootInOrderStart(config.shootPos==SHOOT_NEAR? 1: 2);
+        shootInOrderStart(config.shootPos==SHOOT_NEAR? NEAR: FAR);
 
         // intake and return to shooting position (if intake)
         if (config.intakeLine > 0) {
             intakeTasks(config.intakeLine, isRed);
             if (config.shootPos == SHOOT_NEAR) {
                 addOperation(new IterativeDriveToLocation(1, -49, -29, -25, isRed));
-                shootNum(1, 3);
+                shootNum(NEAR, 3);
             } else if (config.shootPos == SHOOT_FAR) {
-                addOperation(new IterativeDriveToLocation(1, 55, -14, -70, isRed));
-                shootNum(2, 2);
-                addOperation(new IterativeDriveToLocation(1, 25, -14, -70, isRed));
+                // far shoot location drive
+                addOperation(new IterativeDriveToLocation(1, -6, -18, -55, isRed));
+                shootNum(FAR, 3);
+                // park
+                addOperation(new IterativeDriveToLocation(1, 25, -20, -55, isRed));
             }
         }
         else if (config.shootPos == SHOOT_FAR){
             addOperation(new IterativeDriveToLocation(1, 25, -14, -70, isRed));
         }
-        addOperation(new SetShootSpeed(0));
+        addOperation(new SetShootSpeed(-1));
 
 
     }
