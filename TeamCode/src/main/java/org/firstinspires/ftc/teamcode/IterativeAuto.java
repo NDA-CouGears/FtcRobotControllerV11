@@ -62,9 +62,8 @@ public class IterativeAuto extends IterativeRobotParent {
 
         if (startNear) {
             // starting near logic: set near start pos and scan the obelisk (if we want)
-            addOperation(new SetStartingPosition(-58, -46, 45, isRed));
+            addOperation(new SetStartingPosition(-58, -46, -45, isRed));
             if (config.scanObelisk) {
-                addOperation(new IterativeDriveToLocation(1, -51, -31, 35, isRed));
                 addOperation(new IterativeScanObelisk());
             }
             else {
