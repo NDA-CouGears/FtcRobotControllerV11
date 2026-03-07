@@ -454,9 +454,7 @@ public abstract class IterativeRobotParent extends OpMode {
         carouselArm.setPosition(CAROUSEL_ARM_CLOSED);
     }
 
-    /**
-     * @param shootingSpeed 1 is for near, 2 is far, anything else is stop
-     */
+    /* !!! OUTDATED !!!
     public void setShootSpeed(int shootingSpeed) {
         if (shootingSpeed == 1) {
             float motorVel = (SHOOT_TARGET_RPM / 60f) * SHOOT_TICKS_PER_ROTATION;
@@ -471,6 +469,7 @@ public abstract class IterativeRobotParent extends OpMode {
             rightShoot.setVelocity(0);
         }
     }
+    */
 
     /** Precondition:
      * if speed < 0, turn off
@@ -485,6 +484,17 @@ public abstract class IterativeRobotParent extends OpMode {
         } else {
             double range = (SHOOT_MAX_RPM - SHOOT_TARGET_RPM) * speed;
             double motorVel = (SHOOT_TARGET_RPM + range) / 60.0 * SHOOT_TICKS_PER_ROTATION;
+
+            if (speed < .15) {
+                PIDFCoefficients coefficients = new PIDFCoefficients(15f, 3f, 0f, 3.5f);
+                leftShoot.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, coefficients);
+                rightShoot.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, coefficients);
+            }
+            else {
+                PIDFCoefficients coefficients = new PIDFCoefficients(16.52f, 3f, 0f, 2.95f);
+                leftShoot.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, coefficients);
+                rightShoot.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, coefficients);
+            }
             leftShoot.setVelocity(motorVel);
             rightShoot.setVelocity(motorVel);
         }

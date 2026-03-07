@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.operations.Sleep;
 public class IterativeAuto extends IterativeRobotParent {
     public ConfigManager config = new ConfigManager();
     public final double NEAR = 0;
-    public final double FAR = .4;
+    public final double FAR = .3;
     public static boolean ran;
 
     @Override
@@ -94,7 +94,7 @@ public class IterativeAuto extends IterativeRobotParent {
             addOperation(new IterativeDriveToLocation(1, -49, -29, -25, isRed));
         }
         else if (config.shootPos==SHOOT_FAR){
-            addOperation(new IterativeDriveToLocation(1,-6,-18,-55, isRed));
+            addOperation(new IterativeDriveToLocation(1,-6,-18,-50, isRed));
         }
 
         // shoot in the beginning
@@ -107,11 +107,11 @@ public class IterativeAuto extends IterativeRobotParent {
                 addOperation(new IterativeDriveToLocation(1, -49, -29, -25, isRed));
                 shootNum(NEAR, 3);
             } else if (config.shootPos == SHOOT_FAR) {
-                // far shoot location drive
-                addOperation(new IterativeDriveToLocation(1, -6, -18, -55, isRed));
-                shootNum(FAR, 3);
+                // far shoot location drive, then shoot 2 so we have time to park
+                addOperation(new IterativeDriveToLocation(1, -6, -18, -50, isRed, 0.005));
+                shootNum(FAR, 2);
                 // park
-                addOperation(new IterativeDriveToLocation(1, 25, -20, -55, isRed));
+                addOperation(new IterativeDriveToLocation(1, 25, -20, -50, isRed));
             }
         }
         else if (config.shootPos == SHOOT_FAR){

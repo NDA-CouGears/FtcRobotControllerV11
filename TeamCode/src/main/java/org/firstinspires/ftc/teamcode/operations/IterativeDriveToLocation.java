@@ -22,8 +22,8 @@ public class IterativeDriveToLocation extends RobotOperation {
     double y_target_position;
     double target_heading;
     boolean finished;
-
     boolean hold;
+    double turnGain = IterativeRobotParent.P_TURN_GAIN;
 
     public IterativeDriveToLocation(double maxDriveSpeed,
                                     double x_target_position,
@@ -41,7 +41,26 @@ public class IterativeDriveToLocation extends RobotOperation {
             this.y_target_position = -y_target_position;
             this.target_heading = 180-target_heading;
         }
+    }
 
+    public IterativeDriveToLocation(double maxDriveSpeed,
+                                    double x_target_position,
+                                    double y_target_position,
+                                    double target_heading,
+                                    boolean isRed,
+                                    double turnGain) {
+        this.maxDriveSpeed = maxDriveSpeed;
+        if (!isRed) {
+            this.x_target_position = x_target_position;
+            this.y_target_position = y_target_position;
+            this.target_heading = target_heading;
+        }
+        else {
+            this.x_target_position = x_target_position;
+            this.y_target_position = -y_target_position;
+            this.target_heading = 180-target_heading;
+        }
+        this.turnGain = turnGain;
     }
 
     public IterativeDriveToLocation(double maxDriveSpeed) {
@@ -92,7 +111,7 @@ public class IterativeDriveToLocation extends RobotOperation {
         while (headingError <= -180) headingError += 360;
 
         // Multiply the error by the gain to determine the required steering correction/  Limit the result to +/- 1.0
-        double turnSpeed = Range.clip(headingError * IterativeRobotParent.P_TURN_GAIN, -maxDriveSpeed, maxDriveSpeed);
+        double turnSpeed = Range.clip(headingError * turnGain, -maxDriveSpeed, maxDriveSpeed);
 
 
         robot.telemetry.addLine("turn speed: " + turnSpeed);

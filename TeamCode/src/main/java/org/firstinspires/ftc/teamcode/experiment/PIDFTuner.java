@@ -25,7 +25,7 @@ public class PIDFTuner extends OpMode {
     boolean useLeftMotor = true;
 
     private static final double lowSpeed = (IterativeRobotParent.SHOOT_TARGET_RPM / 60f) * IterativeRobotParent.SHOOT_TICKS_PER_ROTATION;
-    double [] speeds = {0.0d, lowSpeed, lowSpeed*1.2, lowSpeed};
+    double [] speeds = {0.0d, lowSpeed, lowSpeed*1.3, lowSpeed};
     int curSpeed = 0;
 
     @Override
