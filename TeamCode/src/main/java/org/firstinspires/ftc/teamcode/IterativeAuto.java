@@ -18,6 +18,7 @@ public class IterativeAuto extends IterativeRobotParent {
     public ConfigManager config = new ConfigManager();
     public final double NEAR = 0;
     public final double FAR = .4;
+    public static boolean ran;
 
     @Override
     public void init() {
@@ -29,6 +30,8 @@ public class IterativeAuto extends IterativeRobotParent {
         initAprilTag();
 
         CarouselOperations.resetColors();
+
+        ran = true;
     }
 
     @Override

@@ -238,7 +238,7 @@ public abstract class IterativeRobotParent extends OpMode {
 
         // Reset the tracking algorithm - this resets the position to the origin,
         // but can also be used to recover from some rare tracking errors
-        if (!SetStartingPosition.called) {
+        if (!IterativeAuto.ran) {
             otosSensor.resetTracking();
 
             // After resetting the tracking, the OTOS will report that the robot is at

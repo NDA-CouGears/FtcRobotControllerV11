@@ -1,5 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.experiment.ConfigManager;
 import org.firstinspires.ftc.teamcode.operations.IterativeDriveToLocation;
 import org.firstinspires.ftc.teamcode.operations.NestedQOp;
 import org.firstinspires.ftc.teamcode.operations.SetShootSpeed;
@@ -9,7 +14,7 @@ import java.util.Locale;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOp", group = "Tournament")
 public class TeleOp extends IterativeRobotParent {
     private boolean shootButtonPressed = false;
-    private int shootingSpeed = 0;
+    private double shootingSpeed = 0;
     private int currentCarPos = 0;
     private boolean carButtonPressed = false;
     private boolean intakeButtonPressed = false;
@@ -18,11 +23,13 @@ public class TeleOp extends IterativeRobotParent {
     private IterativeDriveToLocation holdOp;
     private NestedQOp shootHoldQueue;
     private double testShootSpeed = 0.5;
+    public ConfigManager config = new ConfigManager();
 
 
     @Override
     public void init() {
         initHardware();
+        config.load();
     }
 
     protected void mecanumDrive() {
@@ -41,24 +48,24 @@ public class TeleOp extends IterativeRobotParent {
         if (gamepad2.left_bumper) {
             if (!shootButtonPressed) {
                 shootButtonPressed = true;
-                if (shootingSpeed == 1) {
-                    shootingSpeed = 0;
+                if (shootingSpeed == 0) {
+                    shootingSpeed = -1;
                 } else {
-                    shootingSpeed = 1;
+                    shootingSpeed = 0;
                 }
             }
-            setShootSpeed(shootingSpeed);
+            setShootSpeedVar(shootingSpeed);
         }
         else if (gamepad2.right_bumper) {
             if (!shootButtonPressed) {
                 shootButtonPressed = true;
-                if (shootingSpeed == 2) {
-                    shootingSpeed = 0;
+                if (shootingSpeed == .4) {
+                    shootingSpeed = -1;
                 } else {
-                    shootingSpeed = 2;
+                    shootingSpeed = .4;
                 }
             }
-            setShootSpeed(shootingSpeed);
+            setShootSpeedVar(shootingSpeed);
         }
         else {
             shootButtonPressed = false;
@@ -71,6 +78,27 @@ public class TeleOp extends IterativeRobotParent {
         else if (!gamepad2.x) {
             xPressed = false;
         }
+
+        if (gamepad2.y){
+            setShootSpeedVar(interpolate());
+        }
+    }
+
+    public double interpolate(){
+        Pose2D currentPos = getFieldPosition();
+        double goalX = -60;
+        // red goal y value
+        double goalY = 60;
+        if (config.blueAlliance){
+            // blue goal y value: -60 (move to other side of the field)
+            goalY *= -1;
+        }
+        // distance formula, I might have messed up :(
+        double distance = Math.sqrt(Math.pow(currentPos.getX(DistanceUnit.INCH)-goalX,2)+Math.pow(currentPos.getY(DistanceUnit.INCH)-goalY,2));
+        // speed as function of distance
+        double speed = (distance / 84.852) * .4;
+
+        return speed;
     }
 
     public void intakeBall() {

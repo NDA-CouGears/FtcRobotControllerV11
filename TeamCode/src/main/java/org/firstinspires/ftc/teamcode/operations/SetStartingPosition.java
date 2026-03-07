@@ -10,7 +10,7 @@ public class SetStartingPosition extends RobotOperation{
     double x;
     double y;
     double heading;
-    public static boolean called;
+
     public SetStartingPosition(double x, double y, double heading, boolean isRed){
         if (!isRed) {
             this.x = x;
@@ -34,7 +34,6 @@ public class SetStartingPosition extends RobotOperation{
     public void init(IterativeRobotParent robot) {
         super.init(robot);
         robot.setCurrentPosition(x, y, heading);
-        called = true;
 
     }
 
