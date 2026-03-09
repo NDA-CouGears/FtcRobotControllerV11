@@ -416,7 +416,7 @@ public abstract class IterativeRobotParent extends OpMode {
      *               jams. We use sixths because launch and load are 1/6 of a rotation off from
      *               each other
      */
-    public void setCarouselPosition(int sixths) {
+    public void setCarouselPosition(int sixths, float adjust) {
         // Ticks per revolution of carousel motor
         float CTR = 751.8f;
 
@@ -425,15 +425,27 @@ public abstract class IterativeRobotParent extends OpMode {
         float zero = curPos - offset;
         float targetPos = zero + sixths * CTR / 6;
 
+        if (adjust != 0){
+            targetPos = zero + adjust / 360 * CTR;
+        }
+
         // If our target is more than a little behind our current position go the long way around
         // to prevent ball jams. Required based on hardware teams mechanical design
-        if (targetPos < (curPos - 15)) {
+        else if (targetPos < (curPos - 15)) {
             targetPos += CTR;
         }
 
         carousel.setTargetPosition((int) (targetPos + .5));
         carousel.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         carousel.setPower(.5);
+    }
+
+    public void setCarouselPosition(int sixths) {
+        setCarouselPosition(sixths, 0);
+    }
+
+    public void resetCarousel(){
+        carousel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public void addCarouselTelemetry() {

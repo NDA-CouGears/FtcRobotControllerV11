@@ -118,12 +118,21 @@ public class TeleOp extends IterativeRobotParent {
     }
 
     public void controlCarousel() {
-        if (stalled && gamepad2.right_trigger + gamepad2.left_trigger == 0) {
+        if (stalled && gamepad2.left_trigger == 0) {
             stalled = false;
         }
         if (stalled) {
             stopCarousel();
             return;
+        }
+
+        if (gamepad1.leftBumperWasPressed()){
+            resetCarousel();
+            setCarouselPosition(0,-2.5f);
+        }
+        if (gamepad1.rightBumperWasPressed()){
+            resetCarousel();
+            setCarouselPosition(0,2.5f);
         }
 
         if (gamepad2.left_trigger > .2 && !carButtonPressed){
@@ -229,7 +238,7 @@ public class TeleOp extends IterativeRobotParent {
             shootNumQueue(1, 3, shootHoldQueue);
             // holdOp =  new IterativeDriveToLocation(0.8);
             // addOperation(new ParallelOperation(false, holdOp, shootHoldQueue));
-            shootNum(1, 3);
+            shootNum(interpolate(), 3);
             addOperation(new SetShootSpeed(0));
         }
         if (shootHoldQueue !=null && shootHoldQueue.isFinished()){
