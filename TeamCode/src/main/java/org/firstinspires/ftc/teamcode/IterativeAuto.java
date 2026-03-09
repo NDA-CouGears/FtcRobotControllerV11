@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.operations.Sleep;
 public class IterativeAuto extends IterativeRobotParent {
     public ConfigManager config = new ConfigManager();
     public final double NEAR = 0;
-    public final double FAR = .3;
+    public final double FAR = .35;
     public static boolean ran;
 
     @Override

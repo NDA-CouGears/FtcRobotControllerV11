@@ -61,10 +61,10 @@ public class TeleOp extends IterativeRobotParent {
         else if (gamepad2.right_bumper) {
             if (!shootButtonPressed) {
                 shootButtonPressed = true;
-                if (shootingSpeed == .3) {
+                if (shootingSpeed == .35) {
                     shootingSpeed = -1;
                 } else {
-                    shootingSpeed = .3;
+                    shootingSpeed = .35;
                 }
             }
             setShootSpeedVar(shootingSpeed);
@@ -100,7 +100,7 @@ public class TeleOp extends IterativeRobotParent {
         // distance formula, I might have messed up :(
         double distance = Math.sqrt(Math.pow(currentPos.getX(DistanceUnit.INCH)-goalX,2)+Math.pow(currentPos.getY(DistanceUnit.INCH)-goalY,2));
         // speed as function of distance
-        double speed = (distance / 84.852) * .3;
+        double speed = (distance / 84.852) * .35;
 
         return speed;
     }
