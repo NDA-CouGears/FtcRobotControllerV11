@@ -497,6 +497,7 @@ public abstract class IterativeRobotParent extends OpMode {
             }
             leftShoot.setVelocity(motorVel);
             rightShoot.setVelocity(motorVel);
+
         }
     }
 

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.experiment.ConfigManager;
@@ -24,6 +25,7 @@ public class TeleOp extends IterativeRobotParent {
     private NestedQOp shootHoldQueue;
     private double testShootSpeed = 0.5;
     public ConfigManager config = new ConfigManager();
+    private Telemetry.Line line;
 
 
     @Override
@@ -59,10 +61,10 @@ public class TeleOp extends IterativeRobotParent {
         else if (gamepad2.right_bumper) {
             if (!shootButtonPressed) {
                 shootButtonPressed = true;
-                if (shootingSpeed == .4) {
+                if (shootingSpeed == .3) {
                     shootingSpeed = -1;
                 } else {
-                    shootingSpeed = .4;
+                    shootingSpeed = .3;
                 }
             }
             setShootSpeedVar(shootingSpeed);
@@ -82,6 +84,8 @@ public class TeleOp extends IterativeRobotParent {
         if (gamepad2.y){
             setShootSpeedVar(interpolate());
         }
+        telemetry.addLine(String.format(Locale.US, "interpolateSpeed: %f", interpolate()));
+
     }
 
     public double interpolate(){
@@ -96,7 +100,7 @@ public class TeleOp extends IterativeRobotParent {
         // distance formula, I might have messed up :(
         double distance = Math.sqrt(Math.pow(currentPos.getX(DistanceUnit.INCH)-goalX,2)+Math.pow(currentPos.getY(DistanceUnit.INCH)-goalY,2));
         // speed as function of distance
-        double speed = (distance / 84.852) * .4;
+        double speed = (distance / 84.852) * .3;
 
         return speed;
     }
