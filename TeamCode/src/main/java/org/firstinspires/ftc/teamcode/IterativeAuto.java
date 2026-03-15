@@ -105,11 +105,13 @@ public class IterativeAuto extends IterativeRobotParent {
             intakeTasks(config.intakeLine, isRed);
             if (config.shootPos == SHOOT_NEAR) {
                 addOperation(new IterativeDriveToLocation(1, -49, -29, -25, isRed));
-                shootNum(NEAR, 3);
+                if (config.startDelay < 9) shootNum(NEAR, 3);
             } else if (config.shootPos == SHOOT_FAR) {
                 // far shoot location drive, then shoot 2 so we have time to park
+                if (config.startDelay < 9){
                 addOperation(new IterativeDriveToLocation(1, -6, -18, -50, isRed, 0.005));
                 shootNum(FAR, 2);
+                }
                 // park
                 addOperation(new IterativeDriveToLocation(1, 25, -20, -50, isRed));
             }
