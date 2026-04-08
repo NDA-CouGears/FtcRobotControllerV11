@@ -13,6 +13,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.opencv.Circle;
 import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor;
 import org.firstinspires.ftc.vision.opencv.ColorRange;
 import org.firstinspires.ftc.vision.opencv.ImageRegion;
@@ -22,7 +23,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @TeleOp(name = "DriveToBall", group = "Concept")
-@Disabled
+
 public class DriveToBall extends LinearOpMode{
     private VisionPortal portal = null;
         @Override
@@ -143,7 +144,10 @@ public class DriveToBall extends LinearOpMode{
             telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
 
 
-            setManualExposure(50, 0);
+            //setManualExposure(50, 0);
+
+            waitForStart();
+
             // WARNING:  To view the stream preview on the Driver Station, this code runs in INIT mode.
             while (opModeInInit() || opModeIsActive()) {
                 telemetry.addData("preview on/off", "... Camera Stream\n");
@@ -187,11 +191,11 @@ public class DriveToBall extends LinearOpMode{
                  */
                 ColorBlobLocatorProcessor.Util.filterByCriteria(
                         ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA,
-                        768, 20000, greenBlobs);  // filter out very small blobs.
+                        768, 2000000, greenBlobs);  // filter out very small blobs.
 
                 ColorBlobLocatorProcessor.Util.filterByCriteria(
                         ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA,
-                        768, 20000, purpleBlobs);  // filter out very small blobs.
+                        768, 2000000, purpleBlobs);  // filter out very small blobs.
 
                 List<ColorBlobLocatorProcessor.Blob> blobs = new ArrayList<ColorBlobLocatorProcessor.Blob>(purpleBlobs);
                 blobs.addAll(greenBlobs);
@@ -208,33 +212,48 @@ public class DriveToBall extends LinearOpMode{
                  ColorBlobLocatorProcessor.Util.sortByCriteria(ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA, SortOrder.DESCENDING, blobs);
 
 
-                telemetry.addLine("Circularity Radius Center");
+                //telemetry.addLine("Circularity Radius Center");
 
                 // Display the Blob's circularity, and the size (radius) and center location of its circleFit.
-                /*
+
                 int count = 0;
+                /*
                 for (ColorBlobLocatorProcessor.Blob b : blobs) {
 
                     Circle circleFit = b.getCircle();
                     count += circleFit.getRadius();
-                    //telemetry.addLine(String.format("%5.3f      %3d     (%3d,%3d)",
-                            //b.getCircularity(), (int) circleFit.getRadius(), (int) circleFit.getX(), (int) circleFit.getY()));
+                    telemetry.addLine(String.format("%5.3f      %3d     (%3d,%3d)",
+                            b.getCircularity(), (int) circleFit.getRadius(), (int) circleFit.getX(), (int) circleFit.getY()));
                 }
                 if (blobs.size() > 0){
                     telemetry.addLine(String.format("%3d,", count/blobs.size()));
                 }
-
                  */
-                telemetry.addLine(String.format("b %3d", blobs.size()));
-                telemetry.addLine(String.format("g %3d", greenBlobs.size()));
-                telemetry.addLine(String.format("p %3d", purpleBlobs.size()));
+                if (!blobs.isEmpty()) {
+                    Circle nearest = blobs.get(0).getCircle();
+                    if (!greenBlobs.isEmpty() && greenBlobs.get(0).getCircle().equals(nearest))
+                        telemetry.addLine(String.format("color: green"));
+                    else if (!purpleBlobs.isEmpty() && purpleBlobs.get(0).getCircle().equals(nearest))
+                        telemetry.addLine(String.format("color: purple"));
+                    telemetry.addLine(String.format("size: %3d", blobs.get(0).getContourArea()));
+                    telemetry.addLine(String.format("nearest radius: %3f", nearest.getRadius()));
+                    telemetry.addLine(String.format("x:%3f; y:%3f", nearest.getX(), nearest.getY()));
 
-                
+                    telemetry.addLine(String.format("b %3d", blobs.size()));
+                    telemetry.addLine(String.format("g %3d", greenBlobs.size()));
+                    telemetry.addLine(String.format("p %3d", purpleBlobs.size()));
+                }
+                else {
+                    telemetry.addLine("no blobs seen");
+                }
+
 
                 telemetry.update();
+
             }
 
         }
+
     private boolean setManualExposure(int exposureMS, int gain) {
         // Ensure Vision Portal has been setup.
         if (portal == null) {
@@ -273,8 +292,4 @@ public class DriveToBall extends LinearOpMode{
             return (false);
         }
     }
-    }
-
-
-
-
+}

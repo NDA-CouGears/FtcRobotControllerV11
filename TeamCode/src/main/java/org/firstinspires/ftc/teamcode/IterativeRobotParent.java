@@ -15,6 +15,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.SortOrder;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -37,6 +38,8 @@ import org.firstinspires.ftc.teamcode.operations.Sleep;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.opencv.ColorBlobLocatorProcessor;
+import org.firstinspires.ftc.vision.opencv.ColorRange;
 import org.firstinspires.ftc.vision.opencv.ImageRegion;
 import org.firstinspires.ftc.vision.opencv.PredominantColorProcessor;
 
@@ -64,6 +67,12 @@ public abstract class IterativeRobotParent extends OpMode {
     private AprilTagProcessor aprilTagProcessor;
     private VisionPortal aprilTagVisionPortal;
     private PredominantColorProcessor colorSensor;
+    private ColorBlobLocatorProcessor greenColorLocator;
+    private ColorBlobLocatorProcessor purpleColorLocator;
+    private VisionPortal portal = null;
+    private List<ColorBlobLocatorProcessor.Blob> greenBlobs;
+    private List<ColorBlobLocatorProcessor.Blob> purpleBlobs;
+    private List<ColorBlobLocatorProcessor.Blob> blobs;
 
     private VisionPortal ballVisionPortal;
     public static final double P_TURN_GAIN = 0.02;// Larger is more responsive, but also less stable.
@@ -341,6 +350,91 @@ public abstract class IterativeRobotParent extends OpMode {
                 .setCameraResolution(new Size(320, 240))
                 .setCamera(hardwareMap.get(WebcamName.class, "Ball Cam"))
                 .build();
+    }
+
+    public void initDriveToBall() {
+        greenColorLocator = new ColorBlobLocatorProcessor.Builder()
+                .setTargetColorRange(ColorRange.ARTIFACT_GREEN)
+                .setContourMode(ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY)
+                .setRoi(ImageRegion.asUnityCenterCoordinates(-1, 1, 1, -1))
+                .setDrawContours(true)
+                .setBoxFitColor(0)
+                .setCircleFitColor(Color.rgb(255, 255, 0))
+                .setBlurSize(5) // Smooth the transitions between different colors in image
+                // the following options have been added to fill in perimeter holes.
+                .setDilateSize(15)       // Expand blobs to fill any divots on the edges
+                .setErodeSize(15)        // Shrink blobs back to original size
+                .setMorphOperationType(ColorBlobLocatorProcessor.MorphOperationType.CLOSING)
+                .build();
+
+        purpleColorLocator = new ColorBlobLocatorProcessor.Builder()
+                .setTargetColorRange(ColorRange.ARTIFACT_PURPLE)
+                .setContourMode(ColorBlobLocatorProcessor.ContourMode.EXTERNAL_ONLY)
+                .setRoi(ImageRegion.asUnityCenterCoordinates(-1, 1, 1, -1))
+                .setDrawContours(true)
+                .setBoxFitColor(0)
+                .setCircleFitColor(Color.rgb(255, 255, 0))
+                .setBlurSize(5)  // Smooth the transitions between different colors in image
+                // the following options have been added to fill in perimeter holes.
+                .setDilateSize(15)       // Expand blobs to fill any divots on the edges
+                .setErodeSize(15)        // Shrink blobs back to original size
+                .setMorphOperationType(ColorBlobLocatorProcessor.MorphOperationType.CLOSING)
+                .build();
+
+        portal = new VisionPortal.Builder()
+                .addProcessor(greenColorLocator)
+                .addProcessor(purpleColorLocator)
+                .setCameraResolution(new Size(320, 240))
+                .setCamera(hardwareMap.get(WebcamName.class, "Ball Cam"))
+                .build();
+    }
+
+    /**
+     * @return [distance, headingError]
+     */
+    public double[] getBallErrors(){
+        greenBlobs = greenColorLocator.getBlobs();
+        purpleBlobs = purpleColorLocator.getBlobs();
+
+
+        ColorBlobLocatorProcessor.Util.filterByCriteria(
+                ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA,
+                768, 20000, greenBlobs);  // filter out very small blobs.
+
+        ColorBlobLocatorProcessor.Util.filterByCriteria(
+                ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA,
+                768, 20000, purpleBlobs);  // filter out very small blobs.
+
+        ColorBlobLocatorProcessor.Util.filterByCriteria(
+                ColorBlobLocatorProcessor.BlobCriteria.BY_CIRCULARITY,
+                .6, 1, greenBlobs);  // filter out non-circular blobs.
+
+        ColorBlobLocatorProcessor.Util.filterByCriteria(
+                ColorBlobLocatorProcessor.BlobCriteria.BY_CIRCULARITY,
+                .6, 1, purpleBlobs);  // filter out non-circular blobs.
+
+        blobs = new ArrayList<ColorBlobLocatorProcessor.Blob>(purpleBlobs);
+        blobs.addAll(greenBlobs);
+
+        ColorBlobLocatorProcessor.Util.sortByCriteria(ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA, SortOrder.DESCENDING, blobs);
+
+        ColorBlobLocatorProcessor.Blob nearest = blobs.get(0);
+        double radius = nearest.getCircle().getRadius();
+        double headingError = nearest.getCircle().getX() - 160;
+        double distance = 2.5 / Math.tan(radius*40/320); // changed from radius*48/320
+
+        /*
+        distance = (ball's radius) / tan((blob's radius in pixels)(degrees per pixel))
+        experimentally adjusted to 40 degree horizontal field of view
+        - 30 in -> 38.5 radius calculated 24.7 in, 27.0 in, 29.7 in
+        - 25 in -> 46.5 radius calculated 20.4 in, 22.5 in, 24.6 in
+        - 20 in -> 58.8 radius calculated 16.1 in, 19.4 in
+        - 15 in -> 77.3 radius calculated 12.2 in, 14.7 in
+        - 10 in -> 111.8 radius calculated 8.3 in, 10.0 in
+        - 5 in -> exceeds screen size
+         */
+
+        return new double[]{distance, headingError};
     }
 
     public PredominantColorProcessor.Result getBallAnalysis() {
