@@ -239,6 +239,10 @@ public class DriveToBall extends LinearOpMode{
                     telemetry.addLine(String.format("nearest radius: %3f", nearest.getRadius()));
                     telemetry.addLine(String.format("x:%3f; y:%3f", nearest.getX(), nearest.getY()));
 
+                    telemetry.addLine(String.valueOf(nearest.getRadius()*40/320));
+                    telemetry.addLine(String.format("nearest distance: %3f", 2.5 / (Math.tan(nearest.getRadius()*Math.PI/1440))));
+
+
                     telemetry.addLine(String.format("b %3d", blobs.size()));
                     telemetry.addLine(String.format("g %3d", greenBlobs.size()));
                     telemetry.addLine(String.format("p %3d", purpleBlobs.size()));
