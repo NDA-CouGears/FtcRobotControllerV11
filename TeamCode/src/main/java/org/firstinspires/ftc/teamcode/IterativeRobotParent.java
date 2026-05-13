@@ -420,7 +420,7 @@ public abstract class IterativeRobotParent extends OpMode {
 
         ColorBlobLocatorProcessor.Blob nearest = blobs.get(0);
         double radius = nearest.getCircle().getRadius();
-        double headingError = nearest.getCircle().getX() - 160;
+        double headingError = (nearest.getCircle().getX() - 160)/8;
         double distance = 2.5 / Math.tan(radius*40/320); // changed from radius*48/320
 
         /*
