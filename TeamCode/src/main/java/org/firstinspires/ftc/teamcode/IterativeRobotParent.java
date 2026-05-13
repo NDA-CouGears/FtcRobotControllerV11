@@ -308,7 +308,7 @@ public abstract class IterativeRobotParent extends OpMode {
         builder.setCamera(hardwareMap.get(WebcamName.class, "Tag Cam"));
 
         // Choose a camera resolution. Not all cameras support all resolutions.
-        // builder.setCameraResolution(new Size(640, 480));
+        builder.setCameraResolution(new Size(320, 240));
 
         // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
         builder.enableLiveView(true);
@@ -385,12 +385,12 @@ public abstract class IterativeRobotParent extends OpMode {
                 .addProcessor(greenColorLocator)
                 .addProcessor(purpleColorLocator)
                 .setCameraResolution(new Size(320, 240))
-                .setCamera(hardwareMap.get(WebcamName.class, "Ball Cam"))
+                .setCamera(hardwareMap.get(WebcamName.class, "Tag Cam"))
                 .build();
     }
 
     /**
-     * @return [distance, headingError]
+     * @return [distance, headingError] for nearest ball seen by camera
      */
     public double[] getBallErrors(){
         greenBlobs = greenColorLocator.getBlobs();
@@ -416,12 +416,18 @@ public abstract class IterativeRobotParent extends OpMode {
         blobs = new ArrayList<ColorBlobLocatorProcessor.Blob>(purpleBlobs);
         blobs.addAll(greenBlobs);
 
+        // sort in descending order based off of size (nearest will be blobs.get(0))
         ColorBlobLocatorProcessor.Util.sortByCriteria(ColorBlobLocatorProcessor.BlobCriteria.BY_CONTOUR_AREA, SortOrder.DESCENDING, blobs);
 
+        double degreesPerPixel = 320 / 70.4; // camera width / field of view
+        if (blobs.isEmpty()) return new double[] {-1, -1};
         ColorBlobLocatorProcessor.Blob nearest = blobs.get(0);
         double radius = nearest.getCircle().getRadius();
-        double headingError = (nearest.getCircle().getX() - 160)/8;
-        double distance = 2.5 / Math.tan(radius*40/320); // changed from radius*48/320
+        double headingError = (nearest.getCircle().getX() - 160) / degreesPerPixel;
+        // double distance = 2.5 / Math.tan(radius*40/320); // changed from radius*48/320
+        // radius of ball / tan (pixels, convert to degrees, convert to radians)
+        double distance = 2.5 / (Math.tan(nearest.getCircle().getRadius()*Math.PI/(180 * degreesPerPixel)));
+
 
         /*
         distance = (ball's radius) / tan((blob's radius in pixels)(degrees per pixel))
