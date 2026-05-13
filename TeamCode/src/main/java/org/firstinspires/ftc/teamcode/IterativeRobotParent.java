@@ -311,7 +311,7 @@ public abstract class IterativeRobotParent extends OpMode {
         builder.setCameraResolution(new Size(320, 240));
 
         // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
-        builder.enableLiveView(true);
+        builder.enableLiveView(false);
 
         // Set the stream format; MJPEG uses less bandwidth than default YUY2.
         // builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);

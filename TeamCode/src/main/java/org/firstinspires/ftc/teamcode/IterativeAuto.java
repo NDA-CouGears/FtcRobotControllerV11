@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import org.firstinspires.ftc.teamcode.experiment.ConfigManager;
 import org.firstinspires.ftc.teamcode.operations.CarouselOperations;
 import org.firstinspires.ftc.teamcode.operations.DebugOperation;
+import org.firstinspires.ftc.teamcode.operations.IterativeDriveToBall;
 import org.firstinspires.ftc.teamcode.operations.IterativeDriveToLocation;
 import org.firstinspires.ftc.teamcode.operations.IterativeScanObelisk;
 import org.firstinspires.ftc.teamcode.operations.NestedQOp;
@@ -28,6 +29,7 @@ public class IterativeAuto extends IterativeRobotParent {
         enableEncoders();
         initBallCam();
         initAprilTag();
+        initDriveToBall();
 
         CarouselOperations.resetColors();
 
@@ -47,11 +49,7 @@ public class IterativeAuto extends IterativeRobotParent {
 
     private void addTest(boolean isRed){
         addOperation(new SetStartingPosition(61,-14,90, isRed));
-        NestedQOp queue1 = new NestedQOp();
-        queue1.addOperation(new IterativeDriveToLocation(0.8));
-        NestedQOp queue2 = new NestedQOp();
-        shootNumQueue(NEAR, 3, queue2);
-        addOperation(new ParallelOperation(false, queue1, queue2));
+        addOperation(new IterativeDriveToBall());
     }
 
     private void tasks() {
@@ -129,7 +127,7 @@ public class IterativeAuto extends IterativeRobotParent {
         super.start();
         if (config.testMode) {
             // addTest(!config.blueAlliance);
-            farTest(!config.blueAlliance);
+            addTest(!config.blueAlliance);
         }
         else {
             tasks();
